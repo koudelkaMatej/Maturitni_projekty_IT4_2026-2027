@@ -44,37 +44,41 @@ class SPSTickets implements TicketsApplication
         // Get application configuration
         $this->configuration = new Configuration();
 
-        // Check for dev environment
-        if ($this->configuration->development) {
-            ini_set("display_errors", "1");
-            ini_set("display_startup_errors", "1");
-            error_reporting(E_ALL);
+        try {
+            // Check for dev environment
+            if ($this->configuration->development) {
+                ini_set("display_errors", "1");
+                ini_set("display_startup_errors", "1");
+                error_reporting(E_ALL);
+            }
+
+            // Init database connection
+            $this->database = new Database($this->configuration);
+
+            // Load all repositories
+            $this->assignmentRepository = new AssignmentRepository($this->database);
+            $this->autoAssignRepository = new AutoAssignRepository($this->database);
+            $this->categoryRepository = new CategoryRepository($this->database);
+            $this->priorityRepository = new PriorityRepository($this->database);
+            $this->roomRepository = new RoomRepository($this->database);
+            $this->sessionRepository = new SessionRepository($this->database);
+            $this->teacherRepository = new TeacherRepository($this->database);
+            $this->ticketRepository = new TicketRepository($this->database);
+            $this->userRepository = new UserRepository($this->database);
+            $this->workRepository = new WorkRepository($this->database);
+
+            // Set php session and cookie settings
+            session_name($this->configuration->sessionCookie);
+            session_set_cookie_params([
+                "lifetime" => $this->configuration->sessionLifetime,
+                "samesite" => "Strict",
+            ]);
+
+            // Refresh user session from cookies
+            $this->refreshSession();
+        } catch (Exception $exception) {
+            die("<h1>SPŠ HelpDesk je momentálně nedostupný.</h1>");
         }
-
-        // Init database connection
-        $this->database = new Database($this->configuration);
-
-        // Load all repositories
-        $this->assignmentRepository = new AssignmentRepository($this->database);
-        $this->autoAssignRepository = new AutoAssignRepository($this->database);
-        $this->categoryRepository = new CategoryRepository($this->database);
-        $this->priorityRepository = new PriorityRepository($this->database);
-        $this->roomRepository = new RoomRepository($this->database);
-        $this->sessionRepository = new SessionRepository($this->database);
-        $this->teacherRepository = new TeacherRepository($this->database);
-        $this->ticketRepository = new TicketRepository($this->database);
-        $this->userRepository = new UserRepository($this->database);
-        $this->workRepository = new WorkRepository($this->database);
-
-        // Set php session and cookie settings
-        session_name($this->configuration->sessionCookie);
-        session_set_cookie_params([
-            "lifetime" => $this->configuration->sessionLifetime,
-            "samesite" => "Strict",
-        ]);
-
-        // Refresh user session from cookies
-        $this->refreshSession();
     }
 
     public function getAssignmentRepository(): AssignmentRepository
