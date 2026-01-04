@@ -22,6 +22,16 @@ class SessionRepository extends Repository
         );
     }
 
+    public function refreshSession($session_id): void
+    {
+        $this->database->update(
+            "UPDATE sessions SET session_last_use = NOW() WHERE session_id = :session_id",
+            [
+                ":session_id" => $session_id,
+            ]
+        );
+    }
+
     public function addSession($session_user): false|string
     {
         $session_address = $_SERVER['REMOTE_ADDR'];
