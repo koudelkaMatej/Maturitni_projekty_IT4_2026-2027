@@ -28,4 +28,16 @@ class UserRepository extends Repository
             ]
         );
     }
+
+    public function updateUserPassword($user_id, $user_password): void
+    {
+        $this->database->update(
+            "UPDATE users SET user_password = :user_password WHERE user_id = :user_id",
+            [
+                ":user_password" => $user_password,
+                ":user_id" => $user_id,
+            ]
+        );
+    }
+
 }
