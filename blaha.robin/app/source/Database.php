@@ -12,7 +12,7 @@ class Database
             "mysql:host=" . $configuration->databaseHost . ";dbname=" . $configuration->databaseName . ";charset=utf8",
             $configuration->databaseUser,
             $configuration->databasePassword,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 1]
         );
     }
 
