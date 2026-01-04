@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . "/app/SPSTickets.php";
-require_once __DIR__ . "/app/api/password/PasswordChangeResult.php";
+require_once __DIR__ . "/app/model/password/PasswordChangeResult.php";
 
 getApplication()->checkUser();
 getApplication()->setPageName("Změna hesla");

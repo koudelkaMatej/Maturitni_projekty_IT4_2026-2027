@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . "/api/TicketsApplication.php";
+require_once __DIR__ . "/model/TicketsApplication.php";
 
 require_once __DIR__ . "/configuration/Configuration.php";
 
