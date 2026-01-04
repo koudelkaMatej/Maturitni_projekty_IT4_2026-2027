@@ -25,7 +25,7 @@ class Database
     public function selectOne(string $query, array $parameters = []): array
     {
         $statement = $this->execute($query, $parameters);
-        return $statement->fetch();
+        return $statement->fetch() ?: [];
     }
 
     public function insert(string $query, array $parameters = []): false|string
