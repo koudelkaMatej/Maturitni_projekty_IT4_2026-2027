@@ -40,7 +40,7 @@ $categories = getApplication()->getCategoryRepository()->getAllCategories();
                            class="absolute left-3 top-3.5 text-slate-400 w-5 h-5 pointer-events-none"></i>
                         <input type="text" id="teacher-search-input" autocomplete="off"
                                class="w-full pl-10 pr-10 p-3 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
-                               placeholder="Vyhledat učitele...">
+                               placeholder="Vyhledat učitele..." name="teacher">
 
                         <input type="hidden" id="teacher-selected-id">
 
@@ -68,7 +68,7 @@ $categories = getApplication()->getCategoryRepository()->getAllCategories();
                                class="absolute left-3 top-3.5 text-slate-400 w-5 h-5 pointer-events-none"></i>
                             <input type="text" id="teacher-report-room-input" autocomplete="off"
                                    class="w-full pl-10 pr-10 p-3 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
-                                   placeholder="Vyhledat učebnu...">
+                                   placeholder="Vyhledat učebnu..." name="room">
 
                             <input type="hidden" id="teacher-report-room-id">
 
@@ -90,8 +90,8 @@ $categories = getApplication()->getCategoryRepository()->getAllCategories();
                     <div class="space-y-2">
                         <label class="text-sm font-bold text-slate-700">Kategorie</label>
                         <select id="teacher-report-category" required
-                                class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-                            <option value="" disabled selected>O co se jedná?</option>
+                                class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none" name="category">
+                            <option value="" disabled selected>Vybrat kategorii...</option>
                             <?php foreach ($categories as $category): ?>
                                 <option value="<?php echo $category["category_id"] ?>"><?php echo $category["category_name"] ?></option>
                             <?php endforeach; ?>
@@ -100,20 +100,27 @@ $categories = getApplication()->getCategoryRepository()->getAllCategories();
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-sm font-bold text-slate-700">Popis závady</label>
-                    <textarea id="teacher-report-desc" required rows="5"
+                    <label class="text-sm font-bold text-slate-700">Předmět ticketu</label>
+                    <input id="teacher-report-desc" required rows="5"
                               class="w-full p-4 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                              placeholder="Prosím popište problém co nejpřesněji. Co nefunguje? Jaké se zobrazují chyby?"></textarea>
+                              placeholder="Krátký předmět ticketu" name="title">
                 </div>
 
-                <div class="pt-2 flex items-center justify-end gap-3 border-t border-slate-100">
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-slate-700">Detailní popis</label>
+                    <textarea id="teacher-report-desc" required rows="5"
+                              class="w-full p-4 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                              placeholder="Detailní popis obsahující všechny důležité informace." name="description"></textarea>
+                </div>
+
+                <div class="pt-2 flex items-center justify-end gap-3">
                     <button type="submit"
                             class="px-8 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold shadow-lg shadow-blue-500/30 transition-all transform active:scale-95 flex items-center gap-2">
                         <i data-lucide="send" size="18"></i> Odeslat ticket
                     </button>
                 </div>
 
-                <div class="bg-slate-50 p-1 text-center border-t border-slate-100">
+                <div class="p-1 text-center border-t border-slate-100">
                     <p class="text-xs text-slate-400">© SPŠ Kladno • Systém vytvořil Robin Bláha</p>
                 </div>
             </form>
@@ -146,7 +153,7 @@ $categories = getApplication()->getCategoryRepository()->getAllCategories();
             const filtered = teachers.filter(t => t.name.toLowerCase().includes(query.toLowerCase()));
 
             if (filtered.length === 0) {
-                searchResults.innerHTML = '<div class="p-3 text-sm text-slate-500 text-center">Žádný učitel nenalezen</div>';
+                searchResults.innerHTML = '<div class="p-3 text-sm text-slate-500 text-center">Učitel nenalezen</div>';
                 return;
             }
 
@@ -217,7 +224,7 @@ $categories = getApplication()->getCategoryRepository()->getAllCategories();
             const filtered = rooms.filter(r => r.name.toLowerCase().includes(query.toLowerCase()) || r.id.toLowerCase().includes(query.toLowerCase()));
 
             if (filtered.length === 0) {
-                roomResults.innerHTML = '<div class="p-3 text-sm text-slate-500 text-center">Žádná místnost nenalezena</div>';
+                roomResults.innerHTML = '<div class="p-3 text-sm text-slate-500 text-center">Učebna nenalezena</div>';
                 return;
             }
 

@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . "/app/SPSTickets.php";
-require_once __DIR__ . "/app/api/login/LoginResult.php";
+require_once __DIR__ . "/app/model/login/LoginResult.php";
 
 if (getApplication()->getUser() != null) {
     getApplication()->redirectInternally("dashboard");

@@ -7,7 +7,7 @@ require_once __DIR__ . "/app/tickets/TicketViewPage.php";
 getApplication()->checkUser();
 getApplication()->setPageName("Přehled ticketů");
 
-$view = new TicketView(TicketViewPage::All);
+$view = new TicketView(TicketViewPage::Assigned);
 
 ?>
 
