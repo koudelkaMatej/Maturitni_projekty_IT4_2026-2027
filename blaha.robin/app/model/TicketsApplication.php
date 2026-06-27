@@ -69,7 +69,7 @@ interface TicketsApplication
      * Redirect internally to a page by its script name (without .php).
      *
      * @param string $page
-     * @return never
+     * @return void
      */
     public function redirectInternally($page): void;
 
