@@ -141,8 +141,9 @@ CREATE TABLE tickets
     ticket_room        int(11)             DEFAULT NULL,
     ticket_priority    int(11)             DEFAULT NULL,
     ticket_deadline    date                DEFAULT NULL,
-    ticket_description text       NOT NULL,
-    ticket_is_open     tinyint(1) NOT NULL DEFAULT 1
+    ticket_title       varchar(255) NOT NULL DEFAULT '',
+    ticket_description text        NOT NULL,
+    ticket_is_open     tinyint(1)  NOT NULL DEFAULT 1
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_czech_ci;

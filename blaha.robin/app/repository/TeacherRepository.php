@@ -4,18 +4,16 @@ class TeacherRepository extends Repository
 {
     public function getAllTeachers(): array
     {
-        return $this->database->select(
-            "SELECT * FROM teachers"
-        );
+        $rows = $this->database->select("SELECT * FROM teachers");
+        return array_map(fn($r) => new Teacher($r), $rows);
     }
 
-    public function getTeacherById($teacher_id): array
+    public function getTeacherById($teacher_id): ?Teacher
     {
-        return $this->database->selectOne(
+        $row = $this->database->selectOne(
             "SELECT * FROM teachers WHERE teacher_id = :teacher_id",
-            [
-                ":teacher_id" => $teacher_id,
-            ]
+            [":teacher_id" => $teacher_id]
         );
+        return $row ? new Teacher($row) : null;
     }
 }

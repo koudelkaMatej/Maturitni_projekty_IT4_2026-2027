@@ -16,6 +16,16 @@ require_once __DIR__ . "/repository/TicketRepository.php";
 require_once __DIR__ . "/repository/UserRepository.php";
 require_once __DIR__ . "/repository/WorkRepository.php";
 
+require_once __DIR__ . "/model/Ticket.php";
+require_once __DIR__ . "/model/User.php";
+require_once __DIR__ . "/model/Assignment.php";
+require_once __DIR__ . "/model/Work.php";
+require_once __DIR__ . "/model/Category.php";
+require_once __DIR__ . "/model/Room.php";
+require_once __DIR__ . "/model/Priority.php";
+require_once __DIR__ . "/model/Teacher.php";
+require_once __DIR__ . "/model/PaginatedResult.php";
+
 require_once __DIR__ . "/source/Database.php";
 
 class SPSTickets implements TicketsApplication
@@ -35,7 +45,7 @@ class SPSTickets implements TicketsApplication
     private UserRepository $userRepository;
     private WorkRepository $workRepository;
 
-    private ?array $currentUser = null;
+    private ?User $currentUser = null;
 
     private string $currentPage = "Nepojmenovaná stránka";
 
@@ -148,13 +158,10 @@ class SPSTickets implements TicketsApplication
         $current_session = $this->getSessionRepository()->getSessionById($session_id);
 
         if (!isset($current_session["session_user"])) return;
-        $session_user = $this->getUserRepository()->getUserById($current_session["session_user"]);
-
-        if (!isset($session_user["user_id"])) return;
-        $this->currentUser = $session_user;
+        $this->currentUser = $this->getUserRepository()->getUserById($current_session["session_user"]);
     }
 
-    public function getUser(): ?array
+    public function getUser(): ?User
     {
         return $this->currentUser;
     }
@@ -183,7 +190,7 @@ class SPSTickets implements TicketsApplication
 
     public function redirectInternally($page): void
     {
-        header("Location: " . $page . ".php");
+        header("Location: /" . $page . ".php");
         die();
     }
 
