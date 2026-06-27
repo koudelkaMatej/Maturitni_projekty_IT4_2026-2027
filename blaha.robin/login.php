@@ -30,7 +30,7 @@ if (isset($_POST["username"], $_POST["password"])) {
 
 <?php require_once __DIR__ . "/app/includes/header.php"; ?>
 
-    <div id="view-login" class="absolute inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
+    <div id="view-login" class="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
         <div class="w-full max-w-md anim-scale-in">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
                 <div class="p-8 pb-6 text-center">
