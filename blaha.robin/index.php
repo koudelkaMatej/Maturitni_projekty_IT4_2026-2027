@@ -37,6 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($title === "") $errors[] = "Vyplňte předmět ticketu.";
     if ($description === "") $errors[] = "Vyplňte detailní popis.";
     if ($has_deadline && empty($deadline)) $errors[] = "Vyplňte datum dokončení.";
+    if ($has_deadline && !empty($deadline) && $deadline <= date("Y-m-d")) $errors[] = "Termín dokončení musí být nejméně zítřek.";
 
     if (empty($errors)) {
         $ticket_id = getApplication()->getTicketRepository()->addTicket($teacher_id, $category, $room_id, $title, $description);
@@ -203,8 +204,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </div>
                         <input type="hidden" name="has_deadline" id="has-deadline" value="0">
                         <div id="deadline-field" class="hidden">
-                            <input type="date" name="deadline" id="deadline-input"
-                                   class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all">
+                            <input type="date" name="deadline" id="deadline-input" min="<?php echo date("Y-m-d", strtotime("+1 day")) ?>"
+                                   class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all"
+                                   title="Termín musí být nejméně zítřek">
                         </div>
                     </div>
                 </div>
