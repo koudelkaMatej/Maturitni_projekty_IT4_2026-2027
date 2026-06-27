@@ -59,6 +59,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             if ($tech_username === "") $errors[] = "Uživatelské jméno je povinné.";
             if ($action === "add" && $tech_password === "") $errors[] = "Heslo je povinné.";
 
+            if (empty($errors) && $tech_username !== "") {
+                $existing = getApplication()->getUserRepository()->getUserByUsername($tech_username);
+                if ($existing !== null && ($action === "add" || $existing->user_id !== $edit_uid)) {
+                    $errors[] = "Uživatelské jméno '$tech_username' je již obsazeno.";
+                }
+            }
+
             if (empty($errors)) {
                 if ($action === "add") {
                     $userRepo->addUser($tech_teacher, $tech_username, $tech_password);
