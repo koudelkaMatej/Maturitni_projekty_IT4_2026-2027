@@ -6,13 +6,27 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Data transfer object representing a work log entry on a ticket.
+ */
 class Work implements JsonSerializable
 {
+    /** Auto-increment primary key. */
     public readonly int $work_id;
+
+    /** FK to the associated ticket. */
     public readonly int $work_ticket;
+
+    /** FK to the user (technician) who logged the work. */
     public readonly int $work_user;
+
+    /** Minutes spent. */
     public readonly int $work_minutes;
+
+    /** Free-text description of the work done. */
     public readonly string $work_description;
+
+    /** Joined teacher name (populated when a JOIN is used). */
     public readonly ?string $teacher_name;
 
     public function __construct(array $row)

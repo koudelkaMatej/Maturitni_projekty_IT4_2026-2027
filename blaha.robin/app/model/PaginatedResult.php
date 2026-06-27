@@ -6,12 +6,24 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Wraps a paginated set of items together with pagination metadata.
+ */
 class PaginatedResult implements JsonSerializable
 {
+    /** The items on the current page. */
     public readonly array $items;
+
+    /** Total number of items across all pages. */
     public readonly int $total;
+
+    /** Current page number (1-based). */
     public readonly int $page;
+
+    /** Number of items per page. */
     public readonly int $perPage;
+
+    /** Last available page number. */
     public readonly int $lastPage;
 
     public function __construct(array $items, int $total, int $page, int $perPage)

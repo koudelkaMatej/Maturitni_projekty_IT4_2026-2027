@@ -6,22 +6,54 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Repository for all ticket-related queries.
+ *
+ * Handles creation, status changes, statistics, paginated listing
+ * and the complex joined queries that populate Ticket DTOs with
+ * teacher/category/room/priority/assignment data.
+ */
 class TicketRepository extends Repository
 {
+    /** Default number of tickets per page. */
     private const PER_PAGE = 50;
 
+    /**
+     * Execute a SELECT and wrap each result row in a Ticket object.
+     *
+     * @param string $sql
+     * @param array  $params
+     * @return Ticket[]
+     */
     private function ticketRow(string $sql, array $params = []): array
     {
         $rows = $this->database->select($sql, $params);
         return array_map(fn($r) => new Ticket($r), $rows);
     }
 
+    /**
+     * Execute a SELECT … LIMIT 1 and return a single Ticket or null.
+     *
+     * @param string $sql
+     * @param array  $params
+     * @return ?Ticket
+     */
     private function ticketRowOne(string $sql, array $params = []): ?Ticket
     {
         $row = $this->database->selectOne($sql, $params);
         return $row ? new Ticket($row) : null;
     }
 
+    /**
+     * Apply LIMIT/OFFSET pagination to a query.
+     *
+     * @param string   $baseSql  The main SELECT without LIMIT.
+     * @param string   $countSql A COUNT(*) equivalent of baseSql.
+     * @param array    $params   Bound parameters for both queries.
+     * @param int      $page     Current page (1-based).
+     * @param int|null $perPage  Items per page (defaults to self::PER_PAGE).
+     * @return PaginatedResult
+     */
     private function applyPagination(string $baseSql, string $countSql, array $params, int $page, ?int $perPage): PaginatedResult
     {
         $perPage = $perPage ?? self::PER_PAGE;
@@ -32,6 +64,16 @@ class TicketRepository extends Repository
         return new PaginatedResult($items, $total, $page, $perPage);
     }
 
+    /**
+     * Create a new ticket.
+     *
+     * @param int    $origin      FK to teachers.teacher_id.
+     * @param int    $category    FK to categories.category_id.
+     * @param int    $room        FK to rooms.room_id.
+     * @param string $title       Ticket subject.
+     * @param string $description Ticket description body.
+     * @return false|string The new ticket ID, or false on failure.
+     */
     public function addTicket($origin, $category, $room, $title, $description): false|string
     {
         return $this->database->insert(
@@ -40,6 +82,12 @@ class TicketRepository extends Repository
         );
     }
 
+    /**
+     * Get a single ticket by ID with all joined fields.
+     *
+     * @param int $ticket_id
+     * @return ?Ticket
+     */
     public function getTicketById($ticket_id): ?Ticket
     {
         return $this->ticketRowOne(
@@ -48,18 +96,37 @@ class TicketRepository extends Repository
         );
     }
 
+    /**
+     * Get paginated open tickets.
+     *
+     * @param int      $page
+     * @param int|null $perPage
+     * @return PaginatedResult
+     */
     public function getOpenTickets(int $page = 1, ?int $perPage = null): PaginatedResult
     {
         $base = "SELECT tickets.*, teachers.teacher_name, categories.category_name, rooms.room_name, priorities.priority_name, priorities.priority_weight, priorities.priority_color, (SELECT GROUP_CONCAT(assignment_user SEPARATOR ',') FROM assignments WHERE assignment_ticket = ticket_id) AS assignee_ids, (SELECT GROUP_CONCAT(teacher_name SEPARATOR ', ') FROM assignments INNER JOIN teachers ON assignment_user = teacher_id WHERE assignment_ticket = ticket_id) AS assignee_names, (SELECT COUNT(*) FROM assignments WHERE assignment_ticket = ticket_id) AS assignee_count FROM tickets INNER JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id WHERE ticket_is_open = TRUE ORDER BY ticket_creation DESC";
         return $this->applyPagination($base, "SELECT COUNT(*) AS cnt FROM tickets WHERE ticket_is_open = TRUE", [], $page, $perPage);
     }
 
+    /**
+     * Get paginated closed tickets.
+     *
+     * @param int      $page
+     * @param int|null $perPage
+     * @return PaginatedResult
+     */
     public function getClosedTickets(int $page = 1, ?int $perPage = null): PaginatedResult
     {
         $base = "SELECT tickets.*, teachers.teacher_name, categories.category_name, rooms.room_name, priorities.priority_name, priorities.priority_weight, priorities.priority_color, (SELECT GROUP_CONCAT(assignment_user SEPARATOR ',') FROM assignments WHERE assignment_ticket = ticket_id) AS assignee_ids, (SELECT GROUP_CONCAT(teacher_name SEPARATOR ', ') FROM assignments INNER JOIN teachers ON assignment_user = teacher_id WHERE assignment_ticket = ticket_id) AS assignee_names, (SELECT COUNT(*) FROM assignments WHERE assignment_ticket = ticket_id) AS assignee_count FROM tickets INNER JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id WHERE ticket_is_open = FALSE ORDER BY ticket_creation DESC";
         return $this->applyPagination($base, "SELECT COUNT(*) AS cnt FROM tickets WHERE ticket_is_open = FALSE", [], $page, $perPage);
     }
 
+    /**
+     * Get all open tickets without any assignment.
+     *
+     * @return Ticket[]
+     */
     public function getUnassignedTickets(): array
     {
         return $this->ticketRow(
@@ -67,6 +134,11 @@ class TicketRepository extends Repository
         );
     }
 
+    /**
+     * Get all tickets (open + closed) with basic joined fields.
+     *
+     * @return Ticket[]
+     */
     public function getAllTickets(): array
     {
         return $this->ticketRow(
@@ -74,6 +146,11 @@ class TicketRepository extends Repository
         );
     }
 
+    /**
+     * Mark a ticket as closed.
+     *
+     * @param int $ticket_id
+     */
     public function closeTicket($ticket_id): void
     {
         $this->database->update(
@@ -82,6 +159,11 @@ class TicketRepository extends Repository
         );
     }
 
+    /**
+     * Reopen a closed ticket.
+     *
+     * @param int $ticket_id
+     */
     public function reopenTicket($ticket_id): void
     {
         $this->database->update(
@@ -90,6 +172,15 @@ class TicketRepository extends Repository
         );
     }
 
+    /**
+     * Partially update a ticket — only the keys present in $data are changed.
+     *
+     * Allowed columns: ticket_category, ticket_room, ticket_priority,
+     * ticket_title, ticket_description, ticket_deadline.
+     *
+     * @param int   $ticket_id
+     * @param array $data      Associative array of column => value.
+     */
     public function updateTicket($ticket_id, $data): void
     {
         $fields = [];
@@ -111,6 +202,11 @@ class TicketRepository extends Repository
         );
     }
 
+    /**
+     * Get aggregate counts (total / open / closed).
+     *
+     * @return array{total: int, open: int, closed: int}
+     */
     public function getCountByStatus(): array
     {
         return $this->database->selectOne(
@@ -118,6 +214,11 @@ class TicketRepository extends Repository
         );
     }
 
+    /**
+     * Get the number of open tickets with no assignments.
+     *
+     * @return int
+     */
     public function getCountUnassigned(): int
     {
         $row = $this->database->selectOne(
@@ -126,6 +227,11 @@ class TicketRepository extends Repository
         return (int)($row["cnt"] ?? 0);
     }
 
+    /**
+     * Get the number of open tickets past their deadline.
+     *
+     * @return int
+     */
     public function getCountOverdue(): int
     {
         $row = $this->database->selectOne(
@@ -134,6 +240,12 @@ class TicketRepository extends Repository
         return (int)($row["cnt"] ?? 0);
     }
 
+    /**
+     * Get assignment stats for a single user.
+     *
+     * @param int $user_id
+     * @return array{total_assigned: int, active: int, resolved: int}
+     */
     public function getUserStats($user_id): array
     {
         return $this->database->selectOne(
@@ -142,6 +254,12 @@ class TicketRepository extends Repository
         );
     }
 
+    /**
+     * Get total work minutes logged by a user across all tickets.
+     *
+     * @param int $user_id
+     * @return int
+     */
     public function getUserTotalWorkMinutes($user_id): int
     {
         $row = $this->database->selectOne(
@@ -151,6 +269,15 @@ class TicketRepository extends Repository
         return (int)($row["total"] ?? 0);
     }
 
+    /**
+     * Get work minutes logged by a user in the current month.
+     *
+     * @param int $user_id
+     * @return int
+     *
+     * @deprecated Uses MONTH(work_id) which is semantically incorrect;
+     *             the works table has no date column.
+     */
     public function getUserMonthlyWorkMinutes($user_id): int
     {
         $row = $this->database->selectOne(
@@ -160,6 +287,15 @@ class TicketRepository extends Repository
         return (int)($row["total"] ?? 0);
     }
 
+    /**
+     * Get per-month assignment statistics for a user over the last N months.
+     *
+     * Returns an array with keys: year_month, label, assigned, resolved, still_open.
+     *
+     * @param int $user_id
+     * @param int $months Number of months to look back (default 6).
+     * @return array[]
+     */
     public function getUserMonthlyStats($user_id, int $months = 6): array
     {
         $months = (int)$months;

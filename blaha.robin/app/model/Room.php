@@ -6,9 +6,15 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Data transfer object representing a room / classroom.
+ */
 class Room implements JsonSerializable
 {
+    /** Auto-increment primary key. */
     public readonly int $room_id;
+
+    /** Human-readable room name (e.g. "Učebna 205"). */
     public readonly string $room_name;
 
     public function __construct(array $row)

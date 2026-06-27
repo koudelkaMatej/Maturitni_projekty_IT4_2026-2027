@@ -7,14 +7,22 @@
  */
 
 /**
- * @param string $full_name
+ * Converts a full name to its Czech vocative (oslovení) form.
+ *
+ * Inflects both male and female first names and last names using
+ * suffix-based rules loaded from serialised .dat files.
+ *
  * @author Petro Joachim <petr@joachim.cz>, Jaroslav Týc <mail@jaroslavtyc.com>, Robin Bláha <robin.blaha@inteway.net>
  */
 class CzechVocative
 {
     /**
+     * Format a full name in the vocative case.
+     *
+     * Example: "Petr Novák" → "Petře Nováku"
+     *
      * @param string $full_name
-     * @return string the name inflicted in the vocative
+     * @return string The name inflected in the vocative.
      */
     public function format(string $full_name): string
     {
@@ -27,6 +35,14 @@ class CzechVocative
         return implode(" ", $name_parts);
     }
 
+    /**
+     * Inflect a single name part into the vocative.
+     *
+     * @param string   $name
+     * @param bool|null $isWoman
+     * @param bool|null $isLastName
+     * @return string
+     */
     private function singleVocative(string $name, ?bool $isWoman = null, ?bool $isLastName = null): string
     {
         $name = trim($name);
@@ -60,6 +76,12 @@ class CzechVocative
         return $this->vocativeMan($name, $key);
     }
 
+    /**
+     * Determine whether a name is male based on suffix rules.
+     *
+     * @param string $name Lowercased name.
+     * @return bool
+     */
     private function isMale(string $name): bool
     {
         $name = strtolower($name);
@@ -72,6 +94,13 @@ class CzechVocative
         return $sex !== "w";
     }
 
+    /**
+     * Inflect a male name to the vocative.
+     *
+     * @param string $name
+     * @param string $key Lowercased name for suffix matching.
+     * @return string
+     */
     private function vocativeMan(string $name, string $key): string
     {
         [$match, $suffix] = $this->getMatchingSuffix(
@@ -87,6 +116,12 @@ class CzechVocative
         return ucfirst(strtolower($name));
     }
 
+    /**
+     * Inflect a female first name to the vocative.
+     *
+     * @param string $name
+     * @return string
+     */
     private function vocativeWomanFirstName(string $name): string
     {
         if (str_ends_with($name, "a")) {
@@ -96,11 +131,25 @@ class CzechVocative
         return $name;
     }
 
+    /**
+     * Female last names stay unchanged in the vocative.
+     *
+     * @param string $name
+     * @return string
+     */
     private function vocativeWomanLastName(string $name): string
     {
         return $name;
     }
 
+    /**
+     * Find the longest matching suffix from the rules table and return
+     * [matched_suffix, replacement_value].
+     *
+     * @param string $name
+     * @param array  $suffixes Associative array of suffix => value.
+     * @return array{string, mixed}
+     */
     private function getMatchingSuffix(string $name, array $suffixes): array
     {
         foreach (range(strlen($name), 1) as $length) {
@@ -113,10 +162,20 @@ class CzechVocative
         return ["", $suffixes[""]];
     }
 
+    /** Cached male suffix rules. */
     private ?array $manSuffixes = null;
+
+    /** Cached male-vs-female suffix rules. */
     private ?array $manVsWomanSuffixes = null;
+
+    /** Cached female-first-name-vs-last-name rules. */
     private ?array $womanFirstVsLastSuffixes = null;
 
+    /**
+     * Get (and cache) male vocative suffix rules.
+     *
+     * @return array
+     */
     private function getManSuffixes(): array
     {
         if ($this->manSuffixes === null) {
@@ -126,6 +185,12 @@ class CzechVocative
         return $this->manSuffixes;
     }
 
+    /**
+     * Read a serialised suffix array from a .dat file.
+     *
+     * @param string $file Filename stem (without extension).
+     * @return array
+     */
     private function readSuffixes(string $file): array
     {
         $filename = __DIR__ . "/data/" . $file . ".dat";
@@ -133,6 +198,11 @@ class CzechVocative
         return unserialize(file_get_contents($filename), ["allowed_classes" => false]);
     }
 
+    /**
+     * Get (and cache) male-vs-female suffix rules.
+     *
+     * @return array
+     */
     private function getManVsWomanSuffixes(): array
     {
         if ($this->manVsWomanSuffixes === null) {
@@ -142,6 +212,11 @@ class CzechVocative
         return $this->manVsWomanSuffixes;
     }
 
+    /**
+     * Get (and cache) female first-name-vs-last-name suffix rules.
+     *
+     * @return array
+     */
     private function getWomanFirstVsLastNameSuffixes(): array
     {
         if ($this->womanFirstVsLastSuffixes === null) {

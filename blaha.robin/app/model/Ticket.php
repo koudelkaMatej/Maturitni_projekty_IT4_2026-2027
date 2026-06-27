@@ -6,27 +6,69 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Data transfer object representing a single ticket.
+ *
+ * Contains both the core ticket columns and nullable joined
+ * fields from related tables (teacher, category, room, priority).
+ */
 class Ticket implements JsonSerializable
 {
+    /** Auto-increment primary key. */
     public readonly int $ticket_id;
+
+    /** FK to the teacher who reported the issue. */
     public readonly int $ticket_origin;
+
+    /** FK to the ticket category (nullable). */
     public readonly ?int $ticket_category;
+
+    /** FK to the room (nullable). */
     public readonly ?int $ticket_room;
+
+    /** FK to the priority (nullable). */
     public readonly ?int $ticket_priority;
+
+    /** Short ticket title / subject. */
     public readonly string $ticket_title;
+
+    /** Detailed description of the issue. */
     public readonly string $ticket_description;
+
+    /** Optional deadline date (Y-m-d). */
     public readonly ?string $ticket_deadline;
+
+    /** Whether the ticket is still open. */
     public readonly bool $ticket_is_open;
+
+    /** Creation datetime (Y-m-d H:i:s). */
     public readonly string $ticket_creation;
 
+    /** Joined teacher name (populated via JOIN). */
     public readonly ?string $teacher_name;
+
+    /** Joined category name. */
     public readonly ?string $category_name;
+
+    /** Joined room name. */
     public readonly ?string $room_name;
+
+    /** Joined priority name. */
     public readonly ?string $priority_name;
+
+    /** Joined priority weight. */
     public readonly ?int $priority_weight;
+
+    /** Joined priority colour key. */
     public readonly ?string $priority_color;
+
+    /** Comma-separated assignment user IDs. */
     public readonly ?string $assignee_ids;
+
+    /** Comma-separated assignee teacher names. */
     public readonly ?string $assignee_names;
+
+    /** Number of users assigned to this ticket. */
     public readonly ?int $assignee_count;
 
     public function __construct(array $row)

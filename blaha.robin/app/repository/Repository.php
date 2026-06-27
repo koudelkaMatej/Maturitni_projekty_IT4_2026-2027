@@ -6,8 +6,14 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Base class for all repository types.
+ *
+ * Provides the shared Database instance to every child repository.
+ */
 abstract class Repository
 {
+    /** The PDO wrapper used for all queries. */
     protected Database $database;
 
     public function __construct(Database $database)

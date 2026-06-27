@@ -6,14 +6,28 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Repository for teacher record CRUD.
+ */
 class TeacherRepository extends Repository
 {
+    /**
+     * Get all teachers.
+     *
+     * @return Teacher[]
+     */
     public function getAllTeachers(): array
     {
         $rows = $this->database->select("SELECT * FROM teachers");
         return array_map(fn($r) => new Teacher($r), $rows);
     }
 
+    /**
+     * Get a single teacher by ID.
+     *
+     * @param int $teacher_id
+     * @return ?Teacher
+     */
     public function getTeacherById($teacher_id): ?Teacher
     {
         $row = $this->database->selectOne(
@@ -23,6 +37,13 @@ class TeacherRepository extends Repository
         return $row ? new Teacher($row) : null;
     }
 
+    /**
+     * Create a new teacher.
+     *
+     * @param string $teacher_code Optional short code (max 6 chars).
+     * @param string $teacher_name Full name.
+     * @return false|string The new teacher ID, or false on failure.
+     */
     public function addTeacher(string $teacher_code, string $teacher_name): false|string
     {
         return $this->database->insert(
@@ -31,6 +52,13 @@ class TeacherRepository extends Repository
         );
     }
 
+    /**
+     * Update a teacher's code and name.
+     *
+     * @param int    $teacher_id
+     * @param string $teacher_code
+     * @param string $teacher_name
+     */
     public function updateTeacher(int $teacher_id, string $teacher_code, string $teacher_name): void
     {
         $this->database->update(
@@ -39,6 +67,12 @@ class TeacherRepository extends Repository
         );
     }
 
+    /**
+     * Delete a teacher. The linked user account (if any) is cascade-deleted.
+     * Tickets reported by this teacher will have ticket_origin set to NULL.
+     *
+     * @param int $teacher_id
+     */
     public function deleteTeacher(int $teacher_id): void
     {
         $this->database->delete(
