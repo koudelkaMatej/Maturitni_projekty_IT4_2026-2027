@@ -20,8 +20,8 @@ class Configuration
     /** Database name to connect to. */
     public string $databaseName = "spstickets";
 
-    /** Database user name. */
-    public string $databaseUser = "root";
+    /** Database username. */
+    public string $databaseUser = "admin";
 
     /** Database user password. */
     public string $databasePassword = "";

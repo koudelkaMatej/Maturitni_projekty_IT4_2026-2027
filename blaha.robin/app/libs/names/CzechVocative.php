@@ -10,7 +10,7 @@
  * Converts a full name to its Czech vocative (oslovení) form.
  *
  * Inflects both male and female first names and last names using
- * suffix-based rules loaded from serialised .dat files.
+ * suffix-based rules loaded from serialized .dat files.
  *
  * @author Petro Joachim <petr@joachim.cz>, Jaroslav Týc <mail@jaroslavtyc.com>, Robin Bláha <robin.blaha@inteway.net>
  */
@@ -186,7 +186,7 @@ class CzechVocative
     }
 
     /**
-     * Read a serialised suffix array from a .dat file.
+     * Read a serialized suffix array from a .dat file.
      *
      * @param string $file Filename stem (without extension).
      * @return array
