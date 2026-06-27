@@ -35,4 +35,28 @@ class UserRepository extends Repository
             [":user_password" => $user_password, ":user_id" => $user_id]
         );
     }
+
+    public function addUser(int $user_id, string $user_username, string $user_password): false|string
+    {
+        return $this->database->insert(
+            "INSERT INTO users (user_id, user_username, user_password) VALUES (:user_id, :user_username, :user_password)",
+            [":user_id" => $user_id, ":user_username" => $user_username, ":user_password" => password_hash($user_password, PASSWORD_DEFAULT)]
+        );
+    }
+
+    public function updateUserUsername(int $user_id, string $user_username): void
+    {
+        $this->database->update(
+            "UPDATE users SET user_username = :user_username WHERE user_id = :user_id",
+            [":user_id" => $user_id, ":user_username" => $user_username]
+        );
+    }
+
+    public function deleteUser(int $user_id): void
+    {
+        $this->database->delete(
+            "DELETE FROM users WHERE user_id = :user_id",
+            [":user_id" => $user_id]
+        );
+    }
 }

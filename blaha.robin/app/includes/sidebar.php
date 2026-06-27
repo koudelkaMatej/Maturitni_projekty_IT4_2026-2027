@@ -23,6 +23,11 @@ $pages = [
                 "link" => "stats.php",
                 "icon" => "bar-chart-2",
         ],
+        "Správa systému" => [
+                "has_border" => false,
+                "link" => "manage.php",
+                "icon" => "settings",
+        ],
         "Změna hesla" => [
                 "has_border" => true,
                 "link" => "password.php",

@@ -16,4 +16,28 @@ class TeacherRepository extends Repository
         );
         return $row ? new Teacher($row) : null;
     }
+
+    public function addTeacher(string $teacher_code, string $teacher_name): false|string
+    {
+        return $this->database->insert(
+            "INSERT INTO teachers (teacher_code, teacher_name) VALUES (:teacher_code, :teacher_name)",
+            [":teacher_code" => $teacher_code, ":teacher_name" => $teacher_name]
+        );
+    }
+
+    public function updateTeacher(int $teacher_id, string $teacher_code, string $teacher_name): void
+    {
+        $this->database->update(
+            "UPDATE teachers SET teacher_code = :teacher_code, teacher_name = :teacher_name WHERE teacher_id = :teacher_id",
+            [":teacher_id" => $teacher_id, ":teacher_code" => $teacher_code, ":teacher_name" => $teacher_name]
+        );
+    }
+
+    public function deleteTeacher(int $teacher_id): void
+    {
+        $this->database->delete(
+            "DELETE FROM teachers WHERE teacher_id = :teacher_id",
+            [":teacher_id" => $teacher_id]
+        );
+    }
 }
