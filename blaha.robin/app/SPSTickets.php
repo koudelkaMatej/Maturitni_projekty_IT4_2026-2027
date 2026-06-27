@@ -27,6 +27,7 @@ require_once __DIR__ . "/model/Teacher.php";
 require_once __DIR__ . "/model/PaginatedResult.php";
 
 require_once __DIR__ . "/source/Database.php";
+require_once __DIR__ . "/source/Migrator.php";
 
 class SPSTickets implements TicketsApplication
 {
@@ -64,6 +65,9 @@ class SPSTickets implements TicketsApplication
 
             // Init database connection
             $this->database = new Database($this->configuration);
+
+            // Auto-create missing tables
+            (new Migrator($this->database))->migrate();
 
             // Load all repositories
             $this->assignmentRepository = new AssignmentRepository($this->database);

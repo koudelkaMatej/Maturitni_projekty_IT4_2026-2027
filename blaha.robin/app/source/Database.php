@@ -50,4 +50,9 @@ class Database
         $statement->execute($params);
         return $statement;
     }
+
+    public function exec(string $query): void
+    {
+        $this->connection->exec($query);
+    }
 }
