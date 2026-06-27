@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection GrazieInspection */
 /*
  * Copyright (C) 2026 INTEWAY TECHNOLOGY - All Rights Reserved
  *

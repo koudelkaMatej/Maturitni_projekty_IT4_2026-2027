@@ -59,7 +59,7 @@ class Ticket implements JsonSerializable
     /** Joined priority weight. */
     public readonly ?int $priority_weight;
 
-    /** Joined priority colour key. */
+    /** Joined priority color key. */
     public readonly ?string $priority_color;
 
     /** Comma-separated assignment user IDs. */
