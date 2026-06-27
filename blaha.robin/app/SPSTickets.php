@@ -35,47 +35,77 @@ require_once __DIR__ . "/model/PaginatedResult.php";
 require_once __DIR__ . "/source/Database.php";
 require_once __DIR__ . "/source/Migrator.php";
 
+/**
+ * Application singleton and service locator.
+ *
+ * Bootstraps the database connection, runs the auto-migrator, loads
+ * every repository, and manages the current user session. Accessed
+ * globally via {@see getApplication()}.
+ */
 class SPSTickets implements TicketsApplication
 {
+    /** Application configuration. */
     private Configuration $configuration;
 
+    /** PDO wrapper. */
     private Database $database;
 
+    /** Repository for ticket-to-user assignments. */
     private AssignmentRepository $assignmentRepository;
+
+    /** Repository for auto-assignment rules. */
     private AutoAssignRepository $autoAssignRepository;
+
+    /** Repository for ticket categories. */
     private CategoryRepository $categoryRepository;
+
+    /** Repository for ticket priorities. */
     private PriorityRepository $priorityRepository;
+
+    /** Repository for rooms / classrooms. */
     private RoomRepository $roomRepository;
+
+    /** Repository for DB-backed sessions. */
     private SessionRepository $sessionRepository;
+
+    /** Repository for teacher records. */
     private TeacherRepository $teacherRepository;
+
+    /** Repository for ticket CRUD and statistics. */
     private TicketRepository $ticketRepository;
+
+    /** Repository for user (technician) accounts. */
     private UserRepository $userRepository;
+
+    /** Repository for work log entries. */
     private WorkRepository $workRepository;
 
+    /** Currently authenticated user, or null. */
     private ?User $currentUser = null;
 
+    /** Human-readable page name used in sidebar / header. */
     private string $currentPage = "Nepojmenovaná stránka";
 
+    /**
+     * Boot the application: load config, connect to DB, run migrator,
+     * instantiate all repositories, configure session settings, and
+     * attempt to restore the current user from the session cookie.
+     */
     public function __construct()
     {
-        // Get application configuration
         $this->configuration = new Configuration();
 
         try {
-            // Check for dev environment
             if ($this->configuration->development) {
                 ini_set("display_errors", "1");
                 ini_set("display_startup_errors", "1");
                 error_reporting(E_ALL);
             }
 
-            // Init database connection
             $this->database = new Database($this->configuration);
 
-            // Auto-create missing tables
             (new Migrator($this->database))->migrate();
 
-            // Load all repositories
             $this->assignmentRepository = new AssignmentRepository($this->database);
             $this->autoAssignRepository = new AutoAssignRepository($this->database);
             $this->categoryRepository = new CategoryRepository($this->database);
@@ -87,14 +117,12 @@ class SPSTickets implements TicketsApplication
             $this->userRepository = new UserRepository($this->database);
             $this->workRepository = new WorkRepository($this->database);
 
-            // Set php session and cookie settings
             session_name($this->configuration->sessionCookie);
             session_set_cookie_params([
                 "lifetime" => $this->configuration->sessionLifetime,
                 "samesite" => "Strict",
             ]);
 
-            // Refresh user session from cookies
             $this->refreshSession();
         } catch (Exception $exception) {
             die("<h1>SPŠ HelpDesk je momentálně nedostupný.</h1>");
@@ -151,6 +179,9 @@ class SPSTickets implements TicketsApplication
         return $this->workRepository;
     }
 
+    /**
+     * Start a PHP session if one is not already active.
+     */
     private function startSession(): void
     {
         if (session_status() == PHP_SESSION_NONE) {
@@ -159,6 +190,9 @@ class SPSTickets implements TicketsApplication
         }
     }
 
+    /**
+     * Restore the current user from the DB session stored in $_SESSION.
+     */
     private function refreshSession(): void
     {
         $this->startSession();
@@ -176,6 +210,13 @@ class SPSTickets implements TicketsApplication
         return $this->currentUser;
     }
 
+    /**
+     * Create a new session for a user and store its ID in $_SESSION.
+     *
+     * If singleSession mode is enabled, all previous sessions for the user are deleted.
+     *
+     * @param int $user_id
+     */
     public function createUserSession($user_id): void
     {
         if ($this->configuration->singleSession) $this->getSessionRepository()->deleteUserSessions($user_id);
@@ -185,12 +226,14 @@ class SPSTickets implements TicketsApplication
         $_SESSION["session"] = $session_id;
     }
 
+    /** Destroy the current PHP session. */
     public function destroySession(): void
     {
         $this->startSession();
         session_destroy();
     }
 
+    /** Redirect to the login page if no user is authenticated. */
     public function checkUser(): void
     {
         if (getApplication()->getUser() == null) {
@@ -198,6 +241,11 @@ class SPSTickets implements TicketsApplication
         }
     }
 
+    /**
+     * Redirect to a page by its script name (without .php extension).
+     *
+     * @param string $page
+     */
     public function redirectInternally($page): void
     {
         header("Location: /" . $page . ".php");
@@ -214,6 +262,14 @@ class SPSTickets implements TicketsApplication
         return $this->currentPage;
     }
 
+    /**
+     * Extract the first two uppercase letters from a string.
+     *
+     * Falls back to the first two characters if no uppercase letters are found.
+     *
+     * @param string $string
+     * @return string At most 2 characters.
+     */
     public function getInitials(string $string): string
     {
         $capitals = preg_replace('/[^\p{Lu}]/u', '', $string);

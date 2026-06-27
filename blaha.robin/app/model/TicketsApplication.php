@@ -6,65 +6,89 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Contract for the application singleton.
+ *
+ * Provides access to every repository and a handful of
+ * session / page-level utility methods.
+ */
 interface TicketsApplication
 {
-    /**
-     * Repository to store all ticket assignments to users
-     * @return AssignmentRepository
-     */
+    /** @return AssignmentRepository for ticket-to-user assignments */
     public function getAssignmentRepository(): AssignmentRepository;
 
-    /**
-     * Repository to store automatic ticket assignments to users per category
-     * @return AutoAssignRepository
-     */
+    /** @return AutoAssignRepository for per-category auto-assign rules */
     public function getAutoAssignRepository(): AutoAssignRepository;
 
-    /**
-     * Repository to store ticket categories
-     * @return CategoryRepository
-     */
+    /** @return CategoryRepository for ticket categories */
     public function getCategoryRepository(): CategoryRepository;
 
-    /**
-     * Repository to store ticket priorities
-     * @return PriorityRepository
-     */
+    /** @return PriorityRepository for ticket priorities */
     public function getPriorityRepository(): PriorityRepository;
 
-    /**
-     * Repository to store ticket rooms
-     * @return RoomRepository
-     */
+    /** @return RoomRepository for room/classroom listings */
     public function getRoomRepository(): RoomRepository;
 
-    /**
-     * Repository to store user login sessions
-     * @return SessionRepository
-     */
+    /** @return SessionRepository for DB-backed sessions */
     public function getSessionRepository(): SessionRepository;
 
-    /**
-     * Repository to store all teachers
-     * @return TeacherRepository
-     */
+    /** @return TeacherRepository for teacher records */
     public function getTeacherRepository(): TeacherRepository;
 
-    /**
-     * Repository to store all tickets
-     * @return TicketRepository
-     */
+    /** @return TicketRepository for ticket CRUD */
     public function getTicketRepository(): TicketRepository;
 
-    /**
-     * Repository to store all users (users extend teachers)
-     * @return UserRepository
-     */
+    /** @return UserRepository for user (technician) accounts */
     public function getUserRepository(): UserRepository;
 
-    /**
-     * Repository to store all works for each ticket
-     * @return WorkRepository
-     */
+    /** @return WorkRepository for work log entries */
     public function getWorkRepository(): WorkRepository;
+
+    /** @return ?User Currently authenticated user or null */
+    public function getUser(): ?User;
+
+    /**
+     * Create a new session for the given user ID.
+     *
+     * @param int $user_id
+     * @return void
+     */
+    public function createUserSession($user_id): void;
+
+    /** Destroy the current session. */
+    public function destroySession(): void;
+
+    /**
+     * Redirect to login.php if no user is authenticated.
+     *
+     * @return void
+     */
+    public function checkUser(): void;
+
+    /**
+     * Redirect internally to a page by its script name (without .php).
+     *
+     * @param string $page
+     * @return never
+     */
+    public function redirectInternally($page): void;
+
+    /**
+     * Set the human-readable page name (used in the sidebar/header).
+     *
+     * @param string $page
+     * @return void
+     */
+    public function setPageName(string $page): void;
+
+    /** @return string Current page name */
+    public function getPageName(): string;
+
+    /**
+     * Extract the first two uppercase letters from a string (fallback: first two chars).
+     *
+     * @param string $string
+     * @return string
+     */
+    public function getInitials(string $string): string;
 }

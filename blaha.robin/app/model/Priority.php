@@ -6,11 +6,21 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Data transfer object representing a ticket priority.
+ */
 class Priority implements JsonSerializable
 {
+    /** Auto-increment primary key. */
     public readonly int $priority_id;
+
+    /** Human-readable priority name. */
     public readonly string $priority_name;
+
+    /** Numeric weight used for sorting (higher = more important). */
     public readonly int $priority_weight;
+
+    /** CSS colour key: gray|blue|green|orange|red. */
     public readonly string $priority_color;
 
     public function __construct(array $row)

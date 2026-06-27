@@ -6,10 +6,18 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Data transfer object representing a teacher record.
+ */
 class Teacher implements JsonSerializable
 {
+    /** Auto-increment primary key. */
     public readonly int $teacher_id;
+
+    /** Full name of the teacher. */
     public readonly string $teacher_name;
+
+    /** Optional short code (e.g. initials, max 6 chars). */
     public readonly ?string $teacher_code;
 
     public function __construct(array $row)

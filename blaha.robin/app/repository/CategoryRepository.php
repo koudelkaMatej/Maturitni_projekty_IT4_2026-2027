@@ -6,8 +6,17 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Repository for ticket category CRUD.
+ */
 class CategoryRepository extends Repository
 {
+    /**
+     * Get a single category by ID.
+     *
+     * @param int $category_id
+     * @return ?Category
+     */
     public function getCategoryById($category_id): ?Category
     {
         $row = $this->database->selectOne(
@@ -17,12 +26,23 @@ class CategoryRepository extends Repository
         return $row ? new Category($row) : null;
     }
 
+    /**
+     * Get all categories.
+     *
+     * @return Category[]
+     */
     public function getAllCategories(): array
     {
         $rows = $this->database->select("SELECT * FROM categories");
         return array_map(fn($r) => new Category($r), $rows);
     }
 
+    /**
+     * Create a new category.
+     *
+     * @param string $category_name
+     * @return false|string The new category ID, or false on failure.
+     */
     public function addCategory($category_name): false|string
     {
         return $this->database->insert(
@@ -31,6 +51,12 @@ class CategoryRepository extends Repository
         );
     }
 
+    /**
+     * Update a category's name.
+     *
+     * @param int    $category_id
+     * @param string $category_name
+     */
     public function updateCategory($category_id, $category_name): void
     {
         $this->database->update(
@@ -39,6 +65,11 @@ class CategoryRepository extends Repository
         );
     }
 
+    /**
+     * Delete a category. Tickets referencing it will have ticket_category set to NULL.
+     *
+     * @param int $category_id
+     */
     public function deleteCategory($category_id): void
     {
         $this->database->delete(

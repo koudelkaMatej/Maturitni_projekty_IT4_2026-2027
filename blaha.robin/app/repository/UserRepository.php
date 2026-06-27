@@ -6,8 +6,20 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Repository for user (technician) account CRUD.
+ *
+ * Users extend teacher records in a 1:1 relationship — every
+ * query JOINS the teachers table so all User objects carry
+ * teacher_name and teacher_code.
+ */
 class UserRepository extends Repository
 {
+    /**
+     * Get all users with their teacher details.
+     *
+     * @return User[]
+     */
     public function getAllUsers(): array
     {
         $rows = $this->database->select(
@@ -16,6 +28,12 @@ class UserRepository extends Repository
         return array_map(fn($r) => new User($r), $rows);
     }
 
+    /**
+     * Get a single user (with teacher details) by user ID.
+     *
+     * @param int $user_id
+     * @return ?User
+     */
     public function getUserById($user_id): ?User
     {
         $row = $this->database->selectOne(
@@ -25,6 +43,12 @@ class UserRepository extends Repository
         return $row ? new User($row) : null;
     }
 
+    /**
+     * Find a user by their login username.
+     *
+     * @param string $user_username
+     * @return ?User
+     */
     public function getUserByUsername($user_username): ?User
     {
         $row = $this->database->selectOne(
@@ -34,6 +58,12 @@ class UserRepository extends Repository
         return $row ? new User($row) : null;
     }
 
+    /**
+     * Replace the password hash for a user.
+     *
+     * @param int    $user_id
+     * @param string $user_password Already-hashed password string.
+     */
     public function updateUserPassword($user_id, $user_password): void
     {
         $this->database->update(
@@ -42,6 +72,14 @@ class UserRepository extends Repository
         );
     }
 
+    /**
+     * Create a new user account for an existing teacher.
+     *
+     * @param int    $user_id       FK to teachers.teacher_id.
+     * @param string $user_username Unique login name.
+     * @param string $user_password Plaintext password (will be hashed).
+     * @return false|string The new user ID, or false on failure.
+     */
     public function addUser(int $user_id, string $user_username, string $user_password): false|string
     {
         return $this->database->insert(
@@ -50,6 +88,12 @@ class UserRepository extends Repository
         );
     }
 
+    /**
+     * Change a user's login username.
+     *
+     * @param int    $user_id
+     * @param string $user_username
+     */
     public function updateUserUsername(int $user_id, string $user_username): void
     {
         $this->database->update(
@@ -58,6 +102,11 @@ class UserRepository extends Repository
         );
     }
 
+    /**
+     * Delete a user account (cascades to sessions and assignments).
+     *
+     * @param int $user_id
+     */
     public function deleteUser(int $user_id): void
     {
         $this->database->delete(

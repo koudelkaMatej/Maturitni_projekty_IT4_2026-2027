@@ -6,8 +6,20 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Repository for automatic ticket-assignment rules per category.
+ *
+ * When a ticket is created in a certain category, any user
+ * registered via an auto-assign rule is automatically assigned.
+ */
 class AutoAssignRepository extends Repository
 {
+    /**
+     * Get all users (with teacher details) who auto-assign to a given category.
+     *
+     * @param int $autoassign_category
+     * @return array[]
+     */
     public function getAutoAssignUsersByCategory($autoassign_category): array
     {
         return $this->database->select(
@@ -18,6 +30,12 @@ class AutoAssignRepository extends Repository
         );
     }
 
+    /**
+     * Get all categories that a given user auto-assigns to.
+     *
+     * @param int $autoassign_user
+     * @return array[]
+     */
     public function getAutoAssignCategoriesByUser($autoassign_user): array
     {
         return $this->database->select(
@@ -28,6 +46,12 @@ class AutoAssignRepository extends Repository
         );
     }
 
+    /**
+     * Add an auto-assign rule (skips silently if already exists).
+     *
+     * @param int $autoassign_category
+     * @param int $autoassign_user
+     */
     public function addAutoAssign($autoassign_category, $autoassign_user): void
     {
         $this->database->insert(
@@ -39,6 +63,12 @@ class AutoAssignRepository extends Repository
         );
     }
 
+    /**
+     * Remove an auto-assign rule.
+     *
+     * @param int $autoassign_category
+     * @param int $autoassign_user
+     */
     public function deleteAutoAssign($autoassign_category, $autoassign_user): void
     {
         $this->database->delete(

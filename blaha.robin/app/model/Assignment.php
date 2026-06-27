@@ -6,11 +6,21 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Data transfer object representing a ticket-to-user assignment.
+ */
 class Assignment implements JsonSerializable
 {
+    /** Auto-increment primary key (only present when used standalone). */
     public readonly int $assignment_id;
+
+    /** FK to the assigned ticket. */
     public readonly int $assignment_ticket;
+
+    /** FK to the assigned user (technician). */
     public readonly int $assignment_user;
+
+    /** Joined teacher name (populated when a JOIN is used). */
     public readonly ?string $teacher_name;
 
     public function __construct(array $row)

@@ -6,8 +6,20 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Repository for DB-backed session management.
+ *
+ * Sessions are stored in the `sessions` table with a remote
+ * address and last-use timestamp for expiry checks.
+ */
 class SessionRepository extends Repository
 {
+    /**
+     * Get a single session by its ID.
+     *
+     * @param int $session_id
+     * @return array
+     */
     public function getSessionById($session_id): array
     {
         return $this->database->selectOne(
@@ -18,6 +30,12 @@ class SessionRepository extends Repository
         );
     }
 
+    /**
+     * Get all sessions belonging to a user.
+     *
+     * @param int $session_user
+     * @return array[]
+     */
     public function getSessionsByUser($session_user): array
     {
         return $this->database->select(
@@ -28,6 +46,11 @@ class SessionRepository extends Repository
         );
     }
 
+    /**
+     * Update the last-use timestamp of a session.
+     *
+     * @param int $session_id
+     */
     public function refreshSession($session_id): void
     {
         $this->database->update(
@@ -38,6 +61,12 @@ class SessionRepository extends Repository
         );
     }
 
+    /**
+     * Create a new session for a user.
+     *
+     * @param int $session_user
+     * @return false|string The new session ID, or false on failure.
+     */
     public function addSession($session_user): false|string
     {
         $session_address = $_SERVER['REMOTE_ADDR'];
@@ -51,6 +80,11 @@ class SessionRepository extends Repository
         );
     }
 
+    /**
+     * Delete a single session by ID.
+     *
+     * @param int $session_id
+     */
     public function deleteSession($session_id): void
     {
         $this->database->delete(
@@ -61,6 +95,11 @@ class SessionRepository extends Repository
         );
     }
 
+    /**
+     * Delete all sessions for a given user (used for single-session mode).
+     *
+     * @param int $session_user
+     */
     public function deleteUserSessions($session_user): void
     {
         $this->database->delete(

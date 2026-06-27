@@ -6,8 +6,15 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Auto-creates missing database tables, indexes, and foreign keys on boot.
+ *
+ * The migration runs only once — it checks for the existence of the
+ * `teachers` table and skips everything if it already exists.
+ */
 class Migrator
 {
+    /** The database connection used for DDL execution. */
     private Database $db;
 
     public function __construct(Database $db)
@@ -15,6 +22,9 @@ class Migrator
         $this->db = $db;
     }
 
+    /**
+     * Run the full migration if the `teachers` table does not exist yet.
+     */
     public function migrate(): void
     {
         $row = $this->db->selectOne("SHOW TABLES LIKE 'teachers'");
@@ -26,6 +36,12 @@ class Migrator
         $this->addForeignKeys();
     }
 
+    /**
+     * Execute a DDL statement, silently skipping errors such as
+     * "duplicate key name" or "duplicate foreign key constraint".
+     *
+     * @param string $sql
+     */
     private function execOrSkip(string $sql): void
     {
         try {
@@ -35,6 +51,7 @@ class Migrator
         }
     }
 
+    /** Create all 10 tables if they do not exist. */
     private function createTables(): void
     {
         $this->db->exec("
@@ -140,6 +157,7 @@ class Migrator
         ");
     }
 
+    /** Add secondary indexes to foreign key columns. */
     private function addIndexes(): void
     {
         $this->execOrSkip("ALTER TABLE assignments ADD KEY assignments_ibfk_user (assignment_user)");
@@ -153,6 +171,7 @@ class Migrator
         $this->execOrSkip("ALTER TABLE works ADD KEY works_ibfk_user (work_user)");
     }
 
+    /** Ensure AUTO_INCREMENT is set on all primary key columns that need it. */
     private function ensureAutoIncrement(): void
     {
         $this->execOrSkip("ALTER TABLE categories MODIFY category_id int(11) NOT NULL AUTO_INCREMENT");
@@ -164,6 +183,7 @@ class Migrator
         $this->execOrSkip("ALTER TABLE works MODIFY work_id int(11) NOT NULL AUTO_INCREMENT");
     }
 
+    /** Add foreign key constraints between tables. */
     private function addForeignKeys(): void
     {
         $this->execOrSkip("ALTER TABLE users ADD CONSTRAINT users_ibfk_teacher FOREIGN KEY (user_id) REFERENCES teachers (teacher_id) ON DELETE CASCADE ON UPDATE CASCADE");

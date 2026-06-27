@@ -6,9 +6,15 @@
  * and binary forms via any medium is strictly prohibited.
  */
 
+/**
+ * Data transfer object representing a ticket category.
+ */
 class Category implements JsonSerializable
 {
+    /** Auto-increment primary key. */
     public readonly int $category_id;
+
+    /** Human-readable category name. */
     public readonly string $category_name;
 
     public function __construct(array $row)
