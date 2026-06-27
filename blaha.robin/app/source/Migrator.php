@@ -11,6 +11,9 @@ class Migrator
 
     public function migrate(): void
     {
+        $row = $this->db->selectOne("SHOW TABLES LIKE 'teachers'");
+        if (!empty($row)) return;
+
         $this->createTables();
         $this->addIndexes();
         $this->ensureAutoIncrement();
