@@ -9,18 +9,52 @@ if (getApplication()->getUser() != null) {
 $teachers = getApplication()->getTeacherRepository()->getAllTeachers();
 $rooms = getApplication()->getRoomRepository()->getAllRooms();
 $categories = getApplication()->getCategoryRepository()->getAllCategories();
+$priorities = getApplication()->getPriorityRepository()->getAllPriorities();
+
+$lowestPriority = null;
+$lowestWeight = PHP_INT_MAX;
+foreach ($priorities as $p) {
+    if ($p->priority_weight < $lowestWeight) {
+        $lowestWeight = $p->priority_weight;
+        $lowestPriority = $p;
+    }
+}
 
 $ticketCreated = false;
+$errors = [];
 
-if (isset($_POST["teacher_id"], $_POST["room_id"], $_POST["category"], $_POST["title"], $_POST["description"])) {
-    $origin = (int)$_POST["teacher_id"];
-    $category = (int)$_POST["category"];
-    $room = (int)$_POST["room_id"];
-    $title = trim($_POST["title"]);
-    $description = trim($_POST["description"]);
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $teacher_id = isset($_POST["teacher_id"]) ? (int)$_POST["teacher_id"] : 0;
+    $room_id = !empty($_POST["room_id"]) ? (int)$_POST["room_id"] : null;
+    $category = isset($_POST["category"]) ? (int)$_POST["category"] : 0;
+    $title = trim($_POST["title"] ?? "");
+    $description = trim($_POST["description"] ?? "");
+    $has_deadline = isset($_POST["has_deadline"]) && $_POST["has_deadline"] === "1";
+    $deadline = $has_deadline && !empty($_POST["deadline"]) ? $_POST["deadline"] : null;
 
-    getApplication()->getTicketRepository()->addTicket($origin, $category, $room, $title, $description);
-    $ticketCreated = true;
+    if ($teacher_id <= 0) $errors[] = "Vyberte své jméno ze seznamu.";
+    if ($category <= 0) $errors[] = "Vyberte kategorii.";
+    if ($title === "") $errors[] = "Vyplňte předmět ticketu.";
+    if ($description === "") $errors[] = "Vyplňte detailní popis.";
+    if ($has_deadline && empty($deadline)) $errors[] = "Vyplňte datum dokončení.";
+
+    if (empty($errors)) {
+        $ticket_id = getApplication()->getTicketRepository()->addTicket($teacher_id, $category, $room_id, $title, $description);
+
+        if ($ticket_id && $lowestPriority) {
+            getApplication()->getTicketRepository()->updateTicket((int)$ticket_id, ["ticket_priority" => $lowestPriority->priority_id]);
+        }
+
+        if ($ticket_id && $deadline) {
+            getApplication()->getTicketRepository()->updateTicket((int)$ticket_id, ["ticket_deadline" => $deadline]);
+        }
+
+        if ($ticket_id) {
+            $ticketCreated = true;
+        } else {
+            $errors[] = "Ticket se nepodařilo vytvořit. Zkuste to prosím znovu.";
+        }
+    }
 }
 
 ?>
@@ -28,8 +62,8 @@ if (isset($_POST["teacher_id"], $_POST["room_id"], $_POST["category"], $_POST["t
 <?php require_once __DIR__ . "/app/includes/header.php"; ?>
 
     <div id="view-teacher-report"
-         class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/40 flex items-start justify-center p-4 pb-12 overflow-y-auto">
-        <div class="w-full max-w-2xl anim-scale-in mt-6 md:mt-16 mb-8">
+         class="fixed inset-0 z-50 bg-gradient-to-br from-slate-50 to-blue-50/40 overflow-y-auto">
+        <div class="w-full max-w-2xl anim-scale-in mx-auto mt-6 md:mt-16 mb-8 px-4">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
             <?php if ($ticketCreated): ?>
                 <div class="text-center p-12">
@@ -67,7 +101,15 @@ if (isset($_POST["teacher_id"], $_POST["room_id"], $_POST["category"], $_POST["t
                 </div>
             </div>
 
-            <form method="post" class="p-6 md:p-8 space-y-5">
+            <form method="post" class="p-6 md:p-8 space-y-5" novalidate>
+                <?php if (!empty($errors)): ?>
+                    <div class="bg-red-50 border border-red-100 text-red-700 px-4 py-3 rounded-xl text-sm space-y-1" style="animation: fadeIn 0.3s ease forwards">
+                        <?php foreach ($errors as $err): ?>
+                            <p class="flex items-center gap-2"><i data-lucide="alert-circle" size="16" class="flex-shrink-0"></i> <?php echo $err ?></p>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
                 <div class="space-y-2 relative" id="teacher-search-container">
                     <label class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
                         <i data-lucide="user" size="15" class="text-slate-400"></i> Vaše jméno
@@ -81,7 +123,7 @@ if (isset($_POST["teacher_id"], $_POST["room_id"], $_POST["category"], $_POST["t
                                class="w-full pl-10 pr-10 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all placeholder:text-slate-400"
                                placeholder="Vyhledat učitele..." name="teacher">
 
-                        <input type="hidden" id="teacher-selected-id" name="teacher_id">
+                        <input type="hidden" id="teacher-selected-id" name="teacher_id" value="">
 
                         <button type="button" id="teacher-search-clear"
                                 class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-1 rounded-lg hidden transition-all"
@@ -91,11 +133,7 @@ if (isset($_POST["teacher_id"], $_POST["room_id"], $_POST["category"], $_POST["t
                     </div>
 
                     <div id="teacher-search-results"
-                         class="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-56 overflow-y-auto hidden">
-                        <?php foreach ($teachers as $teacher): ?>
-                            <option value="<?php echo $teacher->teacher_code ?>"><?php echo $teacher->teacher_name ?></option>
-                        <?php endforeach; ?>
-                    </div>
+                         class="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-56 overflow-y-auto hidden"></div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -111,7 +149,7 @@ if (isset($_POST["teacher_id"], $_POST["room_id"], $_POST["category"], $_POST["t
                                    class="w-full pl-10 pr-10 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all placeholder:text-slate-400"
                                    placeholder="Vyhledat učebnu..." name="room">
 
-                            <input type="hidden" id="teacher-report-room-id" name="room_id">
+                            <input type="hidden" id="teacher-report-room-id" name="room_id" value="">
 
                             <button type="button" id="room-search-clear"
                                     class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-1 rounded-lg hidden transition-all"
@@ -121,11 +159,7 @@ if (isset($_POST["teacher_id"], $_POST["room_id"], $_POST["category"], $_POST["t
                         </div>
 
                         <div id="room-search-results"
-                             class="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-56 overflow-y-auto hidden">
-                            <?php foreach ($rooms as $room): ?>
-                                <option value="<?php echo $room->room_id ?>"><?php echo $room->room_name ?></option>
-                            <?php endforeach; ?>
-                        </div>
+                             class="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-56 overflow-y-auto hidden"></div>
                     </div>
 
                     <div class="space-y-2">
@@ -145,13 +179,34 @@ if (isset($_POST["teacher_id"], $_POST["room_id"], $_POST["category"], $_POST["t
                     </div>
                 </div>
 
-                <div class="space-y-2">
-                    <label class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
-                        <i data-lucide="type" size="15" class="text-slate-400"></i> Předmět ticketu
-                    </label>
-                    <input id="teacher-report-title" required
-                           class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all placeholder:text-slate-400"
-                           placeholder="Krátký předmět ticketu" name="title">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                            <i data-lucide="type" size="15" class="text-slate-400"></i> Předmět ticketu
+                        </label>
+                        <input id="teacher-report-title" required
+                               class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all placeholder:text-slate-400"
+                               placeholder="Krátký předmět ticketu" name="title">
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                                <i data-lucide="calendar" size="15" class="text-slate-400"></i> Termín dokončení
+                            </label>
+                            <button type="button" id="deadline-toggle"
+                                    class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors bg-slate-200"
+                                    onclick="toggleDeadline()" aria-pressed="false">
+                                <span id="deadline-toggle-knob"
+                                      class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1 shadow-sm"></span>
+                            </button>
+                        </div>
+                        <input type="hidden" name="has_deadline" id="has-deadline" value="0">
+                        <div id="deadline-field" class="hidden">
+                            <input type="date" name="deadline" id="deadline-input"
+                                   class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="space-y-2">
@@ -200,6 +255,7 @@ if (isset($_POST["teacher_id"], $_POST["room_id"], $_POST["category"], $_POST["t
             <?php endforeach; ?>
         ];
 
+        /* ---- Teacher search ---- */
         const searchInput = document.getElementById('teacher-search-input');
         const searchResults = document.getElementById('teacher-search-results');
         const hiddenId = document.getElementById('teacher-selected-id');
@@ -207,70 +263,41 @@ if (isset($_POST["teacher_id"], $_POST["room_id"], $_POST["category"], $_POST["t
 
         function renderTeacherResults(query = '') {
             const filtered = teachers.filter(t => t.name.toLowerCase().includes(query.toLowerCase()));
-
-            if (filtered.length === 0) {
-                searchResults.innerHTML = '<div class="p-3 text-sm text-slate-500 text-center">Učitel nenalezen</div>';
-                return;
-            }
-
-            searchResults.innerHTML = filtered.map(t => `
-                <div onclick="selectTeacher('${t.id}', '${t.name}')" class="p-3 hover:bg-blue-50 cursor-pointer flex items-center gap-3 transition-colors border-b border-slate-50 last:border-none group">
-                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold font-mono group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                        ${t.initials}
-                    </div>
-                    <div>
-                        <p class="text-sm font-semibold text-slate-800 group-hover:text-blue-700">${t.name}</p>
-                    </div>
-                </div>
-            `).join('');
+            searchResults.innerHTML = filtered.length === 0
+                ? '<div class="p-3 text-sm text-slate-500 text-center">Učitel nenalezen</div>'
+                : filtered.map(t => `<div onclick="selectTeacher('${t.id}', '${t.name}')" class="p-3 hover:bg-blue-50 cursor-pointer flex items-center gap-3 transition-colors border-b border-slate-50 last:border-none group">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold font-mono group-hover:bg-blue-600 group-hover:text-white transition-colors">${t.initials}</div>
+                    <div><p class="text-sm font-semibold text-slate-800 group-hover:text-blue-700">${t.name}</p></div>
+                </div>`).join('');
         }
 
         window.selectTeacher = function (id, name) {
-            searchInput.value = name;
-            hiddenId.value = id;
-            searchResults.classList.add('hidden');
-            clearBtn.classList.remove('hidden');
+            searchInput.value = name; hiddenId.value = id;
+            searchResults.classList.add('hidden'); clearBtn.classList.remove('hidden');
         }
 
         window.clearTeacherSelection = function () {
-            searchInput.value = '';
-            hiddenId.value = '';
-            clearBtn.classList.add('hidden');
-            searchInput.focus();
-            renderTeacherResults('');
-            searchResults.classList.remove('hidden');
+            searchInput.value = ''; hiddenId.value = '';
+            clearBtn.classList.add('hidden'); searchInput.focus();
+            renderTeacherResults(''); searchResults.classList.remove('hidden');
         }
 
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
                 const val = e.target.value;
-                if (val.length > 0) {
-                    searchResults.classList.remove('hidden');
-                    clearBtn.classList.remove('hidden');
-                    renderTeacherResults(val);
-                } else {
-                    searchResults.classList.add('hidden');
-                    clearBtn.classList.add('hidden');
-                }
+                if (val.length > 0) { searchResults.classList.remove('hidden'); clearBtn.classList.remove('hidden'); renderTeacherResults(val); }
+                else { searchResults.classList.add('hidden'); clearBtn.classList.add('hidden'); }
             });
-
             searchInput.addEventListener('focus', () => {
-                if (searchInput.value.trim() === "") {
-                    searchResults.classList.remove('hidden');
-                    renderTeacherResults('');
-                }
+                if (searchInput.value.trim() === "") { searchResults.classList.remove('hidden'); renderTeacherResults(''); }
             });
-
             document.addEventListener('click', (e) => {
                 const container = document.getElementById('teacher-search-container');
-                if (container && !container.contains(e.target)) {
-                    searchResults.classList.add('hidden');
-                }
+                if (container && !container.contains(e.target)) searchResults.classList.add('hidden');
             });
         }
 
-
-
+        /* ---- Room search ---- */
         const roomInput = document.getElementById('teacher-report-room-input');
         const roomResults = document.getElementById('room-search-results');
         const roomHiddenId = document.getElementById('teacher-report-room-id');
@@ -278,67 +305,56 @@ if (isset($_POST["teacher_id"], $_POST["room_id"], $_POST["category"], $_POST["t
 
         function renderRoomResults(query = '') {
             const filtered = rooms.filter(r => r.name.toLowerCase().includes(query.toLowerCase()) || r.id.toLowerCase().includes(query.toLowerCase()));
-
-            if (filtered.length === 0) {
-                roomResults.innerHTML = '<div class="p-3 text-sm text-slate-500 text-center">Učebna nenalezena</div>';
-                return;
-            }
-
-            roomResults.innerHTML = filtered.map(r => `
-                <div onclick="selectRoom('${r.id}', '${r.name}')" class="p-3 hover:bg-blue-50 cursor-pointer flex items-center gap-3 transition-colors border-b border-slate-50 last:border-none group">
-                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs font-bold font-mono group-hover:bg-slate-200 transition-colors">
-                        <i data-lucide="map-pin" size="14"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm font-semibold text-slate-800 group-hover:text-blue-700">${r.name}</p>
-                    </div>
-                </div>
-            `).join('');
+            roomResults.innerHTML = filtered.length === 0
+                ? '<div class="p-3 text-sm text-slate-500 text-center">Učebna nenalezena</div>'
+                : filtered.map(r => `<div onclick="selectRoom('${r.id}', '${r.name}')" class="p-3 hover:bg-blue-50 cursor-pointer flex items-center gap-3 transition-colors border-b border-slate-50 last:border-none group">
+                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs font-bold font-mono group-hover:bg-slate-200 transition-colors"><i data-lucide="map-pin" size="14"></i></div>
+                    <div><p class="text-sm font-semibold text-slate-800 group-hover:text-blue-700">${r.name}</p></div>
+                </div>`).join('');
             lucide.createIcons();
         }
 
         window.selectRoom = function (id, name) {
-            roomInput.value = name;
-            roomHiddenId.value = id;
-            roomResults.classList.add('hidden');
-            roomClearBtn.classList.remove('hidden');
+            roomInput.value = name; roomHiddenId.value = id;
+            roomResults.classList.add('hidden'); roomClearBtn.classList.remove('hidden');
         }
 
         window.clearRoomSelection = function () {
-            roomInput.value = '';
-            roomHiddenId.value = '';
-            roomClearBtn.classList.add('hidden');
-            roomInput.focus();
-            renderRoomResults('');
-            roomResults.classList.remove('hidden');
+            roomInput.value = ''; roomHiddenId.value = '';
+            roomClearBtn.classList.add('hidden'); roomInput.focus();
+            renderRoomResults(''); roomResults.classList.remove('hidden');
         }
 
         if (roomInput) {
             roomInput.addEventListener('input', (e) => {
                 const val = e.target.value;
-                if (val.length > 0) {
-                    roomResults.classList.remove('hidden');
-                    roomClearBtn.classList.remove('hidden');
-                    renderRoomResults(val);
-                } else {
-                    roomResults.classList.add('hidden');
-                    roomClearBtn.classList.add('hidden');
-                }
+                if (val.length > 0) { roomResults.classList.remove('hidden'); roomClearBtn.classList.remove('hidden'); renderRoomResults(val); }
+                else { roomResults.classList.add('hidden'); roomClearBtn.classList.add('hidden'); }
             });
-
             roomInput.addEventListener('focus', () => {
-                if (roomInput.value.trim() === "") {
-                    roomResults.classList.remove('hidden');
-                    renderRoomResults('');
-                }
+                if (roomInput.value.trim() === "") { roomResults.classList.remove('hidden'); renderRoomResults(''); }
             });
-
             document.addEventListener('click', (e) => {
                 const container = document.getElementById('room-search-container');
-                if (container && !container.contains(e.target)) {
-                    roomResults.classList.add('hidden');
-                }
+                if (container && !container.contains(e.target)) roomResults.classList.add('hidden');
             });
+        }
+
+        /* ---- Deadline toggle ---- */
+        function toggleDeadline() {
+            const btn = document.getElementById('deadline-toggle');
+            const knob = document.getElementById('deadline-toggle-knob');
+            const field = document.getElementById('deadline-field');
+            const hidden = document.getElementById('has-deadline');
+            const isOn = btn.getAttribute('aria-pressed') === 'true';
+            btn.setAttribute('aria-pressed', String(!isOn));
+            btn.classList.toggle('bg-blue-500', !isOn);
+            btn.classList.toggle('bg-slate-200', isOn);
+            knob.classList.toggle('translate-x-[1.125rem]', !isOn);
+            knob.classList.toggle('translate-x-1', isOn);
+            field.classList.toggle('hidden', isOn);
+            hidden.value = isOn ? '0' : '1';
+            if (!isOn) document.getElementById('deadline-input').focus();
         }
     </script>
 

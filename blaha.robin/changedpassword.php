@@ -18,7 +18,7 @@ getApplication()->destroySession();
 
 <?php require_once __DIR__ . "/app/includes/header.php"; ?>
 
-    <div id="view-logged-out" class="absolute inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
+    <div id="view-logged-out" class="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
         <div class="w-full max-w-sm anim-scale-in my-8">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden text-center p-8">
                 <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 text-green-600 mb-6">
