@@ -2,32 +2,26 @@
 
 class PriorityRepository extends Repository
 {
-    public function getPriorityById($priority_id): array
+    public function getPriorityById($priority_id): ?Priority
     {
-        return $this->database->selectOne(
+        $row = $this->database->selectOne(
             "SELECT * FROM priorities WHERE priority_id = :priority_id",
-            [
-                ":priority_id" => $priority_id,
-            ]
+            [":priority_id" => $priority_id]
         );
+        return $row ? new Priority($row) : null;
     }
 
     public function getAllPriorities(): array
     {
-        return $this->database->select(
-            "SELECT * FROM priorities"
-        );
+        $rows = $this->database->select("SELECT * FROM priorities");
+        return array_map(fn($r) => new Priority($r), $rows);
     }
 
     public function addPriority($priority_name, $priority_weight, $priority_color): false|string
     {
         return $this->database->insert(
             "INSERT INTO priorities (priority_name, priority_weight, priority_color) VALUES (:priority_name, :priority_weight, :priority_color)",
-            [
-                ":priority_name" => $priority_name,
-                ":priority_weight" => $priority_weight,
-                ":priority_color" => $priority_color,
-            ]
+            [":priority_name" => $priority_name, ":priority_weight" => $priority_weight, ":priority_color" => $priority_color]
         );
     }
 
@@ -35,12 +29,7 @@ class PriorityRepository extends Repository
     {
         $this->database->update(
             "UPDATE priorities SET priority_name = :priority_name, priority_weight = :priority_weight, priority_color = :priority_color WHERE priority_id = :priority_id",
-            [
-                ":priority_id" => $priority_id,
-                ":priority_name" => $priority_name,
-                ":priority_weight" => $priority_weight,
-                ":priority_color" => $priority_color,
-            ]
+            [":priority_id" => $priority_id, ":priority_name" => $priority_name, ":priority_weight" => $priority_weight, ":priority_color" => $priority_color]
         );
     }
 
@@ -48,9 +37,7 @@ class PriorityRepository extends Repository
     {
         $this->database->delete(
             "DELETE FROM priorities WHERE priority_id = :priority_id",
-            [
-                ":priority_id" => $priority_id,
-            ]
+            [":priority_id" => $priority_id]
         );
     }
 }

@@ -2,30 +2,26 @@
 
 class CategoryRepository extends Repository
 {
-    public function getCategoryById($category_id): array
+    public function getCategoryById($category_id): ?Category
     {
-        return $this->database->selectOne(
+        $row = $this->database->selectOne(
             "SELECT * FROM categories WHERE category_id = :category_id",
-            [
-                ":category_id" => $category_id,
-            ]
+            [":category_id" => $category_id]
         );
+        return $row ? new Category($row) : null;
     }
 
     public function getAllCategories(): array
     {
-        return $this->database->select(
-            "SELECT * FROM categories"
-        );
+        $rows = $this->database->select("SELECT * FROM categories");
+        return array_map(fn($r) => new Category($r), $rows);
     }
 
     public function addCategory($category_name): false|string
     {
         return $this->database->insert(
             "INSERT INTO categories (category_name) VALUES (:category_name)",
-            [
-                ":category_name" => $category_name,
-            ]
+            [":category_name" => $category_name]
         );
     }
 
@@ -33,10 +29,7 @@ class CategoryRepository extends Repository
     {
         $this->database->update(
             "UPDATE categories SET category_name = :category_name WHERE category_id = :category_id",
-            [
-                ":category_id" => $category_id,
-                ":category_name" => $category_name,
-            ]
+            [":category_id" => $category_id, ":category_name" => $category_name]
         );
     }
 
@@ -44,9 +37,7 @@ class CategoryRepository extends Repository
     {
         $this->database->delete(
             "DELETE FROM categories WHERE category_id = :category_id",
-            [
-                ":category_id" => $category_id,
-            ]
+            [":category_id" => $category_id]
         );
     }
 }

@@ -5,8 +5,9 @@ require_once __DIR__ . "/app/SPSTickets.php";
 getApplication()->checkUser();
 getApplication()->setPageName("Odhlášení");
 
-$logout_username = getApplication()->getUser()["user_username"];
-$logout_name = getApplication()->getUser()["teacher_name"];
+$logout_user = getApplication()->getUser();
+$logout_username = $logout_user->user_username;
+$logout_name = $logout_user->teacher_name;
 $logout_initials = getApplication()->getInitials($logout_name);
 
 getApplication()->destroySession();
