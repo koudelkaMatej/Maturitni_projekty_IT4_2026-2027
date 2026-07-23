@@ -125,6 +125,7 @@ class SPSTickets implements TicketsApplication
 
             $this->refreshSession();
         } catch (Exception $exception) {
+            if ($this->configuration->development) print_r($exception);
             die("<h1>SPŠ HelpDesk je momentálně nedostupný.</h1>");
         }
     }
