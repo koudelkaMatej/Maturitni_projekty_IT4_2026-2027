@@ -11,7 +11,7 @@
  *
  * Users extend teacher records in a 1:1 relationship — every
  * query JOINS the teachers table so all User objects carry
- * teacher_name and teacher_code.
+ * teacher_name.
  */
 class UserRepository extends Repository
 {
@@ -80,11 +80,11 @@ class UserRepository extends Repository
      * @param string $user_password Plaintext password (will be hashed).
      * @return false|string The new user ID, or false on failure.
      */
-    public function addUser(int $user_id, string $user_username, string $user_password): false|string
+    public function addUser(int $user_id, string $user_username, string $user_password, bool $admin = false): false|string
     {
         return $this->database->insert(
-            "INSERT INTO users (user_id, user_username, user_password) VALUES (:user_id, :user_username, :user_password)",
-            [":user_id" => $user_id, ":user_username" => $user_username, ":user_password" => password_hash($user_password, PASSWORD_DEFAULT)]
+            "INSERT INTO users (user_id, user_username, user_password, user_admin) VALUES (:user_id, :user_username, :user_password, :user_admin)",
+            [":user_id" => $user_id, ":user_username" => $user_username, ":user_password" => password_hash($user_password, PASSWORD_DEFAULT), ":user_admin" => $admin ? 1 : 0]
         );
     }
 
@@ -99,6 +99,14 @@ class UserRepository extends Repository
         $this->database->update(
             "UPDATE users SET user_username = :user_username WHERE user_id = :user_id",
             [":user_id" => $user_id, ":user_username" => $user_username]
+        );
+    }
+
+    public function updateUserAdmin(int $user_id, bool $admin): void
+    {
+        $this->database->update(
+            "UPDATE users SET user_admin = :user_admin WHERE user_id = :user_id",
+            [":user_id" => $user_id, ":user_admin" => $admin ? 1 : 0]
         );
     }
 

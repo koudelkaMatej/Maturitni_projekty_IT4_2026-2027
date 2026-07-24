@@ -23,8 +23,8 @@ class User implements JsonSerializable
     /** Joined full name of the teacher. */
     public readonly string $teacher_name;
 
-    /** Joined optional teacher code. */
-    public readonly ?string $teacher_code;
+    /** Whether this user has administrator privileges. */
+    public readonly bool $user_admin;
 
     /** Password hash (bcrypt) — excluded from jsonSerialize(). */
     private readonly string $user_password;
@@ -34,7 +34,7 @@ class User implements JsonSerializable
         $this->user_id = (int)($row["user_id"] ?? 0);
         $this->user_username = $row["user_username"] ?? "";
         $this->teacher_name = $row["teacher_name"] ?? "";
-        $this->teacher_code = $row["teacher_code"] ?? null;
+        $this->user_admin = (int)($row["user_admin"] ?? 0) === 1;
         $this->user_password = $row["user_password"] ?? "";
     }
 
@@ -56,7 +56,7 @@ class User implements JsonSerializable
             "user_id" => $this->user_id,
             "user_username" => $this->user_username,
             "teacher_name" => $this->teacher_name,
-            "teacher_code" => $this->teacher_code,
+            "user_admin" => $this->user_admin,
         ];
     }
 }

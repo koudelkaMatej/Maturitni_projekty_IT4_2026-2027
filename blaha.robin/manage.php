@@ -8,6 +8,9 @@
 
 require_once __DIR__ . "/app/SPSTickets.php";
 getApplication()->checkUser();
+if (!getApplication()->getUser()->user_admin) {
+    getApplication()->redirectInternally("dashboard");
+}
 getApplication()->setPageName("Správa systému");
 
 $section = $_GET["section"] ?? "teachers";
@@ -29,17 +32,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // --- Teachers ---
     if ($section === "teachers") {
-        $teacher_code = trim($_POST["teacher_code"] ?? "");
         $teacher_name = trim($_POST["teacher_name"] ?? "");
 
         if ($teacher_name === "") $errors[] = "Jméno učitele je povinné.";
 
         if (empty($errors)) {
             if ($action === "edit" && !empty($_POST["edit_id"])) {
-                $teacherRepo->updateTeacher((int)$_POST["edit_id"], $teacher_code, $teacher_name);
+                $teacherRepo->updateTeacher((int)$_POST["edit_id"], $teacher_name);
                 $success = "Učitel byl upraven.";
             } elseif ($action === "add") {
-                $teacherRepo->addTeacher($teacher_code, $teacher_name);
+                $teacherRepo->addTeacher($teacher_name);
                 $success = "Učitel byl přidán.";
             }
         }
@@ -59,6 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $tech_teacher = (int)($_POST["tech_teacher"] ?? 0);
             $tech_username = trim($_POST["tech_username"] ?? "");
             $tech_password = $_POST["tech_password"] ?? "";
+            $tech_admin = isset($_POST["tech_admin"]);
             $edit_uid = (int)($_POST["edit_id"] ?? 0);
 
             if ($tech_teacher <= 0 && $action === "add") $errors[] = "Vyberte učitele.";
@@ -74,10 +77,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             if (empty($errors)) {
                 if ($action === "add") {
-                    $userRepo->addUser($tech_teacher, $tech_username, $tech_password);
+                    $userRepo->addUser($tech_teacher, $tech_username, $tech_password, $tech_admin);
                     $success = "Technik byl přidán.";
                 } elseif ($action === "edit" && $edit_uid > 0) {
                     $userRepo->updateUserUsername($edit_uid, $tech_username);
+                    $userRepo->updateUserAdmin($edit_uid, $tech_admin);
                     if ($tech_password !== "") {
                         $userRepo->updateUserPassword($edit_uid, password_hash($tech_password, PASSWORD_DEFAULT));
                     }
@@ -242,14 +246,7 @@ $tabs = [
                     <?php if ($edit_item): ?>
                         <input type="hidden" name="edit_id" value="<?php echo $edit_item->teacher_id ?>">
                     <?php endif; ?>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                        <div>
-                            <label class="text-xs font-semibold text-slate-500 mb-1 block">Kód</label>
-                            <input type="text" name="teacher_code" maxlength="6"
-                                   value="<?php echo $edit_item ? htmlspecialchars($edit_item->teacher_code ?? "") : "" ?>"
-                                   class="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none text-sm transition-all"
-                                   placeholder="např. SP">
-                        </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
                         <div>
                             <label class="text-xs font-semibold text-slate-500 mb-1 block">Jméno *</label>
                             <input type="text" name="teacher_name" required
@@ -279,7 +276,6 @@ $tabs = [
                         <thead class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider">
                             <tr>
                                 <th class="text-left px-5 py-3">ID</th>
-                                <th class="text-left px-4 py-3">Kód</th>
                                 <th class="text-left px-4 py-3">Jméno</th>
                                 <th class="text-right px-5 py-3">Akce</th>
                             </tr>
@@ -288,7 +284,6 @@ $tabs = [
                             <?php foreach ($items as $item): ?>
                                 <tr class="hover:bg-slate-50 transition-colors">
                                     <td class="px-5 py-3 font-mono text-slate-400 text-xs">#<?php echo $item->teacher_id ?></td>
-                                    <td class="px-4 py-3 font-mono text-xs text-slate-500"><?php echo htmlspecialchars($item->teacher_code ?? "—") ?></td>
                                     <td class="px-4 py-3 font-semibold text-slate-700"><?php echo htmlspecialchars($item->teacher_name) ?></td>
                                     <td class="px-5 py-3 text-right">
                                         <a href="?section=teachers&edit=<?php echo $item->teacher_id ?>"
@@ -307,7 +302,10 @@ $tabs = [
                                 </tr>
                             <?php endforeach; ?>
                             <?php if (empty($items)): ?>
-                                <tr><td colspan="4" class="px-5 py-8 text-center text-sm text-slate-400">Žádní učitelé</td></tr>
+                                <tr>
+                                    <td colspan="3" class="px-5 py-8 text-center text-sm text-slate-400">Žádní učitelé
+                                    </td>
+                                </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -364,19 +362,27 @@ $tabs = [
                                    class="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none text-sm transition-all"
                                    placeholder="••••••••">
                         </div>
-                        <div class="flex gap-2">
-                            <button type="submit"
-                                    class="px-5 py-2.5 rounded-xl <?php echo $edit_item ? 'bg-amber-500 hover:bg-amber-600' : 'bg-blue-600 hover:bg-blue-700' ?> text-white font-semibold text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2 shadow-lg <?php echo $edit_item ? 'shadow-amber-500/30' : 'shadow-blue-500/30' ?>">
-                                <i data-lucide="<?php echo $edit_item ? 'save' : 'plus' ?>" size="16"></i>
-                                <?php echo $edit_item ? 'Uložit změny' : 'Přidat technika' ?>
-                            </button>
-                            <?php if ($edit_item): ?>
-                                <a href="?section=technicians"
-                                   class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-sm transition-all active:scale-95 flex items-center gap-1">
-                                    <i data-lucide="x" size="16"></i>
-                                </a>
-                            <?php endif; ?>
+                        <div class="flex gap-2 items-center">
+                            <label class="flex items-center gap-2 text-sm font-medium text-slate-600 cursor-pointer select-none">
+                                <input type="checkbox" name="tech_admin" value="1"
+                                        <?php echo ($edit_item && $edit_item->user_admin) ? 'checked' : '' ?>
+                                       class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/20">
+                                Administrátor
+                            </label>
                         </div>
+                    </div>
+                    <div class="flex gap-2 mt-4">
+                        <button type="submit"
+                                class="px-5 py-2.5 rounded-xl <?php echo $edit_item ? 'bg-amber-500 hover:bg-amber-600' : 'bg-blue-600 hover:bg-blue-700' ?> text-white font-semibold text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2 shadow-lg <?php echo $edit_item ? 'shadow-amber-500/30' : 'shadow-blue-500/30' ?>">
+                            <i data-lucide="<?php echo $edit_item ? 'save' : 'plus' ?>" size="16"></i>
+                            <?php echo $edit_item ? 'Uložit změny' : 'Přidat technika' ?>
+                        </button>
+                        <?php if ($edit_item): ?>
+                            <a href="?section=technicians"
+                               class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-sm transition-all active:scale-95 flex items-center gap-1">
+                                <i data-lucide="x" size="16"></i>
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </form>
 
@@ -388,6 +394,7 @@ $tabs = [
                                 <th class="text-left px-5 py-3">ID</th>
                                 <th class="text-left px-4 py-3">Přihlašovací jméno</th>
                                 <th class="text-left px-4 py-3">Jméno</th>
+                                <th class="text-left px-4 py-3">Admin</th>
                                 <th class="text-right px-5 py-3">Akce</th>
                             </tr>
                         </thead>
@@ -397,6 +404,14 @@ $tabs = [
                                     <td class="px-5 py-3 font-mono text-slate-400 text-xs">#<?php echo $item->user_id ?></td>
                                     <td class="px-4 py-3 font-mono text-xs text-slate-600"><?php echo htmlspecialchars($item->user_username) ?></td>
                                     <td class="px-4 py-3 font-semibold text-slate-700"><?php echo htmlspecialchars($item->teacher_name) ?></td>
+                                    <td class="px-4 py-3">
+                                        <?php if ($item->user_admin): ?>
+                                            <span class="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md"><i
+                                                        data-lucide="shield-check" size="12"></i> Admin</span>
+                                        <?php else: ?>
+                                            <span class="text-xs text-slate-400">—</span>
+                                        <?php endif; ?>
+                                    </td>
                                     <td class="px-5 py-3 text-right">
                                         <a href="?section=technicians&edit=<?php echo $item->user_id ?>"
                                            class="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-all active:scale-95">
