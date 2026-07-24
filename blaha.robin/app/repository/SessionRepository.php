@@ -54,7 +54,7 @@ class SessionRepository extends Repository
     public function refreshSession($session_id): void
     {
         $this->database->update(
-            "UPDATE sessions SET session_last_use = NOW() WHERE session_id = :session_id",
+            "UPDATE sessions SET session_last_use = " . $this->database->now() . " WHERE session_id = :session_id",
             [
                 ":session_id" => $session_id,
             ]
