@@ -10,7 +10,8 @@
  * Thin PDO wrapper providing convenience methods for common query patterns.
  *
  * All queries use prepared statements with named parameters for safety.
- * The connection uses utf8mb4 charset and throws PDOException on errors.
+ * Supports both MySQL and SQLite drivers with automatic SQL translation
+ * via helper methods (now, curdate, dateSub, concat, month, year, etc.).
  */
 class Database
 {
@@ -23,12 +24,20 @@ class Database
     public function __construct(Configuration $configuration)
     {
         $this->configuration = $configuration;
+
+        $user = $configuration->databaseUser ?? null;
+        $password = $configuration->databasePassword ?? null;
+
         $this->connection = new PDO(
-            "mysql:host=" . $configuration->databaseHost . ";dbname=" . $configuration->databaseName . ";charset=utf8",
-            $configuration->databaseUser,
-            $configuration->databasePassword,
+            $configuration->databaseDsn,
+            $user,
+            $password,
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 1]
         );
+
+        if ($this->isSQLite()) {
+            $this->connection->exec("PRAGMA foreign_keys = ON");
+        }
     }
 
     /**
@@ -114,5 +123,92 @@ class Database
     public function exec(string $query): void
     {
         $this->connection->exec($query);
+    }
+
+    public function getDriverName(): string
+    {
+        return $this->connection->getAttribute(PDO::ATTR_DRIVER_NAME);
+    }
+
+    public function isMySQL(): bool
+    {
+        return $this->getDriverName() === 'mysql';
+    }
+
+    public function isSQLite(): bool
+    {
+        return $this->getDriverName() === 'sqlite';
+    }
+
+    public function now(): string
+    {
+        return $this->isSQLite() ? "datetime('now')" : "NOW()";
+    }
+
+    public function curdate(): string
+    {
+        return $this->isSQLite() ? "date('now')" : "CURDATE()";
+    }
+
+    public function dateSub(string $expr, int $n, string $unit = 'MONTH'): string
+    {
+        if ($this->isSQLite()) {
+            $map = ['MONTH' => 'months', 'DAY' => 'days', 'YEAR' => 'years',
+                'HOUR' => 'hours', 'MINUTE' => 'minutes', 'SECOND' => 'seconds'];
+            $sqliteUnit = $map[strtoupper($unit)] ?? 'months';
+            return "date($expr, '-$n $sqliteUnit')";
+        }
+        return "DATE_SUB($expr, INTERVAL $n $unit)";
+    }
+
+    public function concat(string ...$parts): string
+    {
+        if ($this->isSQLite()) {
+            return implode(' || ', $parts);
+        }
+        return 'CONCAT(' . implode(', ', $parts) . ')';
+    }
+
+    public function lpad(string $expr, int $length, string $pad = ' '): string
+    {
+        if ($this->isSQLite()) {
+            $padRepeated = str_repeat($pad, $length);
+            return "substr('$padRepeated' || $expr, -$length)";
+        }
+        return "LPAD($expr, $length, '$pad')";
+    }
+
+    public function month(string $expr): string
+    {
+        return $this->isSQLite() ? "CAST(strftime('%m', $expr) AS INTEGER)" : "MONTH($expr)";
+    }
+
+    public function year(string $expr): string
+    {
+        return $this->isSQLite() ? "CAST(strftime('%Y', $expr) AS INTEGER)" : "YEAR($expr)";
+    }
+
+    public function groupConcat(string $expr, string $separator = ','): string
+    {
+        if ($this->isSQLite()) {
+            return "GROUP_CONCAT($expr, '$separator')";
+        }
+        return "GROUP_CONCAT($expr SEPARATOR '$separator')";
+    }
+
+    public function insertIgnore(string $query, array $parameters = []): false|string
+    {
+        if ($this->isSQLite()) {
+            $query = str_ireplace('INSERT IGNORE INTO', 'INSERT OR IGNORE INTO', $query);
+        }
+        return $this->insert($query, $parameters);
+    }
+
+    public function deleteIgnore(string $query, array $parameters = []): void
+    {
+        if ($this->isSQLite()) {
+            $query = str_ireplace('DELETE IGNORE FROM', 'DELETE FROM', $query);
+        }
+        $this->delete($query, $parameters);
     }
 }

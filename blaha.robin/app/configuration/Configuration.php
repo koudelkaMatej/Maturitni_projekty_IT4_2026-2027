@@ -14,20 +14,23 @@
  */
 class Configuration
 {
-    /** MySQL/MariaDB host address. */
-    public string $databaseHost = "127.0.0.1";
+    /**
+     * The complete PDO DSN connection string.
+     * Examples:
+     * - MySQL: "mysql:host=127.0.0.1;dbname=spstickets;charset=utf8mb4"
+     * - SQLite File: "sqlite:/path/to/database.sqlite"
+     * - SQLite Memory: "sqlite::memory:"
+     */
+    public string $databaseDsn = "sqlite:" . __DIR__ . "/database.sqlite";
 
-    /** Database name to connect to. */
-    public string $databaseName = "spstickets";
+    /** Database username (null for SQLite). */
+    public ?string $databaseUser = null;
 
-    /** Database username. */
-    public string $databaseUser = "admin";
-
-    /** Database user password. */
-    public string $databasePassword = "";
+    /** Database user password (null for SQLite). */
+    public ?string $databasePassword = null;
 
     /** When true, display_errors and full error reporting are enabled. */
-    public bool $development = true;
+    public bool $development = false;
 
     /** Name of the session cookie. */
     public string $sessionCookie = "SPSTICKETS_SESSION";
