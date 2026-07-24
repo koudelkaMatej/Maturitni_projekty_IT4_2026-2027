@@ -40,30 +40,28 @@ class TeacherRepository extends Repository
     /**
      * Create a new teacher.
      *
-     * @param string $teacher_code Optional short code (max 6 chars).
      * @param string $teacher_name Full name.
      * @return false|string The new teacher ID, or false on failure.
      */
-    public function addTeacher(string $teacher_code, string $teacher_name): false|string
+    public function addTeacher(string $teacher_name): false|string
     {
         return $this->database->insert(
-            "INSERT INTO teachers (teacher_code, teacher_name) VALUES (:teacher_code, :teacher_name)",
-            [":teacher_code" => $teacher_code, ":teacher_name" => $teacher_name]
+            "INSERT INTO teachers (teacher_name) VALUES (:teacher_name)",
+            [":teacher_name" => $teacher_name]
         );
     }
 
     /**
-     * Update a teacher's code and name.
+     * Update a teacher's name.
      *
      * @param int    $teacher_id
-     * @param string $teacher_code
      * @param string $teacher_name
      */
-    public function updateTeacher(int $teacher_id, string $teacher_code, string $teacher_name): void
+    public function updateTeacher(int $teacher_id, string $teacher_name): void
     {
         $this->database->update(
-            "UPDATE teachers SET teacher_code = :teacher_code, teacher_name = :teacher_name WHERE teacher_id = :teacher_id",
-            [":teacher_id" => $teacher_id, ":teacher_code" => $teacher_code, ":teacher_name" => $teacher_name]
+            "UPDATE teachers SET teacher_name = :teacher_name WHERE teacher_id = :teacher_id",
+            [":teacher_id" => $teacher_id, ":teacher_name" => $teacher_name]
         );
     }
 
