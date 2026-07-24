@@ -252,7 +252,7 @@ class SPSTickets implements TicketsApplication
      */
     public function redirectInternally($page): void
     {
-        header("Location: /" . $page . ".php");
+        header("Location: $page.php");
         die();
     }
 
