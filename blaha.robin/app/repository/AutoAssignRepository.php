@@ -54,7 +54,7 @@ class AutoAssignRepository extends Repository
      */
     public function addAutoAssign($autoassign_category, $autoassign_user): void
     {
-        $this->database->insert(
+        $this->database->insertIgnore(
             "INSERT IGNORE INTO autoassigns (autoassign_user, autoassign_category) VALUES (:autoassign_user, :autoassign_category)",
             [
                 ":autoassign_category" => $autoassign_category,
@@ -71,7 +71,7 @@ class AutoAssignRepository extends Repository
      */
     public function deleteAutoAssign($autoassign_category, $autoassign_user): void
     {
-        $this->database->delete(
+        $this->database->deleteIgnore(
             "DELETE IGNORE FROM autoassigns WHERE autoassign_category = :autoassign_category AND autoassign_user = :autoassign_user",
             [
                 ":autoassign_category" => $autoassign_category,
