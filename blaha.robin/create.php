@@ -38,6 +38,7 @@ if (isset($_POST["teacher_id"], $_POST["room_id"], $_POST["category"], $_POST["t
     }
 
     if ($ticket_id) {
+        getApplication()->getTicketEventRepository()->addEvent((int)$ticket_id, $current_user->user_id, "created");
         getApplication()->getAssignmentRepository()->addAssignment((int)$ticket_id, $current_user->user_id);
 
         $auto_users = getApplication()->getAutoAssignRepository()->getAutoAssignUsersByCategory($category);

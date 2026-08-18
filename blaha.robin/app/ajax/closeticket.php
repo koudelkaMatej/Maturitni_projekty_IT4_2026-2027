@@ -20,10 +20,34 @@ if (!$ticket_id || !in_array($action, ["close", "reopen"])) {
     exit;
 }
 
+$ticket = getApplication()->getTicketRepository()->getTicketById($ticket_id);
+if (!$ticket) {
+    http_response_code(404);
+    echo json_encode(["error" => "Ticket not found"]);
+    exit;
+}
+
+$current_user = getApplication()->getUser();
+
 if ($action === "close") {
+    if (!$ticket->ticket_is_open) {
+        http_response_code(400);
+        echo json_encode(["error" => "Ticket is already closed"]);
+        exit;
+    }
+
+    getApplication()->getAssignmentRepository()->addAssignment($ticket_id, $current_user->user_id);
     getApplication()->getTicketRepository()->closeTicket($ticket_id);
+    getApplication()->getTicketEventRepository()->addEvent($ticket_id, $current_user->user_id, "closed");
 } else {
+    if ($ticket->ticket_is_open) {
+        http_response_code(400);
+        echo json_encode(["error" => "Ticket is already open"]);
+        exit;
+    }
+
     getApplication()->getTicketRepository()->reopenTicket($ticket_id);
+    getApplication()->getTicketEventRepository()->addEvent($ticket_id, $current_user->user_id, "reopened");
 }
 
 echo json_encode(["success" => true]);

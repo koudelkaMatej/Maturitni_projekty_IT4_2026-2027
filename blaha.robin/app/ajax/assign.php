@@ -21,6 +21,19 @@ if (!$ticket_id || !$user_id || !in_array($action, ["add", "remove"])) {
     exit;
 }
 
+$ticket = getApplication()->getTicketRepository()->getTicketById($ticket_id);
+if (!$ticket) {
+    http_response_code(404);
+    echo json_encode(["error" => "Ticket not found"]);
+    exit;
+}
+
+if (!$ticket->ticket_is_open) {
+    http_response_code(403);
+    echo json_encode(["error" => "Ticket is closed; reopen it before changing assignees"]);
+    exit;
+}
+
 if ($action === "add") {
     getApplication()->getAssignmentRepository()->addAssignment($ticket_id, $user_id);
 } else {

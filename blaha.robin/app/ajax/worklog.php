@@ -25,6 +25,18 @@ if ($action === "add") {
         exit;
     }
 
+    $ticket = getApplication()->getTicketRepository()->getTicketById($ticket_id);
+    if (!$ticket) {
+        http_response_code(404);
+        echo json_encode(["error" => "Ticket not found"]);
+        exit;
+    }
+    if (!$ticket->ticket_is_open) {
+        http_response_code(403);
+        echo json_encode(["error" => "Ticket is closed; reopen it before adding comments"]);
+        exit;
+    }
+
     getApplication()->getWorkRepository()->addWork($ticket_id, $user_id, $minutes, $description);
     echo json_encode(["success" => true]);
     exit;
@@ -41,6 +53,19 @@ if ($action === "update") {
         exit;
     }
 
+    $work = getApplication()->getWorkRepository()->getWorkById($work_id);
+    if (!$work) {
+        http_response_code(404);
+        echo json_encode(["error" => "Work entry not found"]);
+        exit;
+    }
+    $ticket = getApplication()->getTicketRepository()->getTicketById($work->work_ticket);
+    if (!$ticket || !$ticket->ticket_is_open) {
+        http_response_code(403);
+        echo json_encode(["error" => "Ticket is closed; reopen it before editing comments"]);
+        exit;
+    }
+
     getApplication()->getWorkRepository()->updateWork($work_id, $minutes, $description);
     echo json_encode(["success" => true]);
     exit;
@@ -51,6 +76,19 @@ if ($action === "delete") {
     if (!$work_id) {
         http_response_code(400);
         echo json_encode(["error" => "Missing work ID"]);
+        exit;
+    }
+
+    $work = getApplication()->getWorkRepository()->getWorkById($work_id);
+    if (!$work) {
+        http_response_code(404);
+        echo json_encode(["error" => "Work entry not found"]);
+        exit;
+    }
+    $ticket = getApplication()->getTicketRepository()->getTicketById($work->work_ticket);
+    if (!$ticket || !$ticket->ticket_is_open) {
+        http_response_code(403);
+        echo json_encode(["error" => "Ticket is closed; reopen it before deleting comments"]);
         exit;
     }
 
