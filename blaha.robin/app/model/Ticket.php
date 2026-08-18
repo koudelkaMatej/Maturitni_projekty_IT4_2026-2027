@@ -17,8 +17,8 @@ class Ticket implements JsonSerializable
     /** Auto-increment primary key. */
     public readonly int $ticket_id;
 
-    /** FK to the teacher who reported the issue. */
-    public readonly int $ticket_origin;
+    /** FK to the teacher who reported the issue (nullable — the teacher may have been deleted). */
+    public readonly ?int $ticket_origin;
 
     /** FK to the ticket category (nullable). */
     public readonly ?int $ticket_category;
@@ -74,7 +74,7 @@ class Ticket implements JsonSerializable
     public function __construct(array $row)
     {
         $this->ticket_id = (int)($row["ticket_id"] ?? 0);
-        $this->ticket_origin = (int)($row["ticket_origin"] ?? 0);
+        $this->ticket_origin = isset($row["ticket_origin"]) ? (int)$row["ticket_origin"] : null;
         $this->ticket_category = isset($row["ticket_category"]) ? (int)$row["ticket_category"] : null;
         $this->ticket_room = isset($row["ticket_room"]) ? (int)$row["ticket_room"] : null;
         $this->ticket_priority = isset($row["ticket_priority"]) ? (int)$row["ticket_priority"] : null;
@@ -84,7 +84,7 @@ class Ticket implements JsonSerializable
         $this->ticket_is_open = (bool)($row["ticket_is_open"] ?? true);
         $this->ticket_creation = $row["ticket_creation"] ?? "";
 
-        $this->teacher_name = $row["teacher_name"] ?? null;
+        $this->teacher_name = $row["teacher_name"] ?? ($this->ticket_origin === null ? "Smazaný uživatel" : null);
         $this->category_name = $row["category_name"] ?? null;
         $this->room_name = $row["room_name"] ?? null;
         $this->priority_name = $row["priority_name"] ?? null;

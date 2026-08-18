@@ -83,6 +83,9 @@ $users = getApplication()->getUserRepository()->getAllUsers();
     function avatarHtml(id, name, sizeClasses, extraClasses) {
         sizeClasses = sizeClasses || 'w-7 h-7 text-[10px]';
         extraClasses = extraClasses || 'ring-2 ring-white shadow-sm';
+        if (id === null || id === undefined) {
+            return `<span class="inline-flex ${sizeClasses} rounded-full bg-slate-200 text-slate-400 items-center justify-center flex-shrink-0 ${extraClasses}" title="${escapeHtml(name || 'Smazaný uživatel')}"><i data-lucide="user-x" size="13"></i></span>`;
+        }
         return `<span class="inline-flex ${sizeClasses} rounded-full bg-gradient-to-br ${avatarGradient(id)} text-white font-bold items-center justify-center flex-shrink-0 ${extraClasses}" title="${escapeHtml(name || '')}">${getInitials(name)}</span>`;
     }
 
