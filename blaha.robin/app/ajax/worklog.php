@@ -15,7 +15,7 @@ $action = $_POST["action"] ?? "";
 
 if ($action === "add") {
     $ticket_id = (int)($_POST["ticket_id"] ?? 0);
-    $user_id = (int)($_POST["user_id"] ?? 0);
+    $user_id = getApplication()->getUser()->user_id;
     $minutes = (int)($_POST["minutes"] ?? 0);
     $description = trim($_POST["description"] ?? "");
 
@@ -36,6 +36,9 @@ if ($action === "add") {
         echo json_encode(["error" => "Ticket is closed; reopen it before adding comments"]);
         exit;
     }
+
+    // Commenting on a ticket implicitly assigns the commenter to it, if not already assigned.
+    getApplication()->getAssignmentRepository()->addAssignment($ticket_id, $user_id);
 
     getApplication()->getWorkRepository()->addWork($ticket_id, $user_id, $minutes, $description);
     echo json_encode(["success" => true]);
