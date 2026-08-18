@@ -26,6 +26,9 @@ class Work implements JsonSerializable
     /** Free-text description of the work done. */
     public readonly string $work_description;
 
+    /** Creation datetime (Y-m-d H:i:s). */
+    public readonly string $work_creation;
+
     /** Joined teacher name (populated when a JOIN is used). */
     public readonly ?string $teacher_name;
 
@@ -36,6 +39,7 @@ class Work implements JsonSerializable
         $this->work_user = (int)($row["work_user"] ?? 0);
         $this->work_minutes = (int)($row["work_minutes"] ?? 0);
         $this->work_description = $row["work_description"] ?? "";
+        $this->work_creation = $row["work_creation"] ?? "";
         $this->teacher_name = $row["teacher_name"] ?? null;
     }
 

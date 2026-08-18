@@ -49,6 +49,7 @@ class Migrator
         }
 
         $this->ensureUserAdminColumn();
+        $this->ensureWorkCreationColumn();
     }
 
     private function getMissingTables(): array
@@ -190,6 +191,7 @@ class Migrator
                     work_user        INTEGER DEFAULT NULL,
                     work_minutes     INTEGER NOT NULL DEFAULT 0,
                     work_description TEXT NOT NULL DEFAULT '',
+                    work_creation    TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (work_ticket) REFERENCES tickets (ticket_id) ON DELETE CASCADE ON UPDATE CASCADE,
                     FOREIGN KEY (work_user) REFERENCES users (user_id) ON DELETE SET NULL ON UPDATE CASCADE
                 )
@@ -349,8 +351,9 @@ class Migrator
                     work_id          int(11) NOT NULL AUTO_INCREMENT,
                     work_ticket      int(11) NOT NULL,
                     work_user        int(11) DEFAULT NULL,
-                    work_minutes     int(11) NOT NULL DEFAULT 0,
-                    work_description text    NOT NULL DEFAULT '',
+                    work_minutes     int(11)  NOT NULL DEFAULT 0,
+                    work_description text     NOT NULL DEFAULT '',
+                    work_creation    datetime NOT NULL DEFAULT current_timestamp(),
                     PRIMARY KEY (work_id)
                 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_czech_ci
             ");
@@ -479,6 +482,23 @@ class Migrator
             if (!$has) $this->execOrSkip("ALTER TABLE users ADD COLUMN user_admin INTEGER NOT NULL DEFAULT 0");
         } else {
             $this->execOrSkip("ALTER TABLE users ADD COLUMN user_admin tinyint(1) NOT NULL DEFAULT 0");
+        }
+    }
+
+    private function ensureWorkCreationColumn(): void
+    {
+        if ($this->db->isSQLite()) {
+            $has = false;
+            $cols = $this->db->select("PRAGMA table_info(works)");
+            foreach ($cols as $c) {
+                if ($c["name"] === "work_creation") {
+                    $has = true;
+                    break;
+                }
+            }
+            if (!$has) $this->execOrSkip("ALTER TABLE works ADD COLUMN work_creation TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP");
+        } else {
+            $this->execOrSkip("ALTER TABLE works ADD COLUMN work_creation datetime NOT NULL DEFAULT current_timestamp()");
         }
     }
 }

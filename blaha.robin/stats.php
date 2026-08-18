@@ -32,6 +32,9 @@ $user_stats = getApplication()->getTicketRepository()->getUserStats($selected_us
 $total_minutes = getApplication()->getTicketRepository()->getUserTotalWorkMinutes($selected_user_id);
 $monthly_minutes = getApplication()->getTicketRepository()->getUserMonthlyWorkMinutes($selected_user_id);
 $monthly_stats = getApplication()->getTicketRepository()->getUserMonthlyStats($selected_user_id, 6);
+$category_breakdown = getApplication()->getTicketRepository()->getUserCategoryBreakdown($selected_user_id);
+$priority_breakdown = getApplication()->getTicketRepository()->getUserPriorityBreakdown($selected_user_id);
+$recent_events = getApplication()->getTicketEventRepository()->getRecentEventsByUser($selected_user_id, 8);
 
 $total_assigned = (int)($user_stats["total_assigned"] ?? 0);
 $active = (int)($user_stats["active"] ?? 0);
@@ -46,11 +49,18 @@ $page_title = $is_self ? "Moje statistiky" : "Statistiky — " . $selected_user-
 $initials = getApplication()->getInitials($selected_user->teacher_name);
 $avatar_gradient = getApplication()->getAvatarGradient($selected_user->user_id);
 
-$max_assigned = 0;
-foreach ($monthly_stats as $m) {
-    if ($m["assigned"] > $max_assigned) $max_assigned = $m["assigned"];
-}
-$max_assigned = max($max_assigned, 1);
+// 6-month period totals, derived from the monthly breakdown already fetched above.
+$period_months = count($monthly_stats);
+$period_assigned = array_sum(array_column($monthly_stats, "assigned"));
+$period_resolved = array_sum(array_column($monthly_stats, "resolved"));
+$period_still_open = array_sum(array_column($monthly_stats, "still_open"));
+$period_avg_assigned = $period_months > 0 ? round($period_assigned / $period_months, 1) : 0;
+$period_resolution_rate = $period_assigned > 0 ? round($period_resolved / $period_assigned * 100) : 0;
+
+$max_category_cnt = max(array_column($category_breakdown, "cnt") ?: [1]);
+
+$event_labels = ["created" => "Vytvořil", "closed" => "Uzavřel", "reopened" => "Znovu otevřel"];
+$event_icons = ["created" => "plus-circle", "closed" => "check-circle", "reopened" => "rotate-ccw"];
 
 ?>
 
@@ -147,14 +157,47 @@ $max_assigned = max($max_assigned, 1);
             </div>
         </div>
 
+        <!-- 6-month period totals -->
+        <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5 md:p-6"
+             style="animation: fadeIn 0.4s ease 0.3s forwards; opacity: 0;">
+            <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2"><i data-lucide="sigma" size="18"
+                                                                                 class="text-slate-400"></i> Souhrn za
+                posledních <?php echo $period_months ?> měsíců</h3>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <p class="text-xs text-slate-500 font-medium mb-1">Přiřazeno celkem</p>
+                    <p class="text-2xl font-bold text-slate-900"><?php echo $period_assigned ?></p>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <p class="text-xs text-slate-500 font-medium mb-1">Vyřešeno celkem</p>
+                    <p class="text-2xl font-bold text-slate-900"><?php echo $period_resolved ?></p>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <p class="text-xs text-slate-500 font-medium mb-1">Stále otevřeno</p>
+                    <p class="text-2xl font-bold text-slate-900"><?php echo $period_still_open ?></p>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <p class="text-xs text-slate-500 font-medium mb-1">Průměr / měsíc</p>
+                    <p class="text-2xl font-bold text-slate-900"><?php echo $period_avg_assigned ?></p>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <p class="text-xs text-slate-500 font-medium mb-1">Úspěšnost</p>
+                    <p class="text-2xl font-bold text-slate-900"><?php echo $period_resolution_rate ?><span
+                                class="text-base text-slate-400">%</span></p>
+                </div>
+            </div>
+        </div>
+
         <!-- Monthly table -->
-        <div class="bg-white rounded-2xl shadow-soft border border-slate-200 overflow-hidden" style="animation: fadeIn 0.4s ease 0.3s forwards; opacity: 0;">
+        <div class="bg-white rounded-2xl shadow-soft border border-slate-200 overflow-hidden"
+             style="animation: fadeIn 0.4s ease 0.35s forwards; opacity: 0;">
             <div class="p-5 md:p-6 border-b border-slate-100 bg-slate-50/50">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center"><i data-lucide="bar-chart-3" size="20"></i></div>
+                    <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center"><i
+                                data-lucide="calendar-days" size="20"></i></div>
                     <div>
                         <h3 class="font-bold text-slate-900">Měsíční přehled</h3>
-                        <p class="text-sm text-slate-500">Posledních 6 měsíců</p>
+                        <p class="text-sm text-slate-500">Posledních <?php echo $period_months ?> měsíců</p>
                     </div>
                 </div>
             </div>
@@ -166,15 +209,11 @@ $max_assigned = max($max_assigned, 1);
                             <th class="text-center px-4 py-3">Přiřazeno</th>
                             <th class="text-center px-4 py-3">Vyřešeno</th>
                             <th class="text-center px-4 py-3">Aktivní</th>
-                            <th class="text-center px-4 py-3 hidden md:table-cell">Graf</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         <?php foreach ($monthly_stats as $idx => $m): ?>
-                        <?php
-                            $bar_pct = $max_assigned > 0 ? round($m["assigned"] / $max_assigned * 100) : 0;
-                            $row_delay = 0.35 + ($idx * 0.05);
-                        ?>
+                            <?php $row_delay = 0.4 + ($idx * 0.05); ?>
                         <tr class="hover:bg-slate-50 transition-colors" style="animation: fadeIn 0.3s ease <?php echo $row_delay ?>s forwards; opacity: 0;">
                             <td class="px-5 py-4 font-semibold text-slate-800 whitespace-nowrap"><?php echo $m["label"] ?></td>
                             <td class="px-4 py-4 text-center">
@@ -190,11 +229,6 @@ $max_assigned = max($max_assigned, 1);
                                     <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-50 text-slate-400 font-bold text-sm">—</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="px-4 py-4 hidden md:table-cell">
-                                <div class="flex items-center gap-1.5 h-8">
-                                    <div class="h-full bg-blue-500 rounded-md transition-all" style="width: <?php echo $bar_pct ?>%; min-width: <?php echo $m["assigned"] > 0 ? "4" : "0" ?>px; opacity: 0.7;"></div>
-                                </div>
-                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -202,8 +236,91 @@ $max_assigned = max($max_assigned, 1);
             </div>
         </div>
 
+        <!-- Category & priority breakdown -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5 md:p-6"
+                 style="animation: fadeIn 0.4s ease 0.4s forwards; opacity: 0;">
+                <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2"><i data-lucide="tags" size="18"
+                                                                                     class="text-slate-400"></i> Podle
+                    kategorie</h3>
+                <?php if (empty($category_breakdown)): ?>
+                    <p class="text-sm text-slate-400 italic text-center py-6">Zatím žádné přiřazené tickety</p>
+                <?php else: ?>
+                    <div class="space-y-2.5">
+                        <?php foreach ($category_breakdown as $c): ?>
+                            <?php $pct = $max_category_cnt > 0 ? round((int)$c["cnt"] / $max_category_cnt * 100) : 0; ?>
+                            <div>
+                                <div class="flex items-center justify-between text-sm mb-1">
+                                    <span class="font-medium text-slate-700"><?php echo htmlspecialchars($c["category_name"] ?? "Bez kategorie") ?></span>
+                                    <span class="font-bold text-slate-900"><?php echo $c["cnt"] ?></span>
+                                </div>
+                                <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-indigo-400 rounded-full"
+                                         style="width: <?php echo max($pct, 4) ?>%"></div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5 md:p-6"
+                 style="animation: fadeIn 0.4s ease 0.45s forwards; opacity: 0;">
+                <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2"><i data-lucide="flag" size="18"
+                                                                                     class="text-slate-400"></i> Podle
+                    priority</h3>
+                <?php if (empty($priority_breakdown)): ?>
+                    <p class="text-sm text-slate-400 italic text-center py-6">Zatím žádné přiřazené tickety</p>
+                <?php else: ?>
+                    <div class="space-y-2.5">
+                        <?php $priority_hex = ["red" => "#ef4444", "orange" => "#f97316", "green" => "#22c55e", "blue" => "#3b82f6", "gray" => "#94a3b8"]; ?>
+                        <?php foreach ($priority_breakdown as $p): ?>
+                            <?php $color = $priority_hex[$p["priority_color"] ?? "gray"] ?? $priority_hex["gray"]; ?>
+                            <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="flex items-center gap-2 text-sm font-medium text-slate-700">
+                                    <span class="w-2.5 h-2.5 rounded-full"
+                                          style="background: <?php echo $color ?>"></span>
+                                    <?php echo htmlspecialchars($p["priority_name"] ?? "Bez priority") ?>
+                                </span>
+                                <span class="font-bold text-slate-900 text-sm"><?php echo $p["cnt"] ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Recent activity -->
+        <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5 md:p-6"
+             style="animation: fadeIn 0.4s ease 0.5s forwards; opacity: 0;">
+            <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2"><i data-lucide="history" size="18"
+                                                                                 class="text-slate-400"></i> Nedávná
+                aktivita</h3>
+            <?php if (empty($recent_events)): ?>
+                <p class="text-sm text-slate-400 italic text-center py-6">Zatím žádná aktivita</p>
+            <?php else: ?>
+                <div class="divide-y divide-slate-100">
+                    <?php foreach ($recent_events as $e): ?>
+                        <a href="dashboard.php?detail=<?php echo (int)$e["event_ticket"] ?>"
+                           class="flex items-center gap-3 py-2.5 hover:bg-slate-50 -mx-2 px-2 rounded-lg transition-colors">
+                            <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="<?php echo $event_icons[$e["event_type"]] ?? "circle" ?>" size="14"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm text-slate-700 truncate"><span
+                                            class="font-semibold"><?php echo $event_labels[$e["event_type"]] ?? $e["event_type"] ?></span>
+                                    — <?php echo htmlspecialchars($e["ticket_title"] ?: "Bez předmětu") ?></p>
+                            </div>
+                            <p class="text-xs text-slate-400 flex-shrink-0"><?php echo date("j.n.Y H:i", strtotime($e["event_creation"])) ?></p>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+
         <!-- System overview -->
-        <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5 md:p-6" style="animation: fadeIn 0.4s ease 0.45s forwards; opacity: 0;">
+        <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-5 md:p-6"
+             style="animation: fadeIn 0.4s ease 0.55s forwards; opacity: 0;">
             <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-2" size="18" class="text-slate-400"></i> Systémové přehledy</h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
