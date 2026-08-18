@@ -90,7 +90,8 @@ if (isset($_POST["username"], $_POST["password"])) {
                 </div>
 
                 <div class="bg-slate-50 p-4 text-center border-t border-slate-100">
-                    <p class="text-xs text-slate-400">© SPŠ Kladno • Systém vytvořil Robin Bláha</p>
+                    <p class="text-xs text-slate-400">© <a class="underline" href="https://spskladno.cz">SPŠ a VOŠ
+                            Kladno</a> • Systém vytvořil Robin Bláha</p>
                 </div>
             </div>
         </div>
