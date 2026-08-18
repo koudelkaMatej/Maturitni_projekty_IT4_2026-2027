@@ -320,6 +320,15 @@ class TicketRepository extends Repository
         $sql = "SELECT $ymExpr AS ym, COUNT(*) AS assigned, SUM(CASE WHEN t.ticket_is_open = 1 THEN 1 ELSE 0 END) AS still_open FROM assignments a INNER JOIN tickets t ON a.assignment_ticket = t.ticket_id WHERE a.assignment_user = :user_id AND a.assignment_creation >= $dateSub GROUP BY ym ORDER BY ym ASC";
         $rows = $this->database->select($sql, [":user_id" => $user_id]);
 
+        $workMonthExpr = $this->database->month('work_creation');
+        $workYearExpr = $this->database->year('work_creation');
+        $workLpadExpr = $this->database->lpad($this->database->month('work_creation'), 2, '0');
+        $workYmExpr = $this->database->concat($workYearExpr, "'-'", $workLpadExpr);
+        $workDateSub = $this->database->dateSub($this->database->curdate(), $months, 'MONTH');
+
+        $workSql = "SELECT $workYmExpr AS ym, COALESCE(SUM(work_minutes), 0) AS minutes FROM works WHERE work_user = :user_id AND work_creation >= $workDateSub GROUP BY ym";
+        $workRows = $this->database->select($workSql, [":user_id" => $user_id]);
+
         $monthNames = ["01" => "Leden", "02" => "Únor", "03" => "Březen", "04" => "Duben",
                        "05" => "Květen", "06" => "Červen", "07" => "Červenec", "08" => "Srpen",
                        "09" => "Září", "10" => "Říjen", "11" => "Listopad", "12" => "Prosinec"];
@@ -334,16 +343,26 @@ class TicketRepository extends Repository
                     break;
                 }
             }
+            $foundWork = null;
+            foreach ($workRows as $r) {
+                if ($r["ym"] === $ym) {
+                    $foundWork = $r;
+                    break;
+                }
+            }
             $parts = explode("-", $ym);
             $label = $monthNames[$parts[1]] ?? $parts[1] . " " . $parts[0];
             $assigned = $found ? (int)$found["assigned"] : 0;
             $stillOpen = $found ? (int)$found["still_open"] : 0;
+            $minutes = $foundWork ? (int)$foundWork["minutes"] : 0;
             $result[] = [
                 "year_month" => $ym,
                 "label" => $label . " " . $parts[0],
                 "assigned" => $assigned,
                 "resolved" => $assigned - $stillOpen,
                 "still_open" => $stillOpen,
+                "minutes" => $minutes,
+                "hours" => round($minutes / 60, 1),
             ];
         }
 

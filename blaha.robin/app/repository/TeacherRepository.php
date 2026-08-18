@@ -69,10 +69,20 @@ class TeacherRepository extends Repository
      * Delete a teacher. The linked user account (if any) is cascade-deleted.
      * Tickets reported by this teacher will have ticket_origin set to NULL.
      *
+     * Explicitly deletes this person's own assignment rows first — scoped
+     * strictly to their user_id (== teacher_id) — so other people's ticket
+     * assignments stay correct even on a database where the FK's ON DELETE
+     * CASCADE was never applied (the auto-migrator only adds constraints
+     * to newly-created tables).
+     *
      * @param int $teacher_id
      */
     public function deleteTeacher(int $teacher_id): void
     {
+        $this->database->delete(
+            "DELETE FROM assignments WHERE assignment_user = :teacher_id",
+            [":teacher_id" => $teacher_id]
+        );
         $this->database->delete(
             "DELETE FROM teachers WHERE teacher_id = :teacher_id",
             [":teacher_id" => $teacher_id]
