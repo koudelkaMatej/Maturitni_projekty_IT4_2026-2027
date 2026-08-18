@@ -22,10 +22,12 @@ require_once __DIR__ . "/repository/TicketRepository.php";
 require_once __DIR__ . "/repository/TicketEventRepository.php";
 require_once __DIR__ . "/repository/UserRepository.php";
 require_once __DIR__ . "/repository/WorkRepository.php";
+require_once __DIR__ . "/repository/GuestAccessRepository.php";
 
 require_once __DIR__ . "/model/Ticket.php";
 require_once __DIR__ . "/model/TicketEvent.php";
 require_once __DIR__ . "/model/User.php";
+require_once __DIR__ . "/model/GuestAccess.php";
 require_once __DIR__ . "/model/Assignment.php";
 require_once __DIR__ . "/model/Work.php";
 require_once __DIR__ . "/model/Category.php";
@@ -84,6 +86,9 @@ class SPSTickets implements TicketsApplication
 
     /** Repository for work log entries. */
     private WorkRepository $workRepository;
+
+    /** Repository for the guest-access credential. */
+    private GuestAccessRepository $guestAccessRepository;
 
     /** Currently authenticated user, or null. */
     private ?User $currentUser = null;
@@ -150,6 +155,7 @@ class SPSTickets implements TicketsApplication
             $this->ticketEventRepository = new TicketEventRepository($this->database);
             $this->userRepository = new UserRepository($this->database);
             $this->workRepository = new WorkRepository($this->database);
+            $this->guestAccessRepository = new GuestAccessRepository($this->database);
 
             session_name($this->configuration->sessionCookie);
             session_set_cookie_params([
@@ -219,6 +225,11 @@ class SPSTickets implements TicketsApplication
         return $this->workRepository;
     }
 
+    public function getGuestAccessRepository(): GuestAccessRepository
+    {
+        return $this->guestAccessRepository;
+    }
+
     /**
      * Start a PHP session if one is not already active.
      */
@@ -271,6 +282,30 @@ class SPSTickets implements TicketsApplication
     {
         $this->startSession();
         session_destroy();
+    }
+
+    /**
+     * Mark the current PHP session as an authenticated guest (unauthenticated
+     * ticket submission on index.php), after a successful guest login.
+     */
+    public function authenticateGuestSession(): void
+    {
+        $this->startSession();
+        $_SESSION["guest_authenticated"] = true;
+    }
+
+    /** Whether the current PHP session is an authenticated guest. */
+    public function isGuestSessionAuthenticated(): bool
+    {
+        $this->startSession();
+        return !empty($_SESSION["guest_authenticated"]);
+    }
+
+    /** Clear the current session's guest authentication flag. */
+    public function clearGuestSession(): void
+    {
+        $this->startSession();
+        unset($_SESSION["guest_authenticated"]);
     }
 
     /** Redirect to the login page if no user is authenticated. */

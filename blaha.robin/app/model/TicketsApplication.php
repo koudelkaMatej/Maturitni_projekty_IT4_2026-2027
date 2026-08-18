@@ -47,6 +47,9 @@ interface TicketsApplication
     /** @return WorkRepository for work log entries */
     public function getWorkRepository(): WorkRepository;
 
+    /** @return GuestAccessRepository for the guest-access credential */
+    public function getGuestAccessRepository(): GuestAccessRepository;
+
     /** @return ?User Currently authenticated user or null */
     public function getUser(): ?User;
 
@@ -60,6 +63,15 @@ interface TicketsApplication
 
     /** Destroy the current session. */
     public function destroySession(): void;
+
+    /** Mark the current PHP session as an authenticated guest. */
+    public function authenticateGuestSession(): void;
+
+    /** @return bool Whether the current PHP session is an authenticated guest. */
+    public function isGuestSessionAuthenticated(): bool;
+
+    /** Clear the current session's guest authentication flag. */
+    public function clearGuestSession(): void;
 
     /**
      * Redirect to login.php if no user is authenticated.

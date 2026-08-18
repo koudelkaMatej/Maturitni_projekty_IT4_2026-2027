@@ -18,7 +18,7 @@ class Migrator
 
     private const ALL_TABLES = [
         'teachers', 'categories', 'priorities', 'rooms', 'users',
-        'tickets', 'assignments', 'autoassigns', 'sessions', 'works', 'ticket_events',
+        'tickets', 'assignments', 'autoassigns', 'sessions', 'works', 'ticket_events', 'guest_access',
     ];
 
     public function __construct(Database $db)
@@ -45,6 +45,10 @@ class Migrator
 
             if (in_array('teachers', $missing) && in_array('users', $missing)) {
                 $this->seedAdmin();
+            }
+
+            if (in_array('guest_access', $missing)) {
+                $this->seedGuestAccess();
             }
         }
 
@@ -210,6 +214,16 @@ class Migrator
                 )
             ");
         }
+        if (in_array('guest_access', $tables)) {
+            $this->db->exec("
+                CREATE TABLE IF NOT EXISTS guest_access (
+                    guest_id       INTEGER PRIMARY KEY,
+                    guest_username TEXT NOT NULL DEFAULT '',
+                    guest_password TEXT NOT NULL DEFAULT '',
+                    guest_enabled  INTEGER NOT NULL DEFAULT 0
+                )
+            ");
+        }
     }
 
     private function addIndexesSQLite(array $tables): void
@@ -370,6 +384,17 @@ class Migrator
                 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_czech_ci
             ");
         }
+        if (in_array('guest_access', $tables)) {
+            $this->db->exec("
+                CREATE TABLE IF NOT EXISTS guest_access (
+                    guest_id       int(11)      NOT NULL,
+                    guest_username varchar(255) NOT NULL DEFAULT '',
+                    guest_password varchar(255) NOT NULL DEFAULT '',
+                    guest_enabled  tinyint(1)   NOT NULL DEFAULT 0,
+                    PRIMARY KEY (guest_id)
+                ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_czech_ci
+            ");
+        }
     }
 
     private function addIndexesMySQL(array $tables): void
@@ -465,6 +490,13 @@ class Migrator
         $this->db->insert(
             "INSERT INTO users (user_id, user_username, user_password, user_admin) VALUES (:id, :username, :password, 1)",
             [":id" => $teacherId, ":username" => "Administrator", ":password" => password_hash("initpass", PASSWORD_DEFAULT)]
+        );
+    }
+
+    private function seedGuestAccess(): void
+    {
+        $this->db->insert(
+            "INSERT INTO guest_access (guest_id, guest_username, guest_password, guest_enabled) VALUES (1, '', '', 0)"
         );
     }
 
