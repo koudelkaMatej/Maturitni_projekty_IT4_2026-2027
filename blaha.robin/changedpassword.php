@@ -16,6 +16,7 @@ $user_id = $user->user_id;
 $username = $user->user_username;
 $name = $user->teacher_name;
 $initials = getApplication()->getInitials($name);
+$avatar_gradient = getApplication()->getAvatarGradient($user_id);
 
 getApplication()->getSessionRepository()->deleteUserSessions($user_id);
 getApplication()->destroySession();
@@ -33,7 +34,7 @@ getApplication()->destroySession();
                 <h2 class="text-xl font-bold text-slate-900 mb-2">Heslo změněno!</h2>
 
                 <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 mb-6 flex items-center gap-3 text-left" style="animation: fadeIn 0.4s ease 0.2s forwards; opacity: 0;">
-                    <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600"><?php echo $initials ?></div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br <?php echo $avatar_gradient ?> text-white flex items-center justify-center font-bold"><?php echo $initials ?></div>
                     <div>
                         <p class="font-bold text-sm text-slate-800"><?php echo $username ?></p>
                         <p class="text-xs text-slate-500"><?php echo $name ?></p>

@@ -65,6 +65,27 @@ $users = getApplication()->getUserRepository()->getAllUsers();
         return source.slice(0, 2) || '?';
     }
 
+    // Kept in sync with SPSTickets::AVATAR_COLORS (app/SPSTickets.php)
+    const AVATAR_COLORS = [
+        'from-blue-500 to-indigo-600', 'from-emerald-500 to-teal-600', 'from-violet-500 to-purple-600',
+        'from-amber-500 to-orange-600', 'from-rose-500 to-pink-600', 'from-cyan-500 to-sky-600',
+        'from-fuchsia-500 to-purple-600', 'from-lime-500 to-green-600', 'from-red-500 to-rose-600',
+        'from-teal-500 to-cyan-600', 'from-purple-500 to-violet-700', 'from-orange-500 to-red-600',
+        'from-indigo-500 to-blue-700', 'from-pink-500 to-fuchsia-600', 'from-green-500 to-emerald-700',
+        'from-sky-500 to-blue-600', 'from-yellow-500 to-amber-600', 'from-slate-500 to-slate-700',
+    ];
+
+    function avatarGradient(id) {
+        const n = ((parseInt(id) || 0) % AVATAR_COLORS.length + AVATAR_COLORS.length) % AVATAR_COLORS.length;
+        return AVATAR_COLORS[n];
+    }
+
+    function avatarHtml(id, name, sizeClasses, extraClasses) {
+        sizeClasses = sizeClasses || 'w-7 h-7 text-[10px]';
+        extraClasses = extraClasses || 'ring-2 ring-white shadow-sm';
+        return `<span class="inline-flex ${sizeClasses} rounded-full bg-gradient-to-br ${avatarGradient(id)} text-white font-bold items-center justify-center flex-shrink-0 ${extraClasses}" title="${escapeHtml(name || '')}">${getInitials(name)}</span>`;
+    }
+
     // ===== Pagination =====
 
     function goToPage(page) {
@@ -134,23 +155,16 @@ $users = getApplication()->getUserRepository()->getAllUsers();
             return `<span class="inline-block w-1.5 h-1.5 rounded-full mr-1.5" style="background:${priorityHex[color] || priorityHex.gray}"></span>`;
         }
 
-        function avatar(name) {
-            const initials = getInitials(name);
-            const colors = ['from-blue-400 to-indigo-500', 'from-emerald-400 to-teal-500', 'from-violet-400 to-purple-500', 'from-amber-400 to-orange-500', 'from-rose-400 to-pink-500'];
-            const ci = name ? name.charCodeAt(0) % colors.length : 0;
-            return `<span class="inline-flex w-7 h-7 rounded-full bg-gradient-to-br ${colors[ci]} text-white text-[10px] font-bold items-center justify-center flex-shrink-0 shadow-sm ring-2 ring-white" title="${escapeHtml(name)}">${initials}</span>`;
-        }
-
-        function assigneeAvatars(namesStr) {
+        function assigneeAvatars(idsStr, namesStr) {
             if (!namesStr) return '';
             const names = namesStr.split(', ');
+            const ids = (idsStr || '').split(',');
             if (names.length === 1) {
-                return `<div class="flex items-center gap-2">${avatar(names[0])}<span class="text-xs font-medium text-slate-700">${escapeHtml(names[0])}</span></div>`;
+                return `<div class="flex items-center gap-2">${avatarHtml(ids[0], names[0])}<span class="text-xs font-medium text-slate-700">${escapeHtml(names[0])}</span></div>`;
             }
             const maxShow = 4;
-            const visible = names.slice(0, maxShow);
             const leftover = names.length - maxShow;
-            const circles = visible.map(n => avatar(n)).join('');
+            const circles = names.slice(0, maxShow).map((n, i) => avatarHtml(ids[i], n)).join('');
             const overflow = leftover > 0 ? `<span class="inline-flex w-7 h-7 rounded-full bg-slate-100 text-slate-500 text-[10px] font-bold items-center justify-center flex-shrink-0 -ml-1 border-2 border-white shadow-sm">+${leftover}</span>` : '';
             return `<div class="flex items-center avatar-stack" title="${escapeHtml(namesStr)}">${circles}${overflow}</div>`;
         }
@@ -163,6 +177,7 @@ $users = getApplication()->getUserRepository()->getAllUsers();
             const priorityColor = t.priority_color || 'gray';
             const deadlineRaw = t.ticket_deadline;
             const assigneeNames = t.assignee_names || null;
+            const assigneeIds = t.assignee_ids || null;
             const assigneeCount = parseInt(t.assignee_count || 0);
             const borderColor = priorityHex[priorityColor] || priorityHex.gray;
 
@@ -185,7 +200,7 @@ $users = getApplication()->getUserRepository()->getAllUsers();
             }
 
             const assigneeCell = assigneeCount > 0
-                ? assigneeAvatars(assigneeNames)
+                ? assigneeAvatars(assigneeIds, assigneeNames)
                 : `<button onclick="event.stopPropagation();selfAssign(${t.ticket_id})" class="text-xs font-semibold text-blue-600 hover:text-white hover:bg-blue-600 px-2.5 py-1 rounded-lg border border-blue-200 hover:border-blue-600 transition-all active:scale-95">+ Přiřadit se</button>`;
 
             const badgeClass = priorityBadge[priorityColor] || priorityBadge.gray;
@@ -202,7 +217,7 @@ $users = getApplication()->getUserRepository()->getAllUsers();
                 </td>
                 <td class="px-2 py-4 align-top"><span class="inline-flex text-xs font-medium text-slate-600 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">${catName}</span></td>
                 <td class="px-2 py-4 align-top"><span class="text-xs font-medium text-slate-500">${roomName}</span></td>
-                <td class="px-2 py-4 align-top"><span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600">${avatar(originName)} ${escapeHtml(originName)}</span></td>
+                <td class="px-2 py-4 align-top"><span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600">${avatarHtml(t.ticket_origin, originName)} ${escapeHtml(originName)}</span></td>
                 <td class="px-2 py-4 align-top">${assigneeCell}</td>
                 <td class="px-2 py-4 align-top"><span class="inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-lg border ${badgeClass}">${statusDot(priorityColor)}${priorityName}</span></td>
                 <td class="px-2 py-4 align-top">${deadlineHtml}</td>
@@ -332,7 +347,7 @@ $users = getApplication()->getUserRepository()->getAllUsers();
 
         const logRows = d.work_log.map(w =>
             `<div class="flex items-start gap-3 py-3 border-b border-slate-100 last:border-0 group anim-fade-in">
-                <div class="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-600 flex items-center justify-center text-xs font-bold shadow-sm">${getInitials(w.teacher_name)}</div>
+                ${avatarHtml(w.work_user, w.teacher_name, 'w-9 h-9 text-xs')}
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-semibold text-slate-700">${escapeHtml(w.teacher_name || '—')}</p>
                     <p class="text-sm text-slate-500">${escapeHtml(w.work_description)}</p>
@@ -407,7 +422,7 @@ $users = getApplication()->getUserRepository()->getAllUsers();
                             </div>
                             <div class="bg-white border border-slate-200 rounded-lg p-3 col-span-2 hover:border-blue-200 transition-colors">
                                 <label class="text-[10px] text-slate-400 font-semibold uppercase block mb-1">Zadal</label>
-                                <p class="text-sm font-medium text-slate-700">${escapeHtml(t.teacher_name || '—')}</p>
+                                <p class="text-sm font-medium text-slate-700 flex items-center gap-2">${t.teacher_name ? avatarHtml(t.ticket_origin, t.teacher_name, 'w-6 h-6 text-[10px]') : ''} ${escapeHtml(t.teacher_name || '—')}</p>
                             </div>
                         </div>
                     </div>
@@ -424,7 +439,7 @@ $users = getApplication()->getUserRepository()->getAllUsers();
                                 const isMe = a.assignment_user === currentUserId;
                                 return `<div class="flex items-center justify-between px-4 py-2.5 ${isMe ? 'bg-blue-50/50' : ''} anim-fade-in">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-7 h-7 rounded-full bg-gradient-to-br ${isMe ? 'from-blue-400 to-indigo-500 shadow-sm' : 'from-slate-300 to-slate-400'} text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">${getInitials(a.teacher_name)}</div>
+                                        ${avatarHtml(a.assignment_user, a.teacher_name, 'w-7 h-7 text-[10px]', isMe ? 'ring-2 ring-blue-400 shadow-sm' : 'ring-2 ring-white')}
                                         <span class="text-sm ${isMe ? 'font-bold text-blue-700' : 'text-slate-700'}">${escapeHtml(a.teacher_name)}${isMe ? ' (já)' : ''}</span>
                                     </div>
                                     ${isOpen ? `<button onclick="removeAssignee(${t.ticket_id}, ${a.assignment_user})" class="text-xs text-red-400 hover:text-red-600 p-1.5 hover:bg-red-50 rounded-lg transition-all active:scale-90" title="Odebrat"><i data-lucide="x" size="14"></i></button>` : ''}

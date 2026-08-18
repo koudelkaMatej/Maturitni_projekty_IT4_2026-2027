@@ -44,11 +44,7 @@ $overdue = getApplication()->getTicketRepository()->getCountOverdue();
 $is_self = $selected_user_id === $current_user->user_id;
 $page_title = $is_self ? "Moje statistiky" : "Statistiky — " . $selected_user->teacher_name;
 $initials = getApplication()->getInitials($selected_user->teacher_name);
-
-function avatarColor($name): string {
-    $colors = ["bg-blue-500", "bg-emerald-500", "bg-violet-500", "bg-amber-500", "bg-rose-500", "bg-cyan-500", "bg-orange-500", "bg-indigo-500"];
-    return $colors[crc32($name) % count($colors)];
-}
+$avatar_gradient = getApplication()->getAvatarGradient($selected_user->user_id);
 
 $max_assigned = 0;
 foreach ($monthly_stats as $m) {
@@ -67,7 +63,7 @@ $max_assigned = max($max_assigned, 1);
         <div class="bg-white rounded-2xl shadow-soft border border-slate-200 p-4 md:p-6">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full <?php echo avatarColor($selected_user->teacher_name) ?> text-white flex items-center justify-center text-sm font-bold"><?php echo $initials ?></div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br <?php echo $avatar_gradient ?> text-white flex items-center justify-center text-sm font-bold"><?php echo $initials ?></div>
                     <div>
                         <h2 class="text-lg font-bold text-slate-900"><?php echo $page_title ?></h2>
                         <p class="text-sm text-slate-500">Statistiky přiřazených ticketů a odpracovaného času</p>

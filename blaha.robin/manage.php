@@ -403,7 +403,12 @@ $tabs = [
                                 <tr class="hover:bg-slate-50 transition-colors">
                                     <td class="px-5 py-3 font-mono text-slate-400 text-xs">#<?php echo $item->user_id ?></td>
                                     <td class="px-4 py-3 font-mono text-xs text-slate-600"><?php echo htmlspecialchars($item->user_username) ?></td>
-                                    <td class="px-4 py-3 font-semibold text-slate-700"><?php echo htmlspecialchars($item->teacher_name) ?></td>
+                                    <td class="px-4 py-3 font-semibold text-slate-700">
+                                        <span class="inline-flex items-center gap-2">
+                                            <span class="w-7 h-7 rounded-full bg-gradient-to-br <?php echo getApplication()->getAvatarGradient($item->user_id) ?> text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0"><?php echo getApplication()->getInitials($item->teacher_name) ?></span>
+                                            <?php echo htmlspecialchars($item->teacher_name) ?>
+                                        </span>
+                                    </td>
                                     <td class="px-4 py-3">
                                         <?php if ($item->user_admin): ?>
                                             <span class="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md"><i
