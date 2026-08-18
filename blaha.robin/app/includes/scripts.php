@@ -11,38 +11,13 @@ require_once __DIR__ . "/../tickets/TicketView.php";
 
 global $view;
 $current_user = getApplication()->getUser();
-
-$tickets = [];
-$paginator = null;
-
-if ($view instanceof TicketView) {
-    $current_page = $view->getPage();
-    $page = max(1, (int)($_GET["page"] ?? 1));
-
-    switch ($current_page) {
-        case TicketViewPage::All:
-            $paginator = getApplication()->getTicketRepository()->getOpenTickets($page);
-            $tickets = $paginator->items;
-            break;
-        case TicketViewPage::Assigned:
-            $tickets = getApplication()->getAssignmentRepository()->getActiveAssignedTicketsToUser($current_user->user_id);
-            break;
-        case TicketViewPage::Closed:
-            $paginator = getApplication()->getTicketRepository()->getClosedTickets($page);
-            $tickets = $paginator->items;
-            break;
-    }
-}
-
-$users = getApplication()->getUserRepository()->getAllUsers();
+$current_view_slug = ($view instanceof TicketView) ? $view->getViewSlug() : "";
 
 ?>
 
 <script>
-    const tickets = <?php echo json_encode($tickets, JSON_UNESCAPED_UNICODE); ?>;
-    const users = <?php echo json_encode($users, JSON_UNESCAPED_UNICODE); ?>;
     const currentUserId = <?php echo $current_user->user_id ?? 0 ?>;
-    const pagination = <?php echo json_encode($paginator ? ["page" => $paginator->page, "lastPage" => $paginator->lastPage, "total" => $paginator->total] : null, JSON_UNESCAPED_UNICODE); ?>;
+    const currentView = "<?php echo $current_view_slug ?>";
 
     // ===== Helpers =====
 
@@ -89,65 +64,101 @@ $users = getApplication()->getUserRepository()->getAllUsers();
         return `<span class="inline-flex ${sizeClasses} rounded-full bg-gradient-to-br ${avatarGradient(id)} text-white font-bold items-center justify-center flex-shrink-0 ${extraClasses}" title="${escapeHtml(name || '')}">${getInitials(name)}</span>`;
     }
 
-    // ===== Pagination =====
+    // ===== Ticket list state (server-driven search/filter/sort/lazy-load) =====
 
-    function goToPage(page) {
-        if (!pagination) return;
-        if (page < 1 || page > pagination.lastPage) return;
-        const url = new URL(window.location);
-        url.searchParams.set('page', page);
-        window.location.href = url.toString();
+    const PAGE_SIZE = 50;
+    const ticketState = {search: '', category: '', room: '', priority: '', assignee: '', sort: 'created', dir: 'desc'};
+    let renderedCount = 0;
+    let totalCount = 0;
+    let loadingTickets = false;
+
+    function buildTicketQuery(perPage) {
+        const p = new URLSearchParams();
+        p.set('view', currentView);
+        if (ticketState.search) p.set('search', ticketState.search);
+        if (ticketState.category) p.set('category', ticketState.category);
+        if (ticketState.room) p.set('room', ticketState.room);
+        if (ticketState.priority) p.set('priority', ticketState.priority);
+        if (ticketState.assignee) p.set('assignee', ticketState.assignee);
+        p.set('sort', ticketState.sort);
+        p.set('dir', ticketState.dir);
+        p.set('page', '1');
+        p.set('perPage', String(perPage));
+        return p.toString();
     }
 
-    function renderPagination() {
-        const el = document.getElementById('pagination-controls');
-        if (!el) return;
-        if (!pagination || pagination.lastPage <= 1) {
-            el.classList.add('hidden');
-            return;
-        }
-        el.classList.remove('hidden');
-        let html = `<div class="text-sm text-slate-500">${pagination.total} ticketů</div><div class="flex items-center gap-1">`;
+    function loadTickets(targetCount) {
+        if (!currentView || loadingTickets) return;
+        loadingTickets = true;
+        const loading = document.getElementById('loading-indicator');
+        if (renderedCount === 0 && loading) loading.classList.remove('hidden');
 
-        if (pagination.page > 1) {
-            html += `<button onclick="goToPage(${pagination.page - 1})" class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors active:scale-95">&laquo; Předchozí</button>`;
-        }
-
-        for (let p = 1; p <= pagination.lastPage; p++) {
-            if (p === pagination.page) {
-                html += `<span class="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 rounded-lg">${p}</span>`;
-            } else if (p === 1 || p === pagination.lastPage || Math.abs(p - pagination.page) <= 2) {
-                html += `<button onclick="goToPage(${p})" class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors active:scale-95">${p}</button>`;
-            } else if (Math.abs(p - pagination.page) === 3) {
-                html += `<span class="px-1 text-slate-300">...</span>`;
-            }
-        }
-
-        if (pagination.page < pagination.lastPage) {
-            html += `<button onclick="goToPage(${pagination.page + 1})" class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors active:scale-95">Další &raquo;</button>`;
-        }
-
-        html += '</div>';
-        el.innerHTML = html;
+        fetch('app/ajax/tickets_list.php?' + buildTicketQuery(targetCount))
+            .then(r => r.json())
+            .then(data => {
+                if (loading) loading.classList.add('hidden');
+                totalCount = data.total;
+                renderTickets(data.items);
+                renderedCount = data.items.length;
+                loadingTickets = false;
+                updateLoadMoreUI();
+            })
+            .catch(() => {
+                if (loading) loading.classList.add('hidden');
+                loadingTickets = false;
+            });
     }
 
-    renderPagination();
+    function resetAndLoadTickets() {
+        renderedCount = 0;
+        loadTickets(PAGE_SIZE);
+    }
+
+    function loadMoreTickets() {
+        if (loadingTickets || renderedCount >= totalCount) return;
+        loadTickets(renderedCount + PAGE_SIZE);
+    }
+
+    function refreshTicketList() {
+        if (!currentView) return;
+        loadTickets(Math.max(renderedCount, PAGE_SIZE));
+    }
+
+    function updateLoadMoreUI() {
+        const hasMore = renderedCount < totalCount;
+        const countText = totalCount > 0 ? `Zobrazeno ${renderedCount} z ${totalCount}` : '';
+        const desktop = document.getElementById('load-more-container');
+        const desktopCount = document.getElementById('load-more-count');
+        const mobile = document.getElementById('mobile-load-more-container');
+        const mobileCount = document.getElementById('mobile-load-more-count');
+        if (desktop) desktop.classList.toggle('hidden', !hasMore);
+        if (mobile) mobile.classList.toggle('hidden', !hasMore);
+        if (desktopCount) desktopCount.textContent = countText;
+        if (mobileCount) mobileCount.textContent = countText;
+    }
+
+    const loadMoreSentinel = document.getElementById('load-more-sentinel');
+    if (loadMoreSentinel && 'IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) loadMoreTickets();
+            });
+        }, {rootMargin: '400px'}).observe(loadMoreSentinel);
+    }
 
     // ===== Ticket list rendering =====
 
     function renderTickets(data) {
         const tbody = document.getElementById('ticket-table-body');
         const mobileList = document.getElementById('mobile-ticket-list');
-        const loading = document.getElementById('loading-indicator');
-        if (loading) loading.style.display = 'none';
 
         const priorityHex = {red: '#ef4444', orange: '#f97316', green: '#22c55e', blue: '#3b82f6', gray: '#94a3b8'};
         const priorityBadge = {red: 'text-red-700 bg-red-50 border-red-200', orange: 'text-orange-700 bg-orange-50 border-orange-200', green: 'text-green-700 bg-green-50 border-green-200', blue: 'text-blue-700 bg-blue-50 border-blue-200', gray: 'text-slate-600 bg-slate-50 border-slate-200'};
 
         if (!data || data.length === 0) {
-            const empty = '<tr><td colspan="9" class="p-16 text-center anim-fade-in"><div class="max-w-xs mx-auto"><div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center"><i data-lucide="inbox" class="w-8 h-8 text-slate-300"></i></div><p class="text-sm font-semibold text-slate-500 mb-1">Žádné tickety</p><p class="text-xs text-slate-400">Jakmile někdo vytvoří ticket, objeví se zde.</p></div></td></tr>';
+            const empty = '<tr><td colspan="10" class="p-16 text-center anim-fade-in"><div class="max-w-xs mx-auto"><div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center"><i data-lucide="inbox" class="w-8 h-8 text-slate-300"></i></div><p class="text-sm font-semibold text-slate-500 mb-1">Žádné tickety</p><p class="text-xs text-slate-400">Zkuste upravit filtry, nebo počkejte na nový ticket.</p></div></td></tr>';
             if (tbody) tbody.innerHTML = empty;
-            if (mobileList) mobileList.innerHTML = '<div class="p-16 text-center anim-fade-in"><div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center"><i data-lucide="inbox" class="w-8 h-8 text-slate-300"></i></div><p class="text-sm font-semibold text-slate-500 mb-1">Žádné tickety</p><p class="text-xs text-slate-400">Jakmile někdo vytvoří ticket, objeví se zde.</p></div>';
+            if (mobileList) mobileList.innerHTML = '<div class="p-16 text-center anim-fade-in"><div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center"><i data-lucide="inbox" class="w-8 h-8 text-slate-300"></i></div><p class="text-sm font-semibold text-slate-500 mb-1">Žádné tickety</p><p class="text-xs text-slate-400">Zkuste upravit filtry, nebo počkejte na nový ticket.</p></div>';
             lucide.createIcons();
             return;
         }
@@ -156,6 +167,17 @@ $users = getApplication()->getUserRepository()->getAllUsers();
 
         function statusDot(color) {
             return `<span class="inline-block w-1.5 h-1.5 rounded-full mr-1.5" style="background:${priorityHex[color] || priorityHex.gray}"></span>`;
+        }
+
+        function formatDateTime(raw) {
+            if (!raw) return '—';
+            return new Date(raw.replace(' ', 'T')).toLocaleString('cs-CZ', {
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
 
         function assigneeAvatars(idsStr, namesStr) {
@@ -182,9 +204,10 @@ $users = getApplication()->getUserRepository()->getAllUsers();
             const assigneeNames = t.assignee_names || null;
             const assigneeIds = t.assignee_ids || null;
             const assigneeCount = parseInt(t.assignee_count || 0);
-            const borderColor = priorityHex[priorityColor] || priorityHex.gray;
+            const isUnassigned = assigneeCount === 0;
+            const borderColor = isUnassigned ? '#f59e0b' : (priorityHex[priorityColor] || priorityHex.gray);
 
-            const created = new Date(t.ticket_creation).getTime();
+            const created = new Date(t.ticket_creation.replace(' ', 'T')).getTime();
             const isNew = (now - created) < 86400000;
 
             let deadlineHtml = '<span class="text-slate-400">—</span>';
@@ -204,17 +227,18 @@ $users = getApplication()->getUserRepository()->getAllUsers();
 
             const assigneeCell = assigneeCount > 0
                 ? assigneeAvatars(assigneeIds, assigneeNames)
-                : `<button onclick="event.stopPropagation();selfAssign(${t.ticket_id})" class="text-xs font-semibold text-blue-600 hover:text-white hover:bg-blue-600 px-2.5 py-1 rounded-lg border border-blue-200 hover:border-blue-600 transition-all active:scale-95">+ Přiřadit se</button>`;
+                : `<button onclick="event.stopPropagation();selfAssign(${t.ticket_id})" class="text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 px-2.5 py-1.5 rounded-lg shadow-sm shadow-amber-500/30 transition-all active:scale-95 flex items-center gap-1"><i data-lucide="user-plus" size="12"></i> Přiřadit se</button>`;
 
             const badgeClass = priorityBadge[priorityColor] || priorityBadge.gray;
 
             const newBadge = isNew ? `<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full ml-2 pulse-glow"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Nový</span>` : '';
+            const unassignedBadge = isUnassigned ? `<span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full ml-2"><i data-lucide="alert-circle" size="10"></i> Potřebuje řešitele</span>` : '';
 
-            return `<tr class="group cursor-pointer transition-all duration-150 hover:shadow-card-hover hover:-translate-y-0.5 anim-fade-in" style="border-left:4px solid ${borderColor}" onclick="openDetail(${t.ticket_id})">
+            return `<tr class="group cursor-pointer transition-all duration-150 hover:shadow-card-hover hover:-translate-y-0.5 anim-fade-in ${isUnassigned ? 'bg-amber-50/50 hover:bg-amber-50' : ''}" style="border-left:4px solid ${borderColor}" onclick="openDetail(${t.ticket_id})">
                 <td class="pl-5 pr-2 py-4 align-top"><span class="font-mono text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded-md">#${t.ticket_id}</span></td>
                 <td class="px-2 py-4 align-top">
-                    <div class="flex items-start gap-1">
-                        <p class="font-semibold text-slate-800 text-sm leading-snug">${escapeHtml(t.ticket_title)}${newBadge}</p>
+                    <div class="flex items-start gap-1 flex-wrap">
+                        <p class="font-semibold text-slate-800 text-sm leading-snug">${escapeHtml(t.ticket_title)}${newBadge}${unassignedBadge}</p>
                     </div>
                     ${t.ticket_description ? `<p class="text-xs text-slate-400 mt-0.5 leading-relaxed max-w-md overflow-hidden line-clamp-2">${escapeHtml(t.ticket_description)}</p>` : ''}
                 </td>
@@ -224,6 +248,7 @@ $users = getApplication()->getUserRepository()->getAllUsers();
                 <td class="px-2 py-4 align-top">${assigneeCell}</td>
                 <td class="px-2 py-4 align-top"><span class="inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-lg border ${badgeClass}">${statusDot(priorityColor)}${priorityName}</span></td>
                 <td class="px-2 py-4 align-top">${deadlineHtml}</td>
+                <td class="px-2 py-4 align-top"><span class="text-xs text-slate-500">${formatDateTime(t.ticket_creation)}</span></td>
                 <td class="pr-5 pl-2 py-4 align-top text-right"><span class="inline-flex w-7 h-7 rounded-lg bg-slate-50 group-hover:bg-slate-100 items-center justify-center transition-colors"><i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition-colors"></i></span></td>
             </tr>`;
         }).join('');
@@ -231,19 +256,22 @@ $users = getApplication()->getUserRepository()->getAllUsers();
         const mobileCards = data.map(t => {
             const priorityColor = t.priority_color || 'gray';
             const priorityName = t.priority_name || '—';
-            const borderColor = priorityHex[priorityColor] || priorityHex.gray;
+            const assigneeCount = parseInt(t.assignee_count || 0);
+            const isUnassigned = assigneeCount === 0;
+            const borderColor = isUnassigned ? '#f59e0b' : (priorityHex[priorityColor] || priorityHex.gray);
             const originName = t.teacher_name || 'Neznámý';
             const badgeClass = priorityBadge[priorityColor] || priorityBadge.gray;
 
-            const created = new Date(t.ticket_creation).getTime();
+            const created = new Date(t.ticket_creation.replace(' ', 'T')).getTime();
             const isNew = (now - created) < 86400000;
             const newBadge = isNew ? `<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full flex-shrink-0 pulse-glow">Nový</span>` : '';
+            const unassignedBadge = isUnassigned ? `<span class="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full flex-shrink-0 flex items-center gap-1"><i data-lucide="alert-circle" size="10"></i> Potřebuje řešitele</span>` : '';
 
-            return `<div class="bg-white rounded-xl shadow-card border border-slate-100 p-3.5 cursor-pointer active:scale-[0.98] transition-all duration-150 hover:shadow-card-hover anim-fade-in" style="border-left:3px solid ${borderColor}" onclick="openDetail(${t.ticket_id})">
+            return `<div class="bg-white rounded-xl shadow-card border border-slate-100 p-3.5 cursor-pointer active:scale-[0.98] transition-all duration-150 hover:shadow-card-hover anim-fade-in ${isUnassigned ? 'bg-amber-50/50' : ''}" style="border-left:3px solid ${borderColor}" onclick="openDetail(${t.ticket_id})">
                 <div class="flex justify-between items-start mb-2">
-                    <div class="flex items-center gap-2 min-w-0">
+                    <div class="flex items-center gap-2 min-w-0 flex-wrap">
                         <p class="font-semibold text-slate-800 text-sm truncate">${escapeHtml(t.ticket_title)}</p>
-                        ${newBadge}
+                        ${newBadge}${unassignedBadge}
                     </div>
                     <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 flex-shrink-0 ml-2"></i>
                 </div>
@@ -262,35 +290,88 @@ $users = getApplication()->getUserRepository()->getAllUsers();
         lucide.createIcons();
     }
 
-    renderTickets(tickets);
+    // ===== Search, sort & filters =====
 
-    // ===== Search & Sort =====
+    let searchDebounceTimer = null;
 
     function handleSearch(input) {
-        const q = input.value.toLowerCase();
-        const filtered = tickets.filter(t =>
-            (t.ticket_title && t.ticket_title.toLowerCase().includes(q)) ||
-            (t.ticket_description && t.ticket_description.toLowerCase().includes(q)) ||
-            (t.teacher_name && t.teacher_name.toLowerCase().includes(q)) ||
-            (t.category_name && t.category_name.toLowerCase().includes(q)) ||
-            (t.room_name && t.room_name.toLowerCase().includes(q))
-        );
-        renderTickets(filtered);
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => {
+            ticketState.search = input.value.trim();
+            resetAndLoadTickets();
+        }, 300);
     }
 
     function handleSort(select) {
-        const val = select.value;
-        const sorted = [...tickets];
-        if (val === 'newest') sorted.sort((a, b) => new Date(b.ticket_creation) - new Date(a.ticket_creation));
-        else if (val === 'oldest') sorted.sort((a, b) => new Date(a.ticket_creation) - new Date(b.ticket_creation));
-        else if (val === 'priority') sorted.sort((a, b) => (b.priority_weight || 0) - (a.priority_weight || 0));
-        else if (val === 'deadline') sorted.sort((a, b) => (a.ticket_deadline || '9999') > (b.ticket_deadline || '9999') ? 1 : -1);
-        renderTickets(sorted);
+        const [sort, dir] = select.value.split(':');
+        ticketState.sort = sort;
+        ticketState.dir = dir;
+        updateSortArrows();
+        resetAndLoadTickets();
     }
 
-    function refreshTicketList() {
-        renderTickets(tickets);
-        renderPagination();
+    function setSort(field) {
+        if (ticketState.sort === field) {
+            ticketState.dir = ticketState.dir === 'asc' ? 'desc' : 'asc';
+        } else {
+            ticketState.sort = field;
+            ticketState.dir = (field === 'created' || field === 'priority') ? 'desc' : 'asc';
+        }
+        syncSortSelect();
+        updateSortArrows();
+        resetAndLoadTickets();
+    }
+
+    function syncSortSelect() {
+        const sel = document.getElementById('ticket-sort-select');
+        if (!sel) return;
+        const val = `${ticketState.sort}:${ticketState.dir}`;
+        const match = [...sel.options].find(o => o.value === val);
+        if (match) sel.value = val; else sel.selectedIndex = -1;
+    }
+
+    function updateSortArrows() {
+        document.querySelectorAll('[data-sort-arrow]').forEach(el => {
+            const field = el.getAttribute('data-sort-arrow');
+            el.textContent = field === ticketState.sort ? (ticketState.dir === 'asc' ? '↑' : '↓') : '';
+        });
+    }
+
+    function applyFilters() {
+        const cat = document.getElementById('filter-category');
+        const room = document.getElementById('filter-room');
+        const pri = document.getElementById('filter-priority');
+        const assignee = document.getElementById('filter-assignee');
+        ticketState.category = cat ? cat.value : '';
+        ticketState.room = room ? room.value : '';
+        ticketState.priority = pri ? pri.value : '';
+        ticketState.assignee = assignee ? assignee.value : '';
+        updateFilterDot();
+        resetAndLoadTickets();
+    }
+
+    function clearFilters() {
+        ['filter-category', 'filter-room', 'filter-priority', 'filter-assignee'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        applyFilters();
+    }
+
+    function updateFilterDot() {
+        const active = ticketState.category || ticketState.room || ticketState.priority || ticketState.assignee;
+        const dot = document.getElementById('filter-active-dot');
+        if (dot) dot.classList.toggle('hidden', !active);
+    }
+
+    function toggleFilterPanel() {
+        const panel = document.getElementById('filter-panel');
+        if (panel) panel.classList.toggle('hidden');
+    }
+
+    if (currentView) {
+        updateSortArrows();
+        resetAndLoadTickets();
     }
 
     // ===== Detail Modal =====
@@ -541,41 +622,45 @@ $users = getApplication()->getUserRepository()->getAllUsers();
         const desc = document.getElementById('edit-work-description').value;
         if (!minutes || !desc || !editingWorkId) return;
         api("app/ajax/worklog.php", {action: "update", work_id: editingWorkId, minutes, description: desc})
-            .then(r => { if (r.success) { editingWorkId = null; syncTicket(ticketId).then(() => reloadDetail(ticketId)); } });
+            .then(r => {
+                if (r.success) {
+                    editingWorkId = null;
+                    reloadDetail(ticketId);
+                }
+            });
     }
 
     function deleteWorkLog(ticketId, workId) {
         if (!confirm('Opravdu chcete smazat tento přípis?')) return;
         api("app/ajax/worklog.php", {action: "delete", work_id: workId})
-            .then(r => { if (r.success) syncTicket(ticketId).then(() => reloadDetail(ticketId)); });
+            .then(r => {
+                if (r.success) reloadDetail(ticketId);
+            });
     }
 
     // ===== Ticket Actions =====
 
     function selfAssign(ticketId) {
         api("app/ajax/assign.php", {ticket_id: ticketId, user_id: currentUserId, action: "add"})
-            .then(r => { if (r.success) syncTicket(ticketId).then(() => refreshTicketList()); });
+            .then(r => {
+                if (r.success) refreshTicketList();
+            });
     }
 
     function selfAssignFromDetail(ticketId) {
         api("app/ajax/assign.php", {ticket_id: ticketId, user_id: currentUserId, action: "add"})
-            .then(r => { if (r.success) syncTicket(ticketId).then(() => { reloadDetail(ticketId); refreshTicketList(); }); });
+            .then(r => {
+                if (r.success) {
+                    reloadDetail(ticketId);
+                    refreshTicketList();
+                }
+            });
     }
 
     function updateTicketField(ticketId, field, value) {
         api("app/ajax/updateticket.php", {ticket_id: ticketId, [field]: value})
-            .then(r => { if (r.success) syncTicket(ticketId).then(() => refreshTicketList()); });
-    }
-
-    function syncTicket(ticketId) {
-        return fetch("app/ajax/ticket_json.php?id=" + ticketId)
-            .then(r => r.json())
-            .then(d => {
-                const idx = tickets.findIndex(t => t.ticket_id === ticketId);
-                if (idx !== -1) {
-                    tickets[idx] = d.ticket;
-                }
-                return d;
+            .then(r => {
+                if (r.success) refreshTicketList();
             });
     }
 
@@ -584,12 +669,22 @@ $users = getApplication()->getUserRepository()->getAllUsers();
         const userId = sel.value;
         if (!userId) return;
         api("app/ajax/assign.php", {ticket_id: ticketId, user_id: userId, action: "add"})
-            .then(r => { if (r.success) syncTicket(ticketId).then(() => { reloadDetail(ticketId); refreshTicketList(); }); });
+            .then(r => {
+                if (r.success) {
+                    reloadDetail(ticketId);
+                    refreshTicketList();
+                }
+            });
     }
 
     function removeAssignee(ticketId, userId) {
         api("app/ajax/assign.php", {ticket_id: ticketId, user_id: userId, action: "remove"})
-            .then(r => { if (r.success) syncTicket(ticketId).then(() => { reloadDetail(ticketId); refreshTicketList(); }); });
+            .then(r => {
+                if (r.success) {
+                    reloadDetail(ticketId);
+                    refreshTicketList();
+                }
+            });
     }
 
     function addWorkLog(ticketId) {
@@ -597,7 +692,13 @@ $users = getApplication()->getUserRepository()->getAllUsers();
         const desc = document.getElementById('work-description').value;
         if (!minutes || !desc) return;
         api("app/ajax/worklog.php", {action: "add", ticket_id: ticketId, user_id: currentUserId, minutes, description: desc})
-            .then(r => { if (r.success) { document.getElementById('work-minutes').value = ''; document.getElementById('work-description').value = ''; syncTicket(ticketId).then(() => { reloadDetail(ticketId); refreshTicketList(); }); } });
+            .then(r => {
+                if (r.success) {
+                    document.getElementById('work-minutes').value = '';
+                    document.getElementById('work-description').value = '';
+                    reloadDetail(ticketId);
+                }
+            });
     }
 
     function closeTicket(ticketId) {
