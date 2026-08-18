@@ -71,6 +71,7 @@ $current_view_slug = ($view instanceof TicketView) ? $view->getViewSlug() : "";
     let renderedCount = 0;
     let totalCount = 0;
     let loadingTickets = false;
+    let queuedTicketLoad = null;
 
     function buildTicketQuery(perPage) {
         const p = new URLSearchParams();
@@ -88,7 +89,14 @@ $current_view_slug = ($view instanceof TicketView) ? $view->getViewSlug() : "";
     }
 
     function loadTickets(targetCount) {
-        if (!currentView || loadingTickets) return;
+        if (!currentView) return;
+        if (loadingTickets) {
+            // A load is already in flight — remember this request and replay it
+            // (with the freshest state) once the current one finishes, rather
+            // than silently dropping it.
+            queuedTicketLoad = targetCount;
+            return;
+        }
         loadingTickets = true;
         const loading = document.getElementById('loading-indicator');
         if (renderedCount === 0 && loading) loading.classList.remove('hidden');
@@ -102,10 +110,20 @@ $current_view_slug = ($view instanceof TicketView) ? $view->getViewSlug() : "";
                 renderedCount = data.items.length;
                 loadingTickets = false;
                 updateLoadMoreUI();
+                if (queuedTicketLoad !== null) {
+                    const next = queuedTicketLoad;
+                    queuedTicketLoad = null;
+                    loadTickets(next);
+                }
             })
             .catch(() => {
                 if (loading) loading.classList.add('hidden');
                 loadingTickets = false;
+                if (queuedTicketLoad !== null) {
+                    const next = queuedTicketLoad;
+                    queuedTicketLoad = null;
+                    loadTickets(next);
+                }
             });
     }
 
@@ -697,6 +715,7 @@ $current_view_slug = ($view instanceof TicketView) ? $view->getViewSlug() : "";
                     document.getElementById('work-minutes').value = '';
                     document.getElementById('work-description').value = '';
                     reloadDetail(ticketId);
+                    refreshTicketList();
                 }
             });
     }

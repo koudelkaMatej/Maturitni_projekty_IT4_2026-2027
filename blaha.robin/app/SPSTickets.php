@@ -232,12 +232,17 @@ class SPSTickets implements TicketsApplication
 
     /**
      * Start a PHP session if one is not already active.
+     *
+     * Does not regenerate the session ID — that only happens once, at login
+     * (see {@see createUserSession}). Regenerating it on every request (as
+     * this used to) races the session cookie against itself whenever a page
+     * fires more than one request in quick succession (e.g. two fetches
+     * after a mutation), intermittently logging the user out.
      */
     private function startSession(): void
     {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
-            session_regenerate_id(true);
         }
     }
 
@@ -274,6 +279,7 @@ class SPSTickets implements TicketsApplication
 
         $session_id = $this->getSessionRepository()->addSession($user_id);
         $this->startSession();
+        session_regenerate_id(true);
         $_SESSION["session"] = $session_id;
     }
 
@@ -291,6 +297,7 @@ class SPSTickets implements TicketsApplication
     public function authenticateGuestSession(): void
     {
         $this->startSession();
+        session_regenerate_id(true);
         $_SESSION["guest_authenticated"] = true;
     }
 
