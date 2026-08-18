@@ -229,14 +229,9 @@ if ($guestAuthenticated) {
                             </div>
                             <div class="flex items-center gap-2 relative z-10">
                                 <button onclick="window.location.href='index.php?guest_logout=1'"
-                                        class="bg-white/20 hover:bg-white/30 p-2.5 rounded-xl transition-all backdrop-blur-sm hover:scale-105 active:scale-95"
+                                        class="bg-white/20 hover:bg-white/30 px-3 py-2.5 rounded-xl transition-all backdrop-blur-sm hover:scale-105 active:scale-95 flex items-center gap-1.5 text-sm font-semibold"
                                         title="Odhlásit hosta">
-                                    <i data-lucide="log-out" size="20"></i>
-                                </button>
-                                <button onclick="window.location.href='login.php'"
-                                        class="bg-white/20 hover:bg-white/30 p-2.5 rounded-xl transition-all backdrop-blur-sm hover:scale-105 active:scale-95"
-                                        title="Přihlásit se">
-                                    <i data-lucide="log-in" size="20"></i>
+                                    <i data-lucide="log-out" size="18"></i> Odhlásit hosta
                                 </button>
                             </div>
                         </div>
