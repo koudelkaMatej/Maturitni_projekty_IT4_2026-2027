@@ -18,7 +18,7 @@ class Migrator
 
     private const ALL_TABLES = [
         'teachers', 'categories', 'priorities', 'rooms', 'users',
-        'tickets', 'assignments', 'autoassigns', 'sessions', 'works',
+        'tickets', 'assignments', 'autoassigns', 'sessions', 'works', 'ticket_events',
     ];
 
     public function __construct(Database $db)
@@ -195,6 +195,19 @@ class Migrator
                 )
             ");
         }
+        if (in_array('ticket_events', $tables)) {
+            $this->db->exec("
+                CREATE TABLE IF NOT EXISTS ticket_events (
+                    event_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+                    event_ticket   INTEGER NOT NULL,
+                    event_user     INTEGER DEFAULT NULL,
+                    event_type     TEXT NOT NULL,
+                    event_creation TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (event_ticket) REFERENCES tickets (ticket_id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    FOREIGN KEY (event_user) REFERENCES users (user_id) ON DELETE SET NULL ON UPDATE CASCADE
+                )
+            ");
+        }
     }
 
     private function addIndexesSQLite(array $tables): void
@@ -212,6 +225,10 @@ class Migrator
             'works' => [
                 'idx_works_ticket ON works (work_ticket)',
                 'idx_works_user ON works (work_user)',
+            ],
+            'ticket_events' => [
+                'idx_ticket_events_ticket ON ticket_events (event_ticket)',
+                'idx_ticket_events_user ON ticket_events (event_user)',
             ],
         ];
         foreach ($tables as $table) {
@@ -338,6 +355,18 @@ class Migrator
                 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_czech_ci
             ");
         }
+        if (in_array('ticket_events', $tables)) {
+            $this->db->exec("
+                CREATE TABLE IF NOT EXISTS ticket_events (
+                    event_id       int(11)      NOT NULL AUTO_INCREMENT,
+                    event_ticket   int(11)      NOT NULL,
+                    event_user     int(11)      DEFAULT NULL,
+                    event_type     varchar(50)  NOT NULL,
+                    event_creation datetime     NOT NULL DEFAULT current_timestamp(),
+                    PRIMARY KEY (event_id)
+                ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_czech_ci
+            ");
+        }
     }
 
     private function addIndexesMySQL(array $tables): void
@@ -355,6 +384,10 @@ class Migrator
             'works' => [
                 'ALTER TABLE works ADD KEY works_ibfk_ticket (work_ticket)',
                 'ALTER TABLE works ADD KEY works_ibfk_user (work_user)',
+            ],
+            'ticket_events' => [
+                'ALTER TABLE ticket_events ADD KEY ticket_events_ibfk_ticket (event_ticket)',
+                'ALTER TABLE ticket_events ADD KEY ticket_events_ibfk_user (event_user)',
             ],
         ];
         foreach ($tables as $table) {
@@ -376,6 +409,7 @@ class Migrator
             'teachers' => 'ALTER TABLE teachers MODIFY teacher_id int(11) NOT NULL AUTO_INCREMENT',
             'tickets' => 'ALTER TABLE tickets MODIFY ticket_id int(11) NOT NULL AUTO_INCREMENT',
             'works' => 'ALTER TABLE works MODIFY work_id int(11) NOT NULL AUTO_INCREMENT',
+            'ticket_events' => 'ALTER TABLE ticket_events MODIFY event_id int(11) NOT NULL AUTO_INCREMENT',
         ];
         foreach ($tables as $table) {
             if (isset($map[$table])) $this->execOrSkip($map[$table]);
@@ -404,6 +438,10 @@ class Migrator
             'works' => [
                 'ALTER TABLE works ADD CONSTRAINT works_ibfk_ticket FOREIGN KEY (work_ticket) REFERENCES tickets (ticket_id) ON DELETE CASCADE ON UPDATE CASCADE',
                 'ALTER TABLE works ADD CONSTRAINT works_ibfk_user FOREIGN KEY (work_user) REFERENCES users (user_id) ON DELETE SET NULL ON UPDATE CASCADE',
+            ],
+            'ticket_events' => [
+                'ALTER TABLE ticket_events ADD CONSTRAINT ticket_events_ibfk_ticket FOREIGN KEY (event_ticket) REFERENCES tickets (ticket_id) ON DELETE CASCADE ON UPDATE CASCADE',
+                'ALTER TABLE ticket_events ADD CONSTRAINT ticket_events_ibfk_user FOREIGN KEY (event_user) REFERENCES users (user_id) ON DELETE SET NULL ON UPDATE CASCADE',
             ],
         ];
         foreach ($tables as $table) {

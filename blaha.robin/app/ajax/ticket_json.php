@@ -25,6 +25,7 @@ if (!$ticket) {
 
 $assignments = getApplication()->getAssignmentRepository()->getAssignedUsersToTicket($ticket_id);
 $work_log = getApplication()->getWorkRepository()->getWorksByTicketWithUsers($ticket_id);
+$events = getApplication()->getTicketEventRepository()->getEventsByTicket($ticket_id);
 $all_users = getApplication()->getUserRepository()->getAllUsers();
 $categories = getApplication()->getCategoryRepository()->getAllCategories();
 $rooms = getApplication()->getRoomRepository()->getAllRooms();
@@ -34,6 +35,7 @@ echo json_encode([
     "ticket" => $ticket,
     "assignments" => $assignments,
     "work_log" => $work_log,
+    "events" => $events,
     "all_users" => $all_users,
     "categories" => $categories,
     "rooms" => $rooms,

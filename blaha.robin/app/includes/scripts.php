@@ -338,14 +338,26 @@ $users = getApplication()->getUserRepository()->getAllUsers();
                     <p class="text-sm text-slate-500">${escapeHtml(w.work_description)}</p>
                     <p class="text-xs text-slate-400 mt-0.5">${w.work_minutes} min</p>
                 </div>
-                <div class="flex-shrink-0 flex gap-1 items-start pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                ${t.ticket_is_open == 1 ? `<div class="flex-shrink-0 flex gap-1 items-start pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button onclick="editWorkLog(${t.ticket_id}, ${w.work_id}, '${encodeURIComponent(w.work_description || '')}', ${w.work_minutes})" class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all active:scale-90" title="Upravit"><i data-lucide="pencil" size="14"></i></button>
                     <button onclick="deleteWorkLog(${t.ticket_id}, ${w.work_id})" class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all active:scale-90" title="Smazat"><i data-lucide="trash-2" size="14"></i></button>
-                </div>
+                </div>` : ''}
             </div>`
         ).join('');
 
         const totalMinutes = d.work_log.reduce((sum, w) => sum + parseInt(w.work_minutes || 0), 0);
+
+        const eventLabels = {created: 'Vytvořen', closed: 'Uzavřen', reopened: 'Znovu otevřen'};
+        const eventIcons = {created: 'plus-circle', closed: 'check-circle', reopened: 'rotate-ccw'};
+        const historyRows = (d.events || []).map(e =>
+            `<div class="flex items-start gap-3 py-2.5 border-b border-slate-100 last:border-0 anim-fade-in">
+                <div class="flex-shrink-0 w-7 h-7 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"><i data-lucide="${eventIcons[e.event_type] || 'circle'}" size="13"></i></div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm text-slate-600"><span class="font-semibold text-slate-700">${eventLabels[e.event_type] || e.event_type}</span>${e.teacher_name ? ` — ${escapeHtml(e.teacher_name)}` : ''}</p>
+                    <p class="text-xs text-slate-400">${new Date(e.event_creation).toLocaleString('cs-CZ')}</p>
+                </div>
+            </div>`
+        ).join('');
 
         inner.innerHTML = `
             <div class="flex-shrink-0 bg-gradient-to-r ${isOpen ? 'from-blue-600 to-indigo-600' : 'from-slate-600 to-slate-700'} text-white">
@@ -415,20 +427,20 @@ $users = getApplication()->getUserRepository()->getAllUsers();
                                         <div class="w-7 h-7 rounded-full bg-gradient-to-br ${isMe ? 'from-blue-400 to-indigo-500 shadow-sm' : 'from-slate-300 to-slate-400'} text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">${getInitials(a.teacher_name)}</div>
                                         <span class="text-sm ${isMe ? 'font-bold text-blue-700' : 'text-slate-700'}">${escapeHtml(a.teacher_name)}${isMe ? ' (já)' : ''}</span>
                                     </div>
-                                    <button onclick="removeAssignee(${t.ticket_id}, ${a.assignment_user})" class="text-xs text-red-400 hover:text-red-600 p-1.5 hover:bg-red-50 rounded-lg transition-all active:scale-90" title="Odebrat"><i data-lucide="x" size="14"></i></button>
+                                    ${isOpen ? `<button onclick="removeAssignee(${t.ticket_id}, ${a.assignment_user})" class="text-xs text-red-400 hover:text-red-600 p-1.5 hover:bg-red-50 rounded-lg transition-all active:scale-90" title="Odebrat"><i data-lucide="x" size="14"></i></button>` : ''}
                                 </div>`;
                             }).join('')}
                             ${d.assignments.length === 0
                                 ? '<div class="px-4 py-3 text-sm text-slate-400 italic text-center">Nikdo není přiřazen</div>'
                                 : ''}
                         </div>
-                        <div class="flex gap-2 mt-2">
+                        ${isOpen ? `<div class="flex gap-2 mt-2">
                             <select id="assign-user-select" class="flex-1 text-sm p-2.5 rounded-lg border border-slate-200 bg-white hover:border-blue-200 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500/10 transition-all">
                                 <option value="">-- Přidat řešitele --</option>
                                 ${d.all_users.map(u => `<option value="${u.user_id}">${escapeHtml(u.teacher_name)}</option>`).join('')}
                             </select>
                             <button onclick="addAssignee(${t.ticket_id})" class="px-4 py-2.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-all active:scale-95 font-medium">Přidat</button>
-                        </div>
+                        </div>` : `<p class="text-xs text-slate-400 italic mt-2">Ticket je uzavřený — pro úpravu řešitelů jej nejprve znovu otevřete.</p>`}
                     </div>
 
                     <div>
@@ -436,10 +448,17 @@ $users = getApplication()->getUserRepository()->getAllUsers();
                         <div id="work-log-list" class="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100 px-4">
                             ${logRows || '<div class="py-4 text-sm text-slate-400 italic text-center">Zatím žádné přípisy</div>'}
                         </div>
-                        <div class="mt-3 flex gap-2">
+                        ${isOpen ? `<div class="mt-3 flex gap-2">
                             <input type="number" id="work-minutes" min="1" placeholder="Min" class="w-20 sm:w-24 text-sm p-2.5 rounded-lg border border-slate-200 bg-white hover:border-blue-200 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500/10 transition-all">
                             <input type="text" id="work-description" placeholder="Popis práce" class="flex-1 text-sm p-2.5 rounded-lg border border-slate-200 bg-white hover:border-blue-200 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500/10 transition-all">
                             <button onclick="addWorkLog(${t.ticket_id})" class="px-4 py-2.5 bg-emerald-600 text-white text-sm rounded-lg hover:bg-emerald-700 transition-all active:scale-95 font-medium flex items-center gap-1"><i data-lucide="plus" size="14"></i> <span class="hidden sm:inline">Přidat</span></button>
+                        </div>` : `<p class="text-xs text-slate-400 italic mt-2">Ticket je uzavřený — pro přidání přípisu jej nejprve znovu otevřete.</p>`}
+                    </div>
+
+                    <div>
+                        <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Historie</h4>
+                        <div class="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100 px-4">
+                            ${historyRows || '<div class="py-4 text-sm text-slate-400 italic text-center">Žádná historie</div>'}
                         </div>
                     </div>
 

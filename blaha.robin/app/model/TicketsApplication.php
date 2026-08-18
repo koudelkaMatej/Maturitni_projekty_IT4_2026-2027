@@ -38,6 +38,9 @@ interface TicketsApplication
     /** @return TicketRepository for ticket CRUD */
     public function getTicketRepository(): TicketRepository;
 
+    /** @return TicketEventRepository for the ticket activity log */
+    public function getTicketEventRepository(): TicketEventRepository;
+
     /** @return UserRepository for user (technician) accounts */
     public function getUserRepository(): UserRepository;
 

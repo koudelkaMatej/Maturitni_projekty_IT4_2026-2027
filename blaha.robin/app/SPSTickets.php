@@ -19,10 +19,12 @@ require_once __DIR__ . "/repository/RoomRepository.php";
 require_once __DIR__ . "/repository/SessionRepository.php";
 require_once __DIR__ . "/repository/TeacherRepository.php";
 require_once __DIR__ . "/repository/TicketRepository.php";
+require_once __DIR__ . "/repository/TicketEventRepository.php";
 require_once __DIR__ . "/repository/UserRepository.php";
 require_once __DIR__ . "/repository/WorkRepository.php";
 
 require_once __DIR__ . "/model/Ticket.php";
+require_once __DIR__ . "/model/TicketEvent.php";
 require_once __DIR__ . "/model/User.php";
 require_once __DIR__ . "/model/Assignment.php";
 require_once __DIR__ . "/model/Work.php";
@@ -74,6 +76,9 @@ class SPSTickets implements TicketsApplication
     /** Repository for ticket CRUD and statistics. */
     private TicketRepository $ticketRepository;
 
+    /** Repository for the ticket activity log. */
+    private TicketEventRepository $ticketEventRepository;
+
     /** Repository for user (technician) accounts. */
     private UserRepository $userRepository;
 
@@ -117,6 +122,7 @@ class SPSTickets implements TicketsApplication
             $this->sessionRepository = new SessionRepository($this->database);
             $this->teacherRepository = new TeacherRepository($this->database);
             $this->ticketRepository = new TicketRepository($this->database);
+            $this->ticketEventRepository = new TicketEventRepository($this->database);
             $this->userRepository = new UserRepository($this->database);
             $this->workRepository = new WorkRepository($this->database);
 
@@ -171,6 +177,11 @@ class SPSTickets implements TicketsApplication
     public function getTicketRepository(): TicketRepository
     {
         return $this->ticketRepository;
+    }
+
+    public function getTicketEventRepository(): TicketEventRepository
+    {
+        return $this->ticketEventRepository;
     }
 
     public function getUserRepository(): UserRepository
