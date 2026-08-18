@@ -21,6 +21,7 @@ $userRepo = getApplication()->getUserRepository();
 $categoryRepo = getApplication()->getCategoryRepository();
 $roomRepo = getApplication()->getRoomRepository();
 $priorityRepo = getApplication()->getPriorityRepository();
+$guestRepo = getApplication()->getGuestAccessRepository();
 
 $errors = [];
 $success = "";
@@ -150,6 +151,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $success = "Priorita byla smazána.";
         }
     }
+
+    // --- Guest access ---
+    if ($section === "guests" && $action === "save") {
+        $guest_username = trim($_POST["guest_username"] ?? "");
+        $guest_password = $_POST["guest_password"] ?? "";
+        $guest_enabled = isset($_POST["guest_enabled"]);
+        $current_guest = $guestRepo->get();
+
+        if ($guest_username === "") $errors[] = "Uživatelské jméno hosta je povinné.";
+        if ($guest_enabled && $guest_password === "" && !$current_guest->isConfigured()) {
+            $errors[] = "Před povolením přístupu pro hosty nastavte heslo.";
+        }
+
+        if (empty($errors)) {
+            $guestRepo->updateUsername($guest_username);
+            if ($guest_password !== "") {
+                $guestRepo->updatePassword($guest_password);
+            }
+            $guestRepo->setEnabled($guest_enabled);
+            $success = "Nastavení hostů bylo uloženo.";
+        }
+    }
 }
 
 // ===== Load data for the active section =====
@@ -180,6 +203,10 @@ switch ($section) {
         $items = $priorityRepo->getAllPriorities();
         if ($edit_id) $edit_item = $priorityRepo->getPriorityById($edit_id);
         break;
+    case "guests":
+        $items = [];
+        $guest_settings = $guestRepo->get();
+        break;
     default:
         $section = "teachers";
         $items = $teacherRepo->getAllTeachers();
@@ -199,6 +226,7 @@ $tabs = [
     "categories" => ["label" => "Kategorie", "icon" => "folder-tree"],
     "rooms" => ["label" => "Místnosti", "icon" => "map-pin"],
     "priorities" => ["label" => "Priority", "icon" => "flag"],
+        "guests" => ["label" => "Hosté", "icon" => "key-round"],
 ];
 
 ?>
@@ -694,6 +722,66 @@ $tabs = [
                         </tbody>
                     </table>
                 </div>
+            </div>
+        <?php endif; ?>
+
+        <!-- ===== Guest access ===== -->
+        <?php if ($section === "guests"): ?>
+            <div class="bg-white rounded-2xl shadow-soft border border-slate-200 overflow-hidden">
+                <div class="bg-blue-600 p-5 text-white">
+                    <h2 class="text-lg font-bold flex items-center gap-2"><i data-lucide="key-round"></i> Přístup pro
+                        hosty</h2>
+                    <p class="text-blue-100 text-sm mt-1">Přihlašovací údaje pro odesílání ticketů bez přihlášení
+                        (index.php)</p>
+                </div>
+
+                <form method="post" class="p-5 space-y-5">
+                    <input type="hidden" name="action" value="save">
+
+                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <div>
+                            <p class="text-sm font-bold text-slate-800">Odesílání ticketů bez přihlášení</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Když je vypnuto, formulář na index.php je
+                                nedostupný a je nutné se přihlásit jako technik.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
+                            <input type="checkbox" name="guest_enabled" value="1"
+                                   class="sr-only peer" <?php echo $guest_settings->guest_enabled ? "checked" : "" ?>>
+                            <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:bg-emerald-500 transition-colors"></div>
+                            <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5 shadow-sm"></div>
+                        </label>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 mb-1 block">Uživatelské jméno *</label>
+                            <input type="text" name="guest_username" required
+                                   value="<?php echo htmlspecialchars($guest_settings->guest_username) ?>"
+                                   class="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none text-sm transition-all"
+                                   placeholder="např. host">
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 mb-1 block">
+                                <?php echo $guest_settings->isConfigured() ? "Nové heslo (nechte prázdné pro ponechání)" : "Heslo *" ?>
+                            </label>
+                            <input type="password"
+                                   name="guest_password" <?php echo $guest_settings->isConfigured() ? "" : "required" ?>
+                                   class="w-full p-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none text-sm transition-all"
+                                   placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <?php if (!$guest_settings->isConfigured()): ?>
+                        <p class="text-xs text-amber-600 flex items-center gap-1.5"><i data-lucide="alert-triangle"
+                                                                                       size="14"></i> Přístup pro hosty
+                            zatím nebyl nastaven.</p>
+                    <?php endif; ?>
+
+                    <button type="submit"
+                            class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2 shadow-lg shadow-blue-500/30">
+                        <i data-lucide="save" size="16"></i> Uložit nastavení
+                    </button>
+                </form>
             </div>
         <?php endif; ?>
 

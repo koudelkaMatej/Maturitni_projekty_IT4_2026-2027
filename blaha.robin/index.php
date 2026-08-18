@@ -12,54 +12,88 @@ if (getApplication()->getUser() != null) {
     getApplication()->redirectInternally("dashboard");
 }
 
-$teachers = getApplication()->getTeacherRepository()->getAllTeachers();
-$rooms = getApplication()->getRoomRepository()->getAllRooms();
-$categories = getApplication()->getCategoryRepository()->getAllCategories();
-$priorities = getApplication()->getPriorityRepository()->getAllPriorities();
+$guest = getApplication()->getGuestAccessRepository()->get();
 
-$lowestPriority = null;
-$lowestWeight = PHP_INT_MAX;
-foreach ($priorities as $p) {
-    if ($p->priority_weight < $lowestWeight) {
-        $lowestWeight = $p->priority_weight;
-        $lowestPriority = $p;
+if (!$guest->guest_enabled) {
+    getApplication()->clearGuestSession();
+}
+
+if (isset($_GET["guest_logout"])) {
+    getApplication()->clearGuestSession();
+    getApplication()->redirectInternally("index");
+}
+
+$guestAuthenticated = $guest->guest_enabled && getApplication()->isGuestSessionAuthenticated();
+$guestLoginFailed = false;
+
+if (!$guestAuthenticated && $guest->guest_enabled && $_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["guest_login"])) {
+    $guest_username = trim($_POST["guest_username"] ?? "");
+    $guest_password = $_POST["guest_password"] ?? "";
+
+    if (getApplication()->getGuestAccessRepository()->verify($guest_username, $guest_password)) {
+        getApplication()->authenticateGuestSession();
+        getApplication()->redirectInternally("index");
+    } else {
+        $guestLoginFailed = true;
     }
 }
+
+$teachers = [];
+$rooms = [];
+$categories = [];
+$priorities = [];
+$lowestPriority = null;
 
 $ticketCreated = false;
 $errors = [];
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $teacher_id = isset($_POST["teacher_id"]) ? (int)$_POST["teacher_id"] : 0;
-    $room_id = !empty($_POST["room_id"]) ? (int)$_POST["room_id"] : null;
-    $category = isset($_POST["category"]) ? (int)$_POST["category"] : 0;
-    $title = trim($_POST["title"] ?? "");
-    $description = trim($_POST["description"] ?? "");
-    $has_deadline = isset($_POST["has_deadline"]) && $_POST["has_deadline"] === "1";
-    $deadline = $has_deadline && !empty($_POST["deadline"]) ? $_POST["deadline"] : null;
+if ($guestAuthenticated) {
+    $teachers = getApplication()->getTeacherRepository()->getAllTeachers();
+    $rooms = getApplication()->getRoomRepository()->getAllRooms();
+    $categories = getApplication()->getCategoryRepository()->getAllCategories();
+    $priorities = getApplication()->getPriorityRepository()->getAllPriorities();
 
-    if ($teacher_id <= 0) $errors[] = "Vyberte své jméno ze seznamu.";
-    if ($category <= 0) $errors[] = "Vyberte kategorii.";
-    if ($title === "") $errors[] = "Vyplňte předmět ticketu.";
-    if ($description === "") $errors[] = "Vyplňte detailní popis.";
-    if ($has_deadline && empty($deadline)) $errors[] = "Vyplňte datum dokončení.";
-    if ($has_deadline && !empty($deadline) && $deadline <= date("Y-m-d")) $errors[] = "Termín dokončení musí být nejméně zítřek.";
-
-    if (empty($errors)) {
-        $ticket_id = getApplication()->getTicketRepository()->addTicket($teacher_id, $category, $room_id, $title, $description);
-
-        if ($ticket_id && $lowestPriority) {
-            getApplication()->getTicketRepository()->updateTicket((int)$ticket_id, ["ticket_priority" => $lowestPriority->priority_id]);
+    $lowestWeight = PHP_INT_MAX;
+    foreach ($priorities as $p) {
+        if ($p->priority_weight < $lowestWeight) {
+            $lowestWeight = $p->priority_weight;
+            $lowestPriority = $p;
         }
+    }
 
-        if ($ticket_id && $deadline) {
-            getApplication()->getTicketRepository()->updateTicket((int)$ticket_id, ["ticket_deadline" => $deadline]);
-        }
+    if ($_SERVER["REQUEST_METHOD"] === "POST" && !isset($_POST["guest_login"])) {
+        $teacher_id = isset($_POST["teacher_id"]) ? (int)$_POST["teacher_id"] : 0;
+        $room_id = !empty($_POST["room_id"]) ? (int)$_POST["room_id"] : null;
+        $category = isset($_POST["category"]) ? (int)$_POST["category"] : 0;
+        $title = trim($_POST["title"] ?? "");
+        $description = trim($_POST["description"] ?? "");
+        $has_deadline = isset($_POST["has_deadline"]) && $_POST["has_deadline"] === "1";
+        $deadline = $has_deadline && !empty($_POST["deadline"]) ? $_POST["deadline"] : null;
 
-        if ($ticket_id) {
-            $ticketCreated = true;
-        } else {
-            $errors[] = "Ticket se nepodařilo vytvořit. Zkuste to prosím znovu.";
+        if ($teacher_id <= 0) $errors[] = "Vyberte své jméno ze seznamu.";
+        if ($category <= 0) $errors[] = "Vyberte kategorii.";
+        if ($title === "") $errors[] = "Vyplňte předmět ticketu.";
+        if ($description === "") $errors[] = "Vyplňte detailní popis.";
+        if ($has_deadline && empty($deadline)) $errors[] = "Vyplňte datum dokončení.";
+        if ($has_deadline && !empty($deadline) && $deadline <= date("Y-m-d")) $errors[] = "Termín dokončení musí být nejméně zítřek.";
+
+        if (empty($errors)) {
+            $ticket_id = getApplication()->getTicketRepository()->addTicket($teacher_id, $category, $room_id, $title, $description);
+
+            if ($ticket_id && $lowestPriority) {
+                getApplication()->getTicketRepository()->updateTicket((int)$ticket_id, ["ticket_priority" => $lowestPriority->priority_id]);
+            }
+
+            if ($ticket_id && $deadline) {
+                getApplication()->getTicketRepository()->updateTicket((int)$ticket_id, ["ticket_deadline" => $deadline]);
+            }
+
+            if ($ticket_id) {
+                getApplication()->getTicketEventRepository()->addEvent((int)$ticket_id, null, "created");
+                $ticketCreated = true;
+            } else {
+                $errors[] = "Ticket se nepodařilo vytvořit. Zkuste to prosím znovu.";
+            }
         }
     }
 }
@@ -72,7 +106,101 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
          class="fixed inset-0 z-50 bg-gradient-to-br from-slate-50 to-blue-50/40 overflow-y-auto">
         <div class="w-full max-w-2xl anim-scale-in mx-auto mt-6 md:mt-16 mb-8 px-4">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-            <?php if ($ticketCreated): ?>
+                <?php if (!$guest->guest_enabled): ?>
+                    <div class="relative overflow-hidden">
+                        <div class="bg-gradient-to-r from-slate-700 to-slate-600 p-6 md:p-8 text-white">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="hidden md:flex bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                                        <i data-lucide="lock" size="28"></i>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-xl md:text-2xl font-bold">Odesílání ticketů bez přihlášení je
+                                            vypnuté</h2>
+                                        <p class="text-slate-200 text-sm mt-0.5">Obraťte se na technika, nebo se
+                                            přihlaste.</p>
+                                    </div>
+                                </div>
+                                <button onclick="window.location.href='login.php'"
+                                        class="bg-white/20 hover:bg-white/30 p-2.5 rounded-xl transition-all backdrop-blur-sm hover:scale-105 active:scale-95"
+                                        title="Přihlásit se">
+                                    <i data-lucide="log-in" size="20"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-8 text-center">
+                        <p class="text-slate-500 mb-6">Veřejný formulář pro zadání ticketu je momentálně nedostupný.
+                            Přihlaste se prosím jako technik, nebo kontaktujte administrátora.</p>
+                        <button onclick="window.location.href='login.php'"
+                                class="px-8 py-3 rounded-xl bg-slate-800 text-white hover:bg-slate-900 font-bold shadow-lg transition-all hover:scale-105 active:scale-95">
+                            Přihlásit se
+                        </button>
+                    </div>
+                <?php elseif (!$guestAuthenticated): ?>
+                    <div class="relative overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-600 to-blue-500 p-6 md:p-8 text-white">
+                            <div class="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                            <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+                            <div class="flex items-center justify-between relative z-10">
+                                <div class="flex items-center gap-4">
+                                    <div class="hidden md:flex bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                                        <i data-lucide="key-round" size="28"></i>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-xl md:text-2xl font-bold">Přihlášení pro hosty</h2>
+                                        <p class="text-blue-100 text-sm mt-0.5">Zadejte přístupové údaje pro odeslání
+                                            ticketu</p>
+                                    </div>
+                                </div>
+                                <button onclick="window.location.href='login.php'"
+                                        class="bg-white/20 hover:bg-white/30 p-2.5 rounded-xl transition-all backdrop-blur-sm hover:scale-105 active:scale-95"
+                                        title="Přihlásit se">
+                                    <i data-lucide="log-in" size="20"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post" class="p-6 md:p-8 space-y-5">
+                        <input type="hidden" name="guest_login" value="1">
+                        <?php if ($guestLoginFailed): ?>
+                            <div class="bg-red-50 border border-red-100 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center gap-2"
+                                 style="animation: fadeIn 0.3s ease forwards">
+                                <i data-lucide="alert-circle" size="16" class="flex-shrink-0"></i> Nesprávné uživatelské
+                                jméno nebo heslo.
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="space-y-1">
+                            <label class="text-sm font-bold text-slate-700 ml-1">Uživatelské jméno</label>
+                            <div class="relative">
+                                <i data-lucide="user" class="absolute left-3 top-3 text-slate-400 w-5 h-5"></i>
+                                <input type="text" name="guest_username" required autofocus
+                                       class="w-full pl-10 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all"
+                                       placeholder="host">
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-sm font-bold text-slate-700 ml-1">Heslo</label>
+                            <div class="relative">
+                                <i data-lucide="lock" class="absolute left-3 top-3 text-slate-400 w-5 h-5"></i>
+                                <input type="password" name="guest_password" required
+                                       class="w-full pl-10 p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all"
+                                       placeholder="••••••••">
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                                class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-500/30 hover:bg-blue-700 hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                            Přihlásit se <i data-lucide="arrow-right" size="18"></i>
+                        </button>
+
+                        <p class="text-center text-xs text-slate-400">Přístupové údaje pro hosty nastaví administrátor
+                            ve správě systému.</p>
+                    </form>
+                <?php elseif ($ticketCreated): ?>
                 <div class="text-center p-12">
                     <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 text-green-600 mb-6">
                         <i data-lucide="check" size="40"></i>
@@ -99,11 +227,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 <p class="text-blue-100 text-sm mt-0.5">Formulář pro učitele a zaměstnance</p>
                             </div>
                         </div>
-                        <button onclick="window.location.href='login.php'"
-                                class="bg-white/20 hover:bg-white/30 p-2.5 rounded-xl transition-all backdrop-blur-sm hover:scale-105 active:scale-95"
-                                title="Přihlásit se">
-                            <i data-lucide="log-in" size="20"></i>
-                        </button>
+                        <div class="flex items-center gap-2 relative z-10">
+                            <button onclick="window.location.href='index.php?guest_logout=1'"
+                                    class="bg-white/20 hover:bg-white/30 p-2.5 rounded-xl transition-all backdrop-blur-sm hover:scale-105 active:scale-95"
+                                    title="Odhlásit hosta">
+                                <i data-lucide="log-out" size="20"></i>
+                            </button>
+                            <button onclick="window.location.href='login.php'"
+                                    class="bg-white/20 hover:bg-white/30 p-2.5 rounded-xl transition-all backdrop-blur-sm hover:scale-105 active:scale-95"
+                                    title="Přihlásit se">
+                                <i data-lucide="log-in" size="20"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
