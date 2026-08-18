@@ -209,6 +209,7 @@ $event_icons = ["created" => "plus-circle", "closed" => "check-circle", "reopene
                             <th class="text-center px-4 py-3">Přiřazeno</th>
                             <th class="text-center px-4 py-3">Vyřešeno</th>
                             <th class="text-center px-4 py-3">Aktivní</th>
+                            <th class="text-center px-4 py-3">Hodiny celkem</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -225,6 +226,13 @@ $event_icons = ["created" => "plus-circle", "closed" => "check-circle", "reopene
                             <td class="px-4 py-4 text-center">
                                 <?php if ($m["still_open"] > 0): ?>
                                     <span class="inline-flex items-center justify-center min-w-[2rem] h-7 px-2 rounded-lg bg-orange-50 text-orange-700 font-bold text-sm"><?php echo $m["still_open"] ?></span>
+                                <?php else: ?>
+                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-50 text-slate-400 font-bold text-sm">—</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-4 py-4 text-center">
+                                <?php if ($m["minutes"] > 0): ?>
+                                    <span class="inline-flex items-center justify-center min-w-[3rem] h-7 px-2 rounded-lg bg-amber-50 text-amber-700 font-bold text-sm"><?php echo $m["hours"] ?> h</span>
                                 <?php else: ?>
                                     <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-50 text-slate-400 font-bold text-sm">—</span>
                                 <?php endif; ?>

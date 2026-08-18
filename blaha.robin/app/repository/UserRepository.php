@@ -113,10 +113,19 @@ class UserRepository extends Repository
     /**
      * Delete a user account (cascades to sessions and assignments).
      *
+     * Explicitly deletes this user's own assignment rows first — scoped
+     * strictly to this user_id — so ticket assignments stay correct even
+     * on a database where the FK's ON DELETE CASCADE was never applied
+     * (the auto-migrator only adds constraints to newly-created tables).
+     *
      * @param int $user_id
      */
     public function deleteUser(int $user_id): void
     {
+        $this->database->delete(
+            "DELETE FROM assignments WHERE assignment_user = :user_id",
+            [":user_id" => $user_id]
+        );
         $this->database->delete(
             "DELETE FROM users WHERE user_id = :user_id",
             [":user_id" => $user_id]
