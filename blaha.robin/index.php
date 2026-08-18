@@ -115,7 +115,7 @@ if ($guestAuthenticated) {
                                         <i data-lucide="lock" size="28"></i>
                                     </div>
                                     <div>
-                                        <h2 class="text-xl md:text-2xl font-bold">Odesílání ticketů bez přihlášení je
+                                        <h2 class="text-xl md:text-2xl font-bold">Anonymní odesílání ticketů je
                                             vypnuté</h2>
                                         <p class="text-slate-200 text-sm mt-0.5">Obraťte se na technika, nebo se
                                             přihlaste.</p>
