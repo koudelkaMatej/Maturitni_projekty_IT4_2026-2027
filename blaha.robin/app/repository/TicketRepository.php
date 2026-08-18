@@ -63,20 +63,20 @@ class TicketRepository extends Repository
     {
         $base = $this->ticketSelectWithAssignees();
         return $this->ticketRowOne(
-            $base . " FROM tickets INNER JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id WHERE ticket_id = :ticket_id",
+            $base . " FROM tickets LEFT JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id WHERE ticket_id = :ticket_id",
             [":ticket_id" => $ticket_id]
         );
     }
 
     public function getOpenTickets(int $page = 1, ?int $perPage = null): PaginatedResult
     {
-        $base = $this->ticketSelectWithAssignees() . " FROM tickets INNER JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id WHERE ticket_is_open = 1 ORDER BY ticket_creation DESC";
+        $base = $this->ticketSelectWithAssignees() . " FROM tickets LEFT JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id WHERE ticket_is_open = 1 ORDER BY ticket_creation DESC";
         return $this->applyPagination($base, "SELECT COUNT(*) AS cnt FROM tickets WHERE ticket_is_open = 1", [], $page, $perPage);
     }
 
     public function getClosedTickets(int $page = 1, ?int $perPage = null): PaginatedResult
     {
-        $base = $this->ticketSelectWithAssignees() . " FROM tickets INNER JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id WHERE ticket_is_open = 0 ORDER BY ticket_creation DESC";
+        $base = $this->ticketSelectWithAssignees() . " FROM tickets LEFT JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id WHERE ticket_is_open = 0 ORDER BY ticket_creation DESC";
         return $this->applyPagination($base, "SELECT COUNT(*) AS cnt FROM tickets WHERE ticket_is_open = 0", [], $page, $perPage);
     }
 
@@ -84,14 +84,14 @@ class TicketRepository extends Repository
     {
         $base = $this->ticketSelectWithAssignees();
         return $this->ticketRow(
-            $base . " FROM tickets LEFT JOIN assignments ON ticket_id = assignment_ticket INNER JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id WHERE assignment_ticket IS NULL AND ticket_is_open = 1 ORDER BY ticket_creation DESC"
+            $base . " FROM tickets LEFT JOIN assignments ON ticket_id = assignment_ticket LEFT JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id WHERE assignment_ticket IS NULL AND ticket_is_open = 1 ORDER BY ticket_creation DESC"
         );
     }
 
     public function getAllTickets(): array
     {
         return $this->ticketRow(
-            "SELECT tickets.*, teachers.teacher_name, categories.category_name, rooms.room_name, priorities.priority_name, priorities.priority_weight, priorities.priority_color FROM tickets INNER JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id ORDER BY ticket_creation DESC"
+            "SELECT tickets.*, teachers.teacher_name, categories.category_name, rooms.room_name, priorities.priority_name, priorities.priority_weight, priorities.priority_color FROM tickets LEFT JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id ORDER BY ticket_creation DESC"
         );
     }
 
