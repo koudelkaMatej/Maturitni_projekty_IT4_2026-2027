@@ -15,6 +15,7 @@ $logout_user = getApplication()->getUser();
 $logout_username = $logout_user->user_username;
 $logout_name = $logout_user->teacher_name;
 $logout_initials = getApplication()->getInitials($logout_name);
+$logout_avatar_gradient = getApplication()->getAvatarGradient($logout_user->user_id);
 
 getApplication()->destroySession();
 
@@ -32,7 +33,7 @@ getApplication()->destroySession();
 
             <!-- User Card -->
             <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 mb-6 flex items-center gap-3 text-left">
-                <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600"><?php echo $logout_initials ?></div>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br <?php echo $logout_avatar_gradient ?> text-white flex items-center justify-center font-bold"><?php echo $logout_initials ?></div>
                 <div>
                     <p class="font-bold text-sm text-slate-800"><?php echo $logout_username ?></p>
                     <p class="text-xs text-slate-500"><?php echo $logout_name ?></p>

@@ -10,6 +10,7 @@ $current_user = getApplication()->getUser();
 $current_name = $current_user->teacher_name;
 $current_username = $current_user->user_username;
 $current_initials = getApplication()->getInitials($current_name);
+$current_avatar_gradient = getApplication()->getAvatarGradient($current_user->user_id);
 
 $page_name = getApplication()->getPageName();
 
@@ -60,7 +61,7 @@ $pages["Změna hesla"] = [
             <span class="font-bold text-base tracking-tight">SPŠ HelpDesk</span>
         </div>
     </div>
-    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-xs text-white border-2 border-blue-400/50 shadow-lg flex-shrink-0"><?php echo $current_initials ?></div>
+    <div class="w-8 h-8 rounded-full bg-gradient-to-tr <?php echo $current_avatar_gradient ?> flex items-center justify-center font-bold text-xs text-white border-2 border-blue-400/50 shadow-lg flex-shrink-0"><?php echo $current_initials ?></div>
 </div>
 
 <!-- Overlay -->
@@ -101,7 +102,7 @@ $pages["Změna hesla"] = [
     <!-- User footer -->
     <div class="p-4 border-t border-slate-800 bg-slate-900/60">
         <div class="flex items-center gap-3 px-1 mb-3">
-            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-white text-xs shadow-lg border-2 border-slate-800 flex-shrink-0"><?php echo $current_initials ?></div>
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr <?php echo $current_avatar_gradient ?> flex items-center justify-center font-bold text-white text-xs shadow-lg border-2 border-slate-800 flex-shrink-0"><?php echo $current_initials ?></div>
             <div class="flex-1 min-w-0">
                 <p class="text-sm font-semibold truncate leading-tight"><?php echo $current_username ?></p>
                 <p class="text-xs text-slate-400 truncate"><?php echo $current_name ?></p>

@@ -94,4 +94,13 @@ interface TicketsApplication
      * @return string
      */
     public function getInitials(string $string): string;
+
+    /**
+     * Get the Tailwind gradient classes for a person's avatar, keyed by their
+     * user/teacher ID so the same person always gets the same color everywhere.
+     *
+     * @param int $id
+     * @return string
+     */
+    public function getAvatarGradient(int $id): string;
 }

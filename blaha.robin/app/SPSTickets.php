@@ -92,6 +92,31 @@ class SPSTickets implements TicketsApplication
     private string $currentPage = "Nepojmenovaná stránka";
 
     /**
+     * Tailwind gradient classes used for per-person avatar coloring.
+     * Kept in sync with the AVATAR_COLORS array in app/includes/scripts.php.
+     */
+    private const AVATAR_COLORS = [
+        "from-blue-500 to-indigo-600",
+        "from-emerald-500 to-teal-600",
+        "from-violet-500 to-purple-600",
+        "from-amber-500 to-orange-600",
+        "from-rose-500 to-pink-600",
+        "from-cyan-500 to-sky-600",
+        "from-fuchsia-500 to-purple-600",
+        "from-lime-500 to-green-600",
+        "from-red-500 to-rose-600",
+        "from-teal-500 to-cyan-600",
+        "from-purple-500 to-violet-700",
+        "from-orange-500 to-red-600",
+        "from-indigo-500 to-blue-700",
+        "from-pink-500 to-fuchsia-600",
+        "from-green-500 to-emerald-700",
+        "from-sky-500 to-blue-600",
+        "from-yellow-500 to-amber-600",
+        "from-slate-500 to-slate-700",
+    ];
+
+    /**
      * Boot the application: load config, connect to DB, run migrator,
      * instantiate all repositories, configure session settings, and
      * attempt to restore the current user from the session cookie.
@@ -291,6 +316,19 @@ class SPSTickets implements TicketsApplication
         $source = $capitals ?: $string;
         $result = mb_substr($source, 0, 2);
         return $result ?: '?';
+    }
+
+    /**
+     * Get the Tailwind gradient classes for a person's avatar, keyed by their
+     * user/teacher ID so the same person always gets the same color everywhere.
+     *
+     * @param int $id
+     * @return string e.g. "from-blue-500 to-indigo-600"
+     */
+    public function getAvatarGradient(int $id): string
+    {
+        $index = (($id % count(self::AVATAR_COLORS)) + count(self::AVATAR_COLORS)) % count(self::AVATAR_COLORS);
+        return self::AVATAR_COLORS[$index];
     }
 }
 
