@@ -41,23 +41,6 @@ class AssignmentRepository extends Repository
         );
     }
 
-    /**
-     * Get open tickets assigned to a user, returned as Ticket objects.
-     *
-     * @param int    $assignment_user
-     * @param string $extra_params    Extra SQL to append
-     * @return Ticket[]
-     */
-    public function getActiveAssignedTicketsToUser($assignment_user, $extra_params = ""): array
-    {
-        $assigneeIds = $this->database->groupConcat("assignment_user", ",");
-        $assigneeNames = $this->database->groupConcat("teacher_name", ", ");
-        $rows = $this->database->select(
-            "SELECT tickets.*, teachers.teacher_name, categories.category_name, rooms.room_name, priorities.priority_name, priorities.priority_weight, priorities.priority_color, (SELECT $assigneeIds FROM assignments WHERE assignment_ticket = ticket_id) AS assignee_ids, (SELECT $assigneeNames FROM assignments INNER JOIN teachers ON assignment_user = teacher_id WHERE assignment_ticket = ticket_id) AS assignee_names, (SELECT COUNT(*) FROM assignments WHERE assignment_ticket = ticket_id) AS assignee_count FROM assignments INNER JOIN tickets ON assignment_ticket = ticket_id LEFT JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id WHERE assignment_user = :assignment_user AND ticket_is_open = 1 " . $extra_params,
-            [":assignment_user" => $assignment_user]
-        );
-        return array_map(fn($r) => new Ticket($r), $rows);
-    }
 
     /**
      * Assign a user to a ticket (skips silently if already assigned).

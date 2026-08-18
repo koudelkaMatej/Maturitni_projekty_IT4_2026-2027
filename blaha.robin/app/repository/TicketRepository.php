@@ -68,18 +68,6 @@ class TicketRepository extends Repository
         );
     }
 
-    public function getOpenTickets(int $page = 1, ?int $perPage = null): PaginatedResult
-    {
-        $base = $this->ticketSelectWithAssignees() . " FROM tickets LEFT JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id WHERE ticket_is_open = 1 ORDER BY ticket_creation DESC";
-        return $this->applyPagination($base, "SELECT COUNT(*) AS cnt FROM tickets WHERE ticket_is_open = 1", [], $page, $perPage);
-    }
-
-    public function getClosedTickets(int $page = 1, ?int $perPage = null): PaginatedResult
-    {
-        $base = $this->ticketSelectWithAssignees() . " FROM tickets LEFT JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id WHERE ticket_is_open = 0 ORDER BY ticket_creation DESC";
-        return $this->applyPagination($base, "SELECT COUNT(*) AS cnt FROM tickets WHERE ticket_is_open = 0", [], $page, $perPage);
-    }
-
     public function getUnassignedTickets(): array
     {
         $base = $this->ticketSelectWithAssignees();
@@ -93,6 +81,115 @@ class TicketRepository extends Repository
         return $this->ticketRow(
             "SELECT tickets.*, teachers.teacher_name, categories.category_name, rooms.room_name, priorities.priority_name, priorities.priority_weight, priorities.priority_color FROM tickets LEFT JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id ORDER BY ticket_creation DESC"
         );
+    }
+
+    /** Maps a client-facing sort key to a real ORDER BY expression. */
+    private const SORT_COLUMNS = [
+        "id" => "ticket_id",
+        "title" => "ticket_title",
+        "category" => "category_name",
+        "room" => "room_name",
+        "origin" => "teacher_name",
+        "priority" => "priority_weight",
+        "deadline" => "ticket_deadline",
+        "created" => "ticket_creation",
+    ];
+
+    /**
+     * Query tickets for a list view with server-side search, column filters,
+     * sorting, and pagination — built to scale to large ticket counts.
+     *
+     * Tickets with no assignee are always surfaced first (regardless of the
+     * requested sort) so they stand out as needing a solver.
+     *
+     * @param array $options {
+     * @return PaginatedResult
+     * @var string $view "all" | "assigned" | "closed"
+     * @var int|null $user_id Required when $view is "assigned".
+     * @var string $search Free-text search across title/description/reporter.
+     * @var int|null $category Filter by ticket_category.
+     * @var int|null $room Filter by ticket_room.
+     * @var int|null $priority Filter by ticket_priority.
+     * @var string $assignee "" | "unassigned" | a user_id.
+     * @var string $sort One of the keys in self::SORT_COLUMNS.
+     * @var string $dir "asc" | "desc".
+     * @var int $page
+     * @var int $perPage
+     * }
+     */
+    public function queryTickets(array $options): PaginatedResult
+    {
+        $view = $options["view"] ?? "all";
+        $joins = "FROM tickets LEFT JOIN teachers ON ticket_origin = teacher_id LEFT JOIN categories ON ticket_category = category_id LEFT JOIN rooms ON ticket_room = room_id LEFT JOIN priorities ON ticket_priority = priority_id";
+        $where = [];
+        $params = [];
+
+        $where[] = $view === "closed" ? "ticket_is_open = 0" : "ticket_is_open = 1";
+
+        if ($view === "assigned") {
+            $joins .= " INNER JOIN assignments view_assignment ON view_assignment.assignment_ticket = ticket_id AND view_assignment.assignment_user = :view_user";
+            $params[":view_user"] = $options["user_id"] ?? 0;
+        }
+
+        $search = trim((string)($options["search"] ?? ""));
+        if ($search !== "") {
+            // Use "!" (rather than backslash) as the LIKE escape char — its string-literal
+            // handling differs between MySQL and SQLite, "!" needs no such handling.
+            $escaped = str_replace(["!", "%", "_"], ["!!", "!%", "!_"], $search);
+            $where[] = "(ticket_title LIKE :search ESCAPE '!' OR ticket_description LIKE :search ESCAPE '!' OR teacher_name LIKE :search ESCAPE '!')";
+            $params[":search"] = "%$escaped%";
+        }
+
+        if (!empty($options["category"])) {
+            $where[] = "ticket_category = :category";
+            $params[":category"] = (int)$options["category"];
+        }
+        if (!empty($options["room"])) {
+            $where[] = "ticket_room = :room";
+            $params[":room"] = (int)$options["room"];
+        }
+        if (!empty($options["priority"])) {
+            $where[] = "ticket_priority = :priority";
+            $params[":priority"] = (int)$options["priority"];
+        }
+
+        $assignee = (string)($options["assignee"] ?? "");
+        if ($assignee === "unassigned") {
+            $where[] = "NOT EXISTS (SELECT 1 FROM assignments WHERE assignment_ticket = ticket_id)";
+        } elseif ($assignee !== "") {
+            $where[] = "EXISTS (SELECT 1 FROM assignments WHERE assignment_ticket = ticket_id AND assignment_user = :assignee)";
+            $params[":assignee"] = (int)$assignee;
+        }
+
+        $whereSql = "WHERE " . implode(" AND ", $where);
+
+        $sortKey = $options["sort"] ?? "created";
+        $sortCol = self::SORT_COLUMNS[$sortKey] ?? self::SORT_COLUMNS["created"];
+        $dir = strtoupper((string)($options["dir"] ?? "desc")) === "ASC" ? "ASC" : "DESC";
+        $orderSql = "ORDER BY (CASE WHEN assignee_count = 0 OR assignee_count IS NULL THEN 0 ELSE 1 END) ASC, $sortCol $dir, ticket_id DESC";
+
+        $base = $this->ticketSelectWithAssignees() . " $joins $whereSql $orderSql";
+        $countSql = "SELECT COUNT(*) AS cnt $joins $whereSql";
+
+        $page = max(1, (int)($options["page"] ?? 1));
+        $perPage = isset($options["perPage"]) ? max(1, (int)$options["perPage"]) : null;
+
+        return $this->applyPagination($base, $countSql, $params, $page, $perPage);
+    }
+
+    /**
+     * Cheap count of open tickets currently assigned to a user (for header badges).
+     *
+     * @param int $user_id
+     * @return int
+     */
+    public function getCountActiveAssignedToUser($user_id): int
+    {
+        $row = $this->database->selectOne(
+            "SELECT COUNT(*) AS cnt FROM assignments INNER JOIN tickets ON assignment_ticket = ticket_id WHERE assignment_user = :user_id AND ticket_is_open = 1",
+            [":user_id" => $user_id]
+        );
+        return (int)($row["cnt"] ?? 0);
     }
 
     public function closeTicket($ticket_id): void
