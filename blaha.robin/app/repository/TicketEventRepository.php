@@ -41,4 +41,19 @@ class TicketEventRepository extends Repository
         );
         return array_map(fn($r) => new TicketEvent($r), $rows);
     }
+
+    /**
+     * Get the most recent events triggered by a user, joined with the ticket title, newest first.
+     *
+     * @param int $event_user
+     * @param int $limit
+     * @return array[] Each row is a TicketEvent's fields plus ticket_title.
+     */
+    public function getRecentEventsByUser($event_user, int $limit = 8): array
+    {
+        return $this->database->select(
+            "SELECT ticket_events.*, tickets.ticket_title FROM ticket_events INNER JOIN tickets ON event_ticket = ticket_id WHERE event_user = :event_user ORDER BY event_id DESC LIMIT " . (int)$limit,
+            [":event_user" => $event_user]
+        );
+    }
 }

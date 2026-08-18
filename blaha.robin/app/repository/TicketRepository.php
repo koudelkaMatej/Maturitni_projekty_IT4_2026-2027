@@ -174,11 +174,41 @@ class TicketRepository extends Repository
 
     public function getUserMonthlyWorkMinutes($user_id): int
     {
+        $monthExpr = $this->database->month('work_creation');
+        $yearExpr = $this->database->year('work_creation');
         $row = $this->database->selectOne(
-            "SELECT COALESCE(SUM(work_minutes), 0) AS total FROM works WHERE work_user = :user_id",
-            [":user_id" => $user_id]
+            "SELECT COALESCE(SUM(work_minutes), 0) AS total FROM works WHERE work_user = :user_id AND $monthExpr = :month AND $yearExpr = :year",
+            [":user_id" => $user_id, ":month" => (int)date("n"), ":year" => (int)date("Y")]
         );
         return (int)($row["total"] ?? 0);
+    }
+
+    /**
+     * Get the count of tickets assigned to a user, broken down by category.
+     *
+     * @param int $user_id
+     * @return array[] Each row: category_name (nullable), cnt.
+     */
+    public function getUserCategoryBreakdown($user_id): array
+    {
+        return $this->database->select(
+            "SELECT categories.category_name, COUNT(*) AS cnt FROM assignments INNER JOIN tickets ON assignment_ticket = ticket_id LEFT JOIN categories ON ticket_category = category_id WHERE assignment_user = :user_id GROUP BY ticket_category ORDER BY cnt DESC",
+            [":user_id" => $user_id]
+        );
+    }
+
+    /**
+     * Get the count of tickets assigned to a user, broken down by priority.
+     *
+     * @param int $user_id
+     * @return array[] Each row: priority_name (nullable), priority_color, priority_weight, cnt.
+     */
+    public function getUserPriorityBreakdown($user_id): array
+    {
+        return $this->database->select(
+            "SELECT priorities.priority_name, priorities.priority_color, priorities.priority_weight, COUNT(*) AS cnt FROM assignments INNER JOIN tickets ON assignment_ticket = ticket_id LEFT JOIN priorities ON ticket_priority = priority_id WHERE assignment_user = :user_id GROUP BY ticket_priority ORDER BY priorities.priority_weight DESC",
+            [":user_id" => $user_id]
+        );
     }
 
     public function getUserMonthlyStats($user_id, int $months = 6): array
