@@ -44,6 +44,11 @@ getApplication()->destroySession();
                     class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition-all">
                 Znovu přihlásit
             </button>
+
+            <button onclick="window.location.href ='index.php'"
+                    class="w-full mt-3 text-blue-600 hover:text-blue-700 font-bold text-sm hover:underline flex items-center justify-center gap-1 py-2 transition-colors">
+                Vytvořit ticket bez přihlášení <i data-lucide="external-link" size="14"></i>
+            </button>
         </div>
     </div>
 
