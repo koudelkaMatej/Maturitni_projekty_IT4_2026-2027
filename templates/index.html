@@ -4,83 +4,43 @@
     <meta charset="UTF-8">
     <title>Kino Maturita</title>
     <style>
-        body {
-            background-color: #222; /* Tmavé pozadí jako v kině */
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        .platno {
-            background-color: white;
-            color: black;
-            padding: 10px;
-            margin: 20px auto;
-            width: 60%;
-            border-radius: 10px;
-            box-shadow: 0 0 15px white; /* Efekt svícení */
-            font-weight: bold;
-            letter-spacing: 5px;
-        }
-        .sal {
-            display: grid;
-            grid-template-columns: repeat(5, 50px); /* 5 sedaček vedle sebe */
-            gap: 10px;
-            justify-content: center;
-            margin-top: 50px;
-        }
-        .sedacka {
-            width: 50px;
-            height: 50px;
-            background-color: #4CAF50; /* Zelená = volno */
-            border-radius: 8px;
-            cursor: pointer;
-            /* Tyhle 3 řádky centrují číslo přesně doprostřed sedačky: */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: black;
-            font-weight: bold;
-            text-decoration: none; /* Zruší podtržení, když ze sedačky uděláme odkaz */
-        }
-        .sedacka.obsazeno {
-            background-color: #f44336; /* Červená = obsazeno */
-            cursor: not-allowed;
-            color: white;
-        }
-        .pokladna {
-    margin-top: 40px;
-    font-size: 24px;
-    background-color: #333;
-    display: inline-block;
-    padding: 15px 30px;
-    border-radius: 10px;
-    border: 2px solid #ff9800; /* Oranžový rámeček */
-    color: #ff9800;
-}
+        body { background-color: #222; color: white; font-family: Arial, sans-serif; text-align: center; }
+        .platno { background-color: white; color: black; padding: 10px; margin: 20px auto; width: 60%; border-radius: 10px; box-shadow: 0 0 15px white; font-weight: bold; letter-spacing: 5px; }
+        .sal { display: grid; grid-template-columns: repeat(5, 50px); gap: 10px; justify-content: center; margin-top: 50px; }
+        .sedacka { width: 50px; height: 50px; background-color: #4CAF50; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; text-decoration: none; }
+        .sedacka.obsazeno { background-color: #f44336; cursor: not-allowed; color: white; }
+        .pokladna { margin-top: 40px; font-size: 24px; background-color: #333; display: inline-block; padding: 15px 30px; border-radius: 10px; border: 2px solid #ff9800; color: #ff9800; }
+        .panel-uzivatele { background-color: #333; padding: 15px; margin-bottom: 20px; border-radius: 10px; display: inline-block; }
     </style>
 </head>
 <body>
-    <h1>Cinema Maturita
-        <a href="/registrace" style="color: #ff9800; font-size: 20px;">Klikni zde pro REGISTRACI</a>
-    </h1>
+    <h1>Cinema Maturita</h1>
+    
+    <div class="panel-uzivatele">
+        {% if prihlaseny_uzivatel %}
+            <span style="font-size: 20px;">👤 Přihlášen jako: <strong>{{ prihlaseny_uzivatel }}</strong></span>
+            <a href="/odhlaseni" style="color: #f44336; margin-left: 20px; text-decoration: none; font-weight: bold;">(Odhlásit se)</a>
+        {% else %}
+            <span style="font-size: 20px;">Neregistrovaný divák</span>
+            <a href="/prihlaseni" style="color: #4CAF50; margin-left: 20px; font-weight: bold; text-decoration: none;">Přihlásit</a> |
+            <a href="/registrace" style="color: #ff9800; font-weight: bold; text-decoration: none;">Registrovat</a>
+        {% endif %}
+    </div>
+
     <div class="platno">FILMOVÉ PLÁTNO</div>
     
     <div class="sal">
-    {% for sedacka in sedacky %}
-        {% if sedacka.obsazeno %}
-            <!-- Přidali jsme vlastnost 'title', která se ukáže po najetí myší -->
-            <a href="/rezervace/{{ sedacka.cislo }}" 
-               class="sedacka obsazeno" 
-               title="Rezervoval: {{ sedacka.vlastnik if sedacka.vlastnik else 'Neznámý' }}">
-                {{ sedacka.cislo }}
-            </a>
-        {% else %}
-            <a href="/rezervace/{{ sedacka.cislo }}" class="sedacka" title="Volno">{{ sedacka.cislo }}</a>
-        {% endif %}
-    {% endfor %}
-</div>
-<div class="pokladna">
-    Celková cena rezervací: <strong>{{ celkova_cena }} Kč</strong>
-</div>
+        {% for sedacka in sedacky %}
+            {% if sedacka.obsazeno %}
+                <a href="/rezervace/{{ sedacka.cislo }}" class="sedacka obsazeno" title="Rezervoval: {{ sedacka.vlastnik if sedacka.vlastnik else 'Neznámý' }}">{{ sedacka.cislo }}</a>
+            {% else %}
+                <a href="/rezervace/{{ sedacka.cislo }}" class="sedacka" title="Volno">{{ sedacka.cislo }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="pokladna">
+        Celková cena rezervací: <strong>{{ celkova_cena }} Kč</strong>
+    </div>
 </body>
 </html>
