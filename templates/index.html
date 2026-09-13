@@ -34,10 +34,18 @@
             background-color: #4CAF50; /* Zelená = volno */
             border-radius: 8px;
             cursor: pointer;
+            /* Tyhle 3 řádky centrují číslo přesně doprostřed sedačky: */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: black;
+            font-weight: bold;
+            text-decoration: none; /* Zruší podtržení, když ze sedačky uděláme odkaz */
         }
         .sedacka.obsazeno {
             background-color: #f44336; /* Červená = obsazeno */
             cursor: not-allowed;
+            color: white;
         }
     </style>
 </head>
@@ -46,17 +54,14 @@
     <div class="platno">FILMOVÉ PLÁTNO</div>
     
     <div class="sal">
-        <!-- Zatím si sedačky vyrobíme natvrdo "natupo" pro ukázku -->
-        <div class="sedacka"></div>
-        <div class="sedacka"></div>
-        <div class="sedacka"></div>
-        <div class="sedacka obsazeno"></div> <!-- Tahle bude červená -->
-        <div class="sedacka"></div>
-        <div class="sedacka"></div>
-        <div class="sedacka"></div>
-        <div class="sedacka obsazeno"></div>
-        <div class="sedacka"></div>
-        <div class="sedacka"></div>
+        <!-- Tady Python cyklem vygeneruje všechny sedačky -->
+        {% for sedacka in sedacky %}
+            {% if sedacka.obsazeno %}
+                <div class="sedacka obsazeno">{{ sedacka.cislo }}</div>
+            {% else %}
+                <div class="sedacka">{{ sedacka.cislo }}</div>
+            {% endif %}
+        {% endfor %}
     </div>
 </body>
 </html>
