@@ -1,10 +1,10 @@
-from flask import Flask, render_template, redirect, url_for, request, session
+from flask import Flask, render_template, redirect, url_for, request, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///kino.db'
-app.secret_key = "supertajnyklic" # Tohle je nutné pro fungování session
+app.secret_key = "supertajnyklic" # Důležité pro session i pro flash messages!
 db = SQLAlchemy(app)
 
 # --- DATABÁZE ---
@@ -42,23 +42,24 @@ def domovska_stranka():
 @app.route("/rezervace/<int:cislo_sedacky>")
 def rezervace(cislo_sedacky):
     if "uzivatel" not in session:
-        return "Pro rezervaci se musíš přihlásit! <br><br> <a href='/prihlaseni'>Přihlásit se</a>"
+        flash("Pro rezervaci sedačky se musíš nejprve přihlásit!", "error")
+        return redirect(url_for("prihlaseni"))
         
     aktualni_uzivatel = session["uzivatel"]
     sedacka = Sedacka.query.filter_by(cislo=cislo_sedacky).first()
     
     if sedacka:
         if sedacka.obsazeno:
-            # Pokud je obsazená, zrušit ji může jen její majitel
             if sedacka.vlastnik == aktualni_uzivatel:
                 sedacka.obsazeno = False
                 sedacka.vlastnik = None
+                flash(f"Tvoje rezervace sedačky {cislo_sedacky} byla zrušena.", "info")
             else:
-                return "Tuto sedačku si zarezervoval někdo jiný! <br><br> <a href='/'>Zpět</a>"
+                flash("Tuto sedačku si zarezervoval někdo jiný, nemůžeš ji zrušit!", "error")
         else:
-            # Pokud je volná, zarezervujeme ji na aktuálního uživatele
             sedacka.obsazeno = True
             sedacka.vlastnik = aktualni_uzivatel
+            flash(f"Úspěšně jsi zarezervoval sedačku {cislo_sedacky}!", "success")
             
         db.session.commit()
         
@@ -73,14 +74,16 @@ def registrace():
         
         existuje = Uzivatel.query.filter_by(jmeno=jmeno).first()
         if existuje:
-            return "Tohle jméno už je zabrané! <br><br> <a href='/registrace'>Zkus to znovu</a>"
+            flash("Tohle jméno už je zabrané! Zkus si vymyslet jiné.", "error")
+            return redirect(url_for("registrace"))
         
         zahasovane_heslo = generate_password_hash(heslo)
         novy_uzivatel = Uzivatel(jmeno=jmeno, heslo=zahasovane_heslo)
         db.session.add(novy_uzivatel)
         db.session.commit()
         
-        return "Paráda, jsi zaregistrován! <br><br> <a href='/prihlaseni'>Můžeš se přihlásit</a>"
+        flash("Paráda, jsi zaregistrován! Nyní se můžeš přihlásit.", "success")
+        return redirect(url_for("prihlaseni"))
         
     return render_template("registrace.html")
 
@@ -94,9 +97,11 @@ def prihlaseni():
         uzivatel = Uzivatel.query.filter_by(jmeno=jmeno).first()
         if uzivatel and check_password_hash(uzivatel.heslo, heslo):
             session["uzivatel"] = uzivatel.jmeno
+            flash(f"Vítej zpět, {uzivatel.jmeno}! Jsi úspěšně přihlášen.", "success")
             return redirect(url_for("domovska_stranka"))
         else:
-            return "Špatné jméno nebo heslo. <br><br> <a href='/prihlaseni'>Zkus to znovu</a>"
+            flash("Špatné jméno nebo heslo. Zkus to znovu.", "error")
+            return redirect(url_for("prihlaseni"))
             
     return render_template("prihlaseni.html")
 
@@ -104,6 +109,7 @@ def prihlaseni():
 @app.route("/odhlaseni")
 def odhlaseni():
     session.pop("uzivatel", None)
+    flash("Byl jsi úspěšně odhlášen.", "info")
     return redirect(url_for("domovska_stranka"))
 
 if __name__ == "__main__":
