@@ -9,9 +9,11 @@ db = SQLAlchemy(app)
 
 # 2. VZHLED DATABÁZE (tzv. Model): Jak vypadá jedna sedačka v tabulce
 class Sedacka(db.Model):
-    id = db.Column(db.Integer, primary_key=True)      # Unikátní ID v databázi
-    cislo = db.Column(db.Integer, unique=True)        # Číslo sedačky (1-25)
-    obsazeno = db.Column(db.Boolean, default=False)   # Je volná? (Ano/Ne)
+    id = db.Column(db.Integer, primary_key=True)
+    cislo = db.Column(db.Integer, unique=True)
+    obsazeno = db.Column(db.Boolean, default=False)
+    # NOVÝ SLOUPECEK: Může být prázdný (nullable=True), pokud je sedačka volná
+    vlastnik = db.Column(db.String(100), nullable=True)
 
 # 3. VYTVOŘENÍ SÁLU PŘI STARTU: 
 with app.app_context():
@@ -47,8 +49,15 @@ def rezervace(cislo_sedacky):
     sedacka = Sedacka.query.filter_by(cislo=cislo_sedacky).first()
     
     if sedacka:
-        # MAGIE: Pokud je True, "not" z toho udělá False. Pokud je False, udělá True.
         sedacka.obsazeno = not sedacka.obsazeno
+        
+        # Pokud se právě zarezervovala, přiřadíme cvičné jméno
+        if sedacka.obsazeno:
+            sedacka.vlastnik = "Adam" # Tohle pak nahradíme přihlášeným uživatelem
+        # Pokud se uvolnila, jméno smažeme
+        else:
+            sedacka.vlastnik = None
+            
         db.session.commit()
         
     return redirect(url_for('domovska_stranka'))
