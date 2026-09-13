@@ -26,10 +26,20 @@ with app.app_context():
 
 # 4. NAŠE HLAVNÍ STRÁNKA
 @app.route("/")
+@app.route("/")
 def domovska_stranka():
-    # Vytáhneme VŠECHNY sedačky z databáze a pošleme je do HTML
     sedacky_z_db = Sedacka.query.all()
-    return render_template("index.html", sedacky=sedacky_z_db)
+    
+    # Zjistíme počet obsazených sedaček
+    # Tohle se zeptá databáze: "Kolik jich má obsazeno=True?"
+    pocet_obsazenych = Sedacka.query.filter_by(obsazeno=True).count()
+    
+    # Spočítáme cenu (1 lístek = 150 Kč)
+    cena_za_listek = 150
+    celkova_cena = pocet_obsazenych * cena_za_listek
+
+    # Přidali jsme celkova_cena do render_template, aby to HTML mohlo přečíst
+    return render_template("index.html", sedacky=sedacky_z_db, celkova_cena=celkova_cena)
 
 # 5. REZERVACE SEDAČKY
 @app.route("/rezervace/<int:cislo_sedacky>")
