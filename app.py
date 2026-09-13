@@ -1,69 +1,75 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-
-# 1. NASTAVENÍ DATABÁZE: Říkáme, že se má vytvořit soubor kino.db
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///kino.db'
+app.secret_key = "supertajnyklic" # Tohle budeme potřebovat pro přihlášení
 db = SQLAlchemy(app)
 
-# 2. VZHLED DATABÁZE (tzv. Model): Jak vypadá jedna sedačka v tabulce
+# 1. TABULKA SEDAČEK
 class Sedacka(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cislo = db.Column(db.Integer, unique=True)
     obsazeno = db.Column(db.Boolean, default=False)
-    # NOVÝ SLOUPECEK: Může být prázdný (nullable=True), pokud je sedačka volná
     vlastnik = db.Column(db.String(100), nullable=True)
 
-# 3. VYTVOŘENÍ SÁLU PŘI STARTU: 
+# 2. TABULKA UŽIVATELŮ (NOVÉ!)
+class Uzivatel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    jmeno = db.Column(db.String(50), unique=True)
+    heslo = db.Column(db.String(120)) # Ukládáme jako dlouhý tajný kód
+
 with app.app_context():
-    db.create_all() # Vytvoří tabulky, pokud ještě neexistují
-    
-    # Pokud v databázi není zatím ani jedna sedačka, vyrobíme jich 25 volných
+    db.create_all() # Vytvoří i naši novou tabulku uživatelů
     if not Sedacka.query.first():
         for i in range(1, 26):
             nova_sedacka = Sedacka(cislo=i, obsazeno=False)
             db.session.add(nova_sedacka)
-        db.session.commit() # Tohle databázi řekne "Ulož to natrvalo"
+        db.session.commit()
 
-# 4. NAŠE HLAVNÍ STRÁNKA
-@app.route("/")
 @app.route("/")
 def domovska_stranka():
     sedacky_z_db = Sedacka.query.all()
-    
-    # Zjistíme počet obsazených sedaček
-    # Tohle se zeptá databáze: "Kolik jich má obsazeno=True?"
     pocet_obsazenych = Sedacka.query.filter_by(obsazeno=True).count()
-    
-    # Spočítáme cenu (1 lístek = 150 Kč)
-    cena_za_listek = 150
-    celkova_cena = pocet_obsazenych * cena_za_listek
-
-    # Přidali jsme celkova_cena do render_template, aby to HTML mohlo přečíst
+    celkova_cena = pocet_obsazenych * 150
     return render_template("index.html", sedacky=sedacky_z_db, celkova_cena=celkova_cena)
 
-# 5. REZERVACE SEDAČKY
 @app.route("/rezervace/<int:cislo_sedacky>")
 def rezervace(cislo_sedacky):
     sedacka = Sedacka.query.filter_by(cislo=cislo_sedacky).first()
-    
     if sedacka:
         sedacka.obsazeno = not sedacka.obsazeno
-        
-        # Pokud se právě zarezervovala, přiřadíme cvičné jméno
         if sedacka.obsazeno:
-            sedacka.vlastnik = "Adam" # Tohle pak nahradíme přihlášeným uživatelem
-        # Pokud se uvolnila, jméno smažeme
+            sedacka.vlastnik = "Adam" # Tohle změníme hned v další fázi!
         else:
             sedacka.vlastnik = None
-            
+        db.session.commit()
+    return redirect(url_for('domovska_stranka'))
+
+# 3. NOVÉ: STRÁNKA PRO REGISTRACI
+@app.route("/registrace", methods=["GET", "POST"])
+def registrace():
+    # Pokud uživatel odeslal formulář (metoda POST)
+    if request.method == "POST":
+        jmeno = request.form.get("jmeno")
+        heslo = request.form.get("heslo")
+        
+        # Zkontrolujeme, zda už tohle jméno někdo nemá
+        existuje = Uzivatel.query.filter_by(jmeno=jmeno).first()
+        if existuje:
+            return "Tohle jméno už je zabrané! <a href='/registrace'>Zkus to znovu</a>"
+        
+        # Bezpečnost: Heslo nikdy neukládáme jako čistý text!
+        zahasovane_heslo = generate_password_hash(heslo)
+        novy_uzivatel = Uzivatel(jmeno=jmeno, heslo=zahasovane_heslo)
+        db.session.add(novy_uzivatel)
         db.session.commit()
         
-    return redirect(url_for('domovska_stranka'))
+        return "Paráda, jsi zaregistrován! <a href='/'>Zpět do kina</a>"
         
-    # Místo hlášky "Zpracovávám" uživatele rovnou přesměrujeme zpět do sálu
-    return redirect(url_for('domovska_stranka'))
+    # Pokud jen přišel na stránku (metoda GET), ukážeme mu formulář
+    return render_template("registrace.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
