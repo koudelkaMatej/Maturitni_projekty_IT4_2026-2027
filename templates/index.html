@@ -47,6 +47,16 @@
             cursor: not-allowed;
             color: white;
         }
+        .pokladna {
+    margin-top: 40px;
+    font-size: 24px;
+    background-color: #333;
+    display: inline-block;
+    padding: 15px 30px;
+    border-radius: 10px;
+    border: 2px solid #ff9800; /* Oranžový rámeček */
+    color: #ff9800;
+}
     </style>
 </head>
 <body>
@@ -62,6 +72,9 @@
             <a href="/rezervace/{{ sedacka.cislo }}" class="sedacka">{{ sedacka.cislo }}</a>
         {% endif %}
     {% endfor %}
+</div>
+<div class="pokladna">
+    Celková cena rezervací: <strong>{{ celkova_cena }} Kč</strong>
 </div>
 </body>
 </html>
