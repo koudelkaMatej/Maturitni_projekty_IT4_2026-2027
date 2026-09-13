@@ -54,14 +54,14 @@
     <div class="platno">FILMOVÉ PLÁTNO</div>
     
     <div class="sal">
-        <!-- Tady Python cyklem vygeneruje všechny sedačky -->
-        {% for sedacka in sedacky %}
-            {% if sedacka.obsazeno %}
-                <div class="sedacka obsazeno">{{ sedacka.cislo }}</div>
-            {% else %}
-                <div class="sedacka">{{ sedacka.cislo }}</div>
-            {% endif %}
-        {% endfor %}
-    </div>
+    {% for sedacka in sedacky %}
+        {% if sedacka.obsazeno %}
+            <!-- Změnili jsme div na odkaz (a) a přidali href -->
+            <a href="/rezervace/{{ sedacka.cislo }}" class="sedacka obsazeno">{{ sedacka.cislo }}</a>
+        {% else %}
+            <a href="/rezervace/{{ sedacka.cislo }}" class="sedacka">{{ sedacka.cislo }}</a>
+        {% endif %}
+    {% endfor %}
+</div>
 </body>
 </html>
