@@ -66,10 +66,14 @@
     <div class="sal">
     {% for sedacka in sedacky %}
         {% if sedacka.obsazeno %}
-            <!-- Změnili jsme div na odkaz (a) a přidali href -->
-            <a href="/rezervace/{{ sedacka.cislo }}" class="sedacka obsazeno">{{ sedacka.cislo }}</a>
+            <!-- Přidali jsme vlastnost 'title', která se ukáže po najetí myší -->
+            <a href="/rezervace/{{ sedacka.cislo }}" 
+               class="sedacka obsazeno" 
+               title="Rezervoval: {{ sedacka.vlastnik if sedacka.vlastnik else 'Neznámý' }}">
+                {{ sedacka.cislo }}
+            </a>
         {% else %}
-            <a href="/rezervace/{{ sedacka.cislo }}" class="sedacka">{{ sedacka.cislo }}</a>
+            <a href="/rezervace/{{ sedacka.cislo }}" class="sedacka" title="Volno">{{ sedacka.cislo }}</a>
         {% endif %}
     {% endfor %}
 </div>
