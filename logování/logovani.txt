@@ -1,0 +1,8 @@
+2026-10-05 13:17:31,619 - info_logger - INFO - Hrac Petr byl vytvoren.
+2026-10-05 13:17:31,624 - debug_logger - DEBUG - Vytvoren objekt Hrac(jmeno='Petr', skore=0)
+2026-10-05 13:17:31,629 - info_logger - INFO - Hrac Petr ziskal 5 bodu. Celkem ma 5.
+2026-10-05 13:17:31,634 - debug_logger - DEBUG - Zmena skore: 0 -> 5
+2026-10-05 13:17:31,638 - info_logger - INFO - Hrac Petr ziskal 10 bodu. Celkem ma 15.
+2026-10-05 13:17:31,643 - debug_logger - DEBUG - Zmena skore: 5 -> 15
+2026-10-05 13:17:31,647 - info_logger - INFO - Hrac Petr vyhral!
+2026-10-05 13:17:31,651 - debug_logger - DEBUG - Kontrola vyhry: skore=15, limit=10 => VYHRAL
