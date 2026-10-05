@@ -1,5 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 aaaaaaaaaaaaa
 =======
 a
 >>>>>>> 3e6c85a (ahoj)
+=======
+aaaaaaaaaa
+>>>>>>> feb88d8 (ab)
