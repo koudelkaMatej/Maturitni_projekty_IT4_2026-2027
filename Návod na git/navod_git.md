@@ -19,7 +19,7 @@
 
 ---
 
-## 1. Co je Git a proč ho používat?
+## 1. Co je Git a proč ho používat???
 
 **Git** je systém pro správu verzí (version control). Umožňuje:
 
