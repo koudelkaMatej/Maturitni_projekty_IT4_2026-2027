@@ -1,4 +1,5 @@
 import pygame
+import sys
 # Rozliseni okna
 
 WIDTH = 1920
@@ -15,8 +16,11 @@ RED = (200, 0, 0)
 
 GRAY = (150, 150, 150)
 
-BACKGROUND = (30, 30, 30)
 
+
+play_text = "Hrát"
+settings_text = "Nastavení"
+exit_text = "Vypnout"
 play_button = pygame.Rect(860, 350, 200, 60)
 settings_button = pygame.Rect(860, 450, 200, 60)
 exit_button = pygame.Rect(860, 550, 200, 60)
