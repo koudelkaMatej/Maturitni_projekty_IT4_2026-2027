@@ -13,9 +13,11 @@ from character_select import draw_character_select
 
 pygame.init()
 
-# Nastaveni herniho okna
-
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+# Nastaveni herniho okna
+BACKGROUND = pygame.image.load("Maturitni_projekty_IT4_2026-2027/PavelKrob/obrazky/OIP.png").convert()
+BACKGROUND = pygame.transform.scale(BACKGROUND, (WIDTH, HEIGHT))
+
 pygame.display.set_caption("Endless Cinderia")
 
 # Font pro texty
@@ -38,7 +40,7 @@ while running:
 
     # Vyplneni pozadi
 
-    screen.fill(BACKGROUND)
+    screen.blit(BACKGROUND, (0,0))
 
     # Zpracovani vstupu od uzivatele
 

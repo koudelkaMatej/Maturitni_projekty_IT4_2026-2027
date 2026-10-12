@@ -10,6 +10,6 @@ def draw_menu(screen, font, play_button, settings_button, exit_button):
     pygame.draw.rect(screen, BLUE, settings_button)
     pygame.draw.rect(screen, RED, exit_button)
 
-    screen.blit(font.render("Hrat", True, WHITE), (920, 365))
+    screen.blit(font.render("Hrat", True, WHITE), (play_button.center))
     screen.blit(font.render("Settings", True, WHITE), (885, 465))
     screen.blit(font.render("Konec", True, WHITE), (910, 565))
