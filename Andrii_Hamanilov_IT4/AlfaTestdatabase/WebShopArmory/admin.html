@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Lokální analytická nástěnka demo e-shopu VOID ARMORY." />
+  <title>VOID ARMORY // ANALYTICS</title>
+  <link rel="icon" type="image/png" href="imgs/logoNback/voidarmlogo.png" />
+  <link rel="stylesheet" href="static/styles/style.css" />
+  <script src="static/scripts/admin.js" defer></script>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="top-line">
+      <a class="brand-mini" href="index.html" aria-label="VOID ARMORY – e-shop"><img class="brand-mark" src="imgs/logoNback/voidarmlogo.png" alt="" />VOID<span>_</span>ARMORY</a>
+      <span class="system-status"><span class="status-dot"></span> LOCAL ANALYTICS // DEMO</span>
+      <a class="admin-button" href="index.html">← ZPĚT DO E-SHOPU</a>
+    </header>
+
+    <main class="admin-page">
+      <div class="admin-heading">
+        <p class="eyebrow">// PRIVATE VIEW · SCHOOL DEMO</p>
+        <h1 class="admin-title">ANALYTICKÝ <span>TERMINÁL</span></h1>
+        <p>Přehled zaznamenaných testovacích objednávek, poptávky po produktech, aktuálních demo zásob a zákaznické zpětné vazby.</p>
+      </div>
+      <p class="admin-warning"><strong>Jen lokální demo:</strong> IndexedDB je uložená v tomto prohlížeči a zařízení. Nejde o serverovou ani sdílenou databázi, panel nemá přihlášení a není určen pro skutečné zákaznické údaje nebo veřejný provoz. Test objednávky nejsou platby ani skutečné prodeje.</p>
+
+      <div class="admin-stats" aria-live="polite">
+        <article class="stat-card"><span>TEST OBJEDNÁVKY</span><strong id="statOrders">—</strong></article>
+        <article class="stat-card"><span>DEMO OBRAT</span><strong id="statRevenue">—</strong></article>
+        <article class="stat-card"><span>PRODANÉ KUSY</span><strong id="statUnits">—</strong></article>
+        <article class="stat-card"><span>KOMENTÁŘE</span><strong id="statFeedback">—</strong></article>
+      </div>
+
+      <div class="admin-actions">
+        <button class="admin-button" id="exportData" type="button">EXPORTOVAT JSON ↓</button>
+        <button class="admin-button danger" id="clearData" type="button">VYMAZAT DEMO OBJEDNÁVKY A KOMENTÁŘE</button>
+        <span class="micro-note" id="adminStatus" role="status" aria-live="polite"></span>
+      </div>
+
+      <div class="admin-panels">
+        <section class="admin-panel">
+          <h2>SKLAD // NABÍDKA</h2>
+          <p class="admin-empty">Uprav ukázkové skladové počty. Změny se uloží v lokální databázi.</p>
+          <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>PRODUKT</th><th>KATEGORIE</th><th>SKLADEM</th><th></th></tr></thead><tbody id="inventoryRows"></tbody></table></div>
+        </section>
+        <section class="admin-panel">
+          <h2>POPTÁVKA // NEJPRODÁVANĚJŠÍ</h2>
+          <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>PRODUKT</th><th>KUSY V TEST OBJ.</th><th>TRŽBY DEMO</th></tr></thead><tbody id="demandRows"></tbody></table></div>
+        </section>
+        <section class="admin-panel">
+          <h2>POSLEDNÍ TEST OBJEDNÁVKY</h2>
+          <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>DATUM</th><th>E-MAIL</th><th>POLOŽKY</th><th>CELKEM</th></tr></thead><tbody id="orderRows"></tbody></table></div>
+        </section>
+        <section class="admin-panel">
+          <h2>ZÁKAZNICKÉ KOMENTÁŘE</h2>
+          <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>DATUM</th><th>E-MAIL</th><th>KOMENTÁŘ</th></tr></thead><tbody id="feedbackRows"></tbody></table></div>
+        </section>
+      </div>
+      <p class="admin-footer">Pokud panel ukazuje chybu nebo prázdná data, otevři projekt přes lokální vývojový server (například VS Code Live Server) a použij stejný prohlížeč i adresu pro e-shop i tento panel. Pro skutečný e-shop je nutný backend, přihlášení správce, zabezpečená databáze a pravidla ochrany osobních údajů.</p>
+    </main>
+    <footer class="site-footer"><a class="brand-mini" href="index.html" aria-label="VOID ARMORY – e-shop"><img class="brand-mark" src="imgs/logoNback/voidarmlogo.png" alt="" />VOID<span>_</span>ARMORY</a><p>© 2026 VOID ARMORY // ŠKOLNÍ DEMO PROJEKT</p><a href="index.html" class="back-top">ZPĚT DO E-SHOPU ↑</a></footer>
+  </div>
+</body>
+</html>
