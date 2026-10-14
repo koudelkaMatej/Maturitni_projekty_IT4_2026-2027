@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="VOID ARMORY — ukázkový e-shop s airsoftovými replikami, vybavením a kosmetickou personalizací." />
+  <title>VOID ARMORY // AIRSOFT CUSTOM</title>
+  <link rel="icon" type="image/png" href="imgs/logoNback/voidarmlogo.png" />
+  <link rel="stylesheet" href="static/styles/style.css" />
+  <script src="static/scripts/shop.js" defer></script>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="top-line">
+      <a class="brand-mini" href="#home" aria-label="VOID ARMORY – domů"><img class="brand-mark" src="imgs/logoNback/voidarmlogo.png" alt="" />VOID<span>_</span>ARMORY</a>
+      <span class="system-status"><span class="status-dot"></span> SYSTEM ONLINE // DEMO SHOP</span>
+      <button class="cart-open" id="openCart" type="button" aria-haspopup="dialog" aria-controls="cartDialog">
+        KOŠÍK <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </header>
+
+    <nav class="nav-row" aria-label="Hlavní navigace">
+      <a class="nav-item active" href="#home">[01] DOMŮ</a>
+      <a class="nav-item" href="#catalog">[02] KATALOG</a>
+      <a class="nav-item" href="#customizer">[03] CUSTOM LAB</a>
+      <a class="nav-item" href="#about">[04] INFO</a>
+    </nav>
+
+    <main>
+      <section class="hero" id="home">
+        <div class="hero-copy">
+          <p class="eyebrow">// AIRSOFT · GEAR · PERSONALIZACE</p>
+          <h1 class="title-block">VOID<br /><span>ARMORY</span></h1>
+          <p class="hero-description">Vybavení, které odpovídá tvému stylu. Vyber si airsoftovou repliku, dolaď vzhled a sestav vlastní loadout.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#catalog">PROHLÉDNOUT KATALOG <span aria-hidden="true">↘</span></a>
+            <a class="btn btn-ghost" href="#customizer">VSTOUPIT DO CUSTOM LAB</a>
+          </div>
+          <div class="hero-meta">
+            <div><span class="meta-label">SORTIMENT</span><strong>06 <small>POLOŽEK</small></strong></div>
+            <div><span class="meta-label">REŽIM</span><strong>DEMO <small>VERZE</small></strong></div>
+            <div><span class="meta-label">MĚNA</span><strong>CZK <small>KČ</small></strong></div>
+          </div>
+        </div>
+        <div class="hero-art">
+          <div class="scanline"></div>
+          <div class="art-corner corner-tl"></div><div class="art-corner corner-br"></div>
+          <span class="art-label art-label-top">FIG. 01 / VX SERIES</span>
+          <img class="brand-hero-logo" src="imgs/logoNback/voidarmlogo.png" alt="Logo VOID ARMORY" />
+          <span class="art-label art-label-bottom">VISUAL MOCKUP // AIRSOFT</span>
+          <span class="art-coord">50°05' N<br />14°25' E</span>
+        </div>
+      </section>
+
+      <section class="section" id="catalog">
+        <div class="section-heading">
+          <div><p class="eyebrow">// 01 — VÝBĚR VYBAVENÍ</p><h2>PRODUKTOVÝ <span>ARCHIV</span></h2></div>
+          <p class="section-note">Vyber kategorii nebo vyhledej produkt.</p>
+        </div>
+        <div class="catalog-tools">
+          <div class="filter-row" role="group" aria-label="Filtrovat produkty">
+            <button class="filter-chip active" type="button" data-filter="all">VŠE</button>
+            <button class="filter-chip" type="button" data-filter="replica">AIRSOFT</button>
+            <button class="filter-chip" type="button" data-filter="gear">VYBAVENÍ</button>
+            <button class="filter-chip" type="button" data-filter="custom">CUSTOM</button>
+          </div>
+          <label class="search-box"><span aria-hidden="true">⌕</span><input id="productSearch" type="search" placeholder="Hledat v katalogu..." aria-label="Hledat produkty" /></label>
+        </div>
+        <div class="product-grid" id="productGrid" aria-live="polite"></div>
+        <p class="empty-state" id="emptyState" hidden>Žádný produkt neodpovídá hledání.</p>
+      </section>
+
+      <section class="custom-section" id="customizer">
+        <div class="section-heading">
+          <div><p class="eyebrow">// 02 — PERSONALIZAČNÍ ROZHRANÍ</p><h2>CUSTOM <span>LAB</span></h2></div>
+          <span class="lab-status"><span class="status-dot"></span> CONFIGURATOR READY</span>
+        </div>
+        <div class="custom-layout">
+          <div class="custom-preview">
+            <div class="preview-top"><span>PREVIEW / VX-01</span><span id="previewCode">FINISH: BLACK</span></div>
+            <div class="preview-stage" id="previewStage" data-color="black">
+              <img class="preview-logo" src="imgs/logoNback/voidarmlogo.png" alt="Logo VOID ARMORY" />
+              <span class="preview-stamp">COSMETIC<br />PREVIEW</span>
+            </div>
+            <p class="preview-caption">Náhled je pouze ilustrační. Skutečný odstín se může lišit.</p>
+          </div>
+          <form class="custom-controls" id="customForm">
+            <div class="control-heading"><span class="step-number">01</span><div><h3>ZÁKLAD</h3><p>Airsoftová replika VX-01</p></div><strong>3 890 Kč</strong></div>
+            <fieldset class="option-group">
+              <legend>BARVA POVRCHU</legend>
+              <label class="color-option"><input type="radio" name="color" value="black" checked /><span class="color-swatch swatch-black"></span><span>MATTE BLACK</span></label>
+              <label class="color-option"><input type="radio" name="color" value="olive" /><span class="color-swatch swatch-olive"></span><span>OLIVE DRAB</span></label>
+              <label class="color-option"><input type="radio" name="color" value="sand" /><span class="color-swatch swatch-sand"></span><span>DESERT SAND</span></label>
+            </fieldset>
+            <fieldset class="option-group">
+              <legend>VZHLEDOVÝ DOPLNĚK</legend>
+              <label class="check-option"><input type="checkbox" id="decalOption" /><span class="fake-check"></span><span>Personalizovaná samolepka <small>+ 190 Kč</small></span></label>
+              <label class="check-option"><input type="checkbox" id="patchOption" /><span class="fake-check"></span><span>Textilní patch se znakem <small>+ 250 Kč</small></span></label>
+              <label class="check-option"><input type="checkbox" id="caseOption" /><span class="fake-check"></span><span>Ochranný přepravní obal <small>+ 490 Kč</small></span></label>
+            </fieldset>
+            <div class="custom-total"><span>CELKOVÁ CENA</span><strong id="customTotal">3 890 Kč</strong></div>
+            <button class="btn btn-primary full-btn" type="submit">PŘIDAT KONFIGURACI DO KOŠÍKU <span aria-hidden="true">＋</span></button>
+            <p class="micro-note">Personalizace se týká pouze vzhledu a příslušenství airsoftové repliky.</p>
+          </form>
+        </div>
+      </section>
+
+      <section class="info-strip" id="about">
+        <div class="info-item"><span class="info-symbol">◈</span><div><h3>VYBAVENÍ NA JEDNOM MÍSTĚ</h3><p>Airsoftové repliky a doplňky pro bezpečnou hru.</p></div></div>
+        <div class="info-item"><span class="info-symbol">⌁</span><div><h3>VLASTNÍ VZHLED</h3><p>Vyber barvu a kosmetické doplňky podle sebe.</p></div></div>
+        <div class="info-item"><span class="info-symbol">＋</span><div><h3>DEMO E-SHOP</h3><p>Ukázkový projekt bez napojení na platby a dopravu.</p></div></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a class="brand-mini" href="#home" aria-label="VOID ARMORY – domů"><img class="brand-mark" src="imgs/logoNback/voidarmlogo.png" alt="" />VOID<span>_</span>ARMORY</a>
+      <p>© 2026 VOID ARMORY // ŠKOLNÍ DEMO PROJEKT</p>
+      <a href="#home" class="back-top">ZPĚT NAHORU ↑</a>
+    </footer>
+  </div>
+
+  <div class="dialog-backdrop" id="cartBackdrop" hidden></div>
+  <section class="cart-dialog" id="cartDialog" role="dialog" aria-modal="true" aria-labelledby="cartTitle" hidden>
+    <div class="cart-header"><div><p class="eyebrow">// ORDER TERMINAL</p><h2 id="cartTitle">TVŮJ <span>KOŠÍK</span></h2></div><button class="icon-button" id="closeCart" type="button" aria-label="Zavřít košík">×</button></div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-empty" id="cartEmpty">Košík je zatím prázdný. Vyber si něco z katalogu.</div>
+    <div class="cart-bottom"><div class="cart-total"><span>CELKEM</span><strong id="cartTotal">0 Kč</strong></div><button class="btn btn-primary full-btn" id="checkoutButton" type="button">POKRAČOVAT K OBJEDNÁVCE →</button><p class="micro-note">Demo režim: objednávka se nikam neodesílá a platba neproběhne.</p></div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
