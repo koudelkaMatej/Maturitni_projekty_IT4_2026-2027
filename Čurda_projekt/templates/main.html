@@ -1,0 +1,19 @@
+</html>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <body>
+        <header>
+            <div>
+                <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo"></a>
+            </div>
+            <nav class="navigace">
+                <a href="{{ url_for('manga') }}">Manga</a>
+                <a href="#">Figurky</a>
+            </nav>
+             <div class="header-icons">
+                <a href="#">Hledat</a>
+                <a href="#">Účet</a>
+                <a href="#">Košík</a>
+            </div>
+        </header>
+        <title>Home | AKATA</title>
+    </body>
