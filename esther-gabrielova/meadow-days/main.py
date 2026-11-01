@@ -2,6 +2,7 @@ import pygame, sys
 from settings import *
 from menu import Menu
 
+#TODO: Dodělat komentáře :-)
 
 class Game:
     def __init__(self):
