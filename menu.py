@@ -7,11 +7,6 @@ from settings_menu import run_settings
 pygame.init()
 
 
-TITLE_IMAGE_PATH = "dice.png"
-
-TITLE_RECT = pygame.Rect(0, 0, 500, 230)
-TITLE_RECT.center = (300, 140)
-
 PLAY_BUTTON_RECT = pygame.Rect(0, 0, 220, 70)
 PLAY_BUTTON_RECT.center = (300, 310)
 
@@ -24,19 +19,8 @@ QUIT_BUTTON_RECT.center = (300, 480)
 button_font = pygame.font.SysFont("segoeui", 32, bold=True)
 
 
-def _load_title_image():
-    if os.path.isfile(TITLE_IMAGE_PATH):
-        image = pygame.image.load(TITLE_IMAGE_PATH).convert_alpha()
-        return pygame.transform.smoothscale(image, TITLE_RECT.size)
-    return None
-
-
-title_image = _load_title_image()
-
-
 def draw_title():
-    if title_image is not None:
-        screen.blit(title_image, TITLE_RECT)
+    screen.blit(title_image, TITLE_RECT)
 
 
 def _draw_menu_button(rect, text, mouse_pos):
