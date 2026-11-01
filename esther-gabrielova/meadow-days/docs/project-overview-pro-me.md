@@ -99,5 +99,9 @@ notes: ER diagram upravovat a později finálně dokončit, optat se na obsah we
 >>>>>>> 4bfde0b (Add Project Overview #2)
 =======
 
+<<<<<<< HEAD
 notes: ER diagram upravovat a později finálně dokončit
 >>>>>>> d6f7904 (Update Project Overview)
+=======
+notes: ER diagram upravovat a později finálně dokončit, optat se na obsah webu (mby switch)
+>>>>>>> 5beb799 (Add notes to Project overview)
