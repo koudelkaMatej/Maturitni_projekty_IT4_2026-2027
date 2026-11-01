@@ -3,9 +3,13 @@ from settings import *
 from menu import Menu
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 #TODO: Dodělat komentáře :-)
 =======
 >>>>>>> d14b0a0 (Add main menu)
+=======
+#TODO: Dodělat komentáře :-)
+>>>>>>> c7e69f0 (Add todo)
 
 class Game:
     def __init__(self):
