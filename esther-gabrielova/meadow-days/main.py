@@ -2,7 +2,10 @@ import pygame, sys
 from settings import *
 from menu import Menu
 
+<<<<<<< HEAD
 #TODO: Dodělat komentáře :-)
+=======
+>>>>>>> d14b0a0 (Add main menu)
 
 class Game:
     def __init__(self):
