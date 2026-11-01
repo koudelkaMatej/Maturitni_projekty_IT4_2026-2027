@@ -1,1 +1,0 @@
-#inspo: https://github.com/Gax-il/26-it4-2/tree/main/Ukazka
