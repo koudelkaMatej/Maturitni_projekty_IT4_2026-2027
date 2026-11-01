@@ -1,5 +1,15 @@
 import pygame
 
+USER = "?"
+HOST = "?"
+PASSWORD = "?"
+DATABASE = "http://dbs.spskladno.cz/myadmin/"
+
+
+
+
+
+######################################################################################
 
 WHITE = (245, 245, 245)
 BLACK = (20, 20, 20)
@@ -57,4 +67,13 @@ final_values = [1]
 ##########screen#############
 
 screen = pygame.display.set_mode((600, 600))
-pygame.display.set_caption("Kostky")
+pygame.display.set_caption("KostkyMaturita")
+
+
+##########title image#############
+
+TITLE_RECT = pygame.Rect(0, 0, 500, 230)
+TITLE_RECT.center = (300, 140)
+
+title_image = pygame.image.load("dice.png").convert_alpha()
+title_image = pygame.transform.smoothscale(title_image, TITLE_RECT.size)
