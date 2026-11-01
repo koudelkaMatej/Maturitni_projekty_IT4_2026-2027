@@ -1,0 +1,211 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="js7oi79rsu8gxatr5GJM">
+    <mxGraphModel dx="2460" dy="1124" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="-JoS83o0_PLYLFN4lu92-6" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Hlavní menu" vertex="1">
+          <mxGeometry height="60" width="120" x="130" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-32" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-12">
+          <mxGeometry relative="1" x="0.0504" as="geometry">
+            <Array as="points">
+              <mxPoint x="390" y="190" />
+              <mxPoint x="595" y="190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Inventář" vertex="1">
+          <mxGeometry height="60" width="120" x="330" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-31" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-33" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Obchod" vertex="1">
+          <mxGeometry height="60" width="120" x="535" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-4" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="UI" vertex="1">
+          <mxGeometry height="30" width="60" x="360" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-8" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;startArrow=classic;startFill=1;" target="-JoS83o0_PLYLFN4lu92-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Ukládání a načítání" vertex="1">
+          <mxGeometry height="60" width="120" x="-40" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Databáze" vertex="1">
+          <mxGeometry height="60" width="120" x="-40" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-9" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Databáze" vertex="1">
+          <mxGeometry height="30" width="60" x="-80" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-47" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-35">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Zalévání" vertex="1">
+          <mxGeometry height="60" width="120" x="125" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-48" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-36">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-49" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.665;entryY=0.008;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-35">
+          <mxGeometry relative="1" x="-0.1268" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="675" />
+              <mxPoint x="297.6" y="675" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Farmaření (sázení věcí)" vertex="1">
+          <mxGeometry height="60" width="120" x="325" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-50" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-36">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-12" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Správa inventáře" vertex="1">
+          <mxGeometry height="60" width="120" x="535" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-13" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Herní mechaniky" vertex="1">
+          <mxGeometry height="30" width="100" x="335" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-51" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-36">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="780" y="700" />
+              <mxPoint x="477.5" y="700" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-14" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Nákup, prodej věcí" vertex="1">
+          <mxGeometry height="60" width="120" x="720" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-52" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-37">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="960" y="720" />
+              <mxPoint x="687.5" y="720" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-15" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Pohyb hráče" vertex="1">
+          <mxGeometry height="60" width="120" x="900" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-44" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-35">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint y="710" />
+              <mxPoint x="277.5" y="710" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-46" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-36">
+          <mxGeometry relative="1" x="0.0006" as="geometry">
+            <Array as="points">
+              <mxPoint x="80" y="580" />
+              <mxPoint x="80" y="900" />
+              <mxPoint x="390" y="900" />
+              <mxPoint x="390" y="770" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-16" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Sklizeň úrody" vertex="1">
+          <mxGeometry height="60" width="120" x="-60" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-45" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-39">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-180" y="755" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-17" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Herní čas" vertex="1">
+          <mxGeometry height="60" width="120" x="-240" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-22" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="-JoS83o0_PLYLFN4lu92-19">
+          <mxGeometry relative="1" x="0.2024" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="360" />
+              <mxPoint x="260" y="400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-18" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Myš" vertex="1">
+          <mxGeometry height="60" width="120" x="203" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-24" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-34" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-4">
+          <mxGeometry relative="1" x="-0.0113" as="geometry">
+            <Array as="points">
+              <mxPoint x="385" y="290" />
+              <mxPoint x="860" y="290" />
+              <mxPoint x="860" y="10" />
+              <mxPoint x="390" y="10" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-19" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Zprac. vstupu" vertex="1">
+          <mxGeometry height="60" width="120" x="325" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-23" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="-JoS83o0_PLYLFN4lu92-19">
+          <mxGeometry relative="1" x="0.2118" as="geometry">
+            <Array as="points">
+              <mxPoint x="510" y="360" />
+              <mxPoint x="510" y="400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-20" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Klávesnice" vertex="1">
+          <mxGeometry height="60" width="120" x="445" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-21" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Ovládání" vertex="1">
+          <mxGeometry height="30" width="60" x="355" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-42" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;defaultLabelBackgroundColor=page;entryX=0.5;entryY=1;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" target="-JoS83o0_PLYLFN4lu92-9">
+          <mxGeometry relative="1" x="0.1096" as="geometry">
+            <Array as="points">
+              <mxPoint x="277.5" y="850" />
+              <mxPoint x="-430" y="850" />
+              <mxPoint x="-430" y="270" />
+              <mxPoint x="-50" y="270" />
+            </Array>
+            <mxPoint x="-50" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-35" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Pole, plodiny (?)" vertex="1">
+          <mxGeometry height="60" width="120" x="217.5" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-36" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Inventář - obsah" vertex="1">
+          <mxGeometry height="60" width="120" x="417.5" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-37" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Hráč - pozice, majetek" vertex="1">
+          <mxGeometry height="60" width="120" x="627.5" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-38" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Herní data" vertex="1">
+          <mxGeometry height="30" width="100" x="330" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-41" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-9">
+          <mxGeometry relative="1" x="-0.4234" as="geometry">
+            <Array as="points">
+              <mxPoint x="-280" y="770" />
+              <mxPoint x="-280" y="235" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-43" edge="1" parent="1" source="-JoS83o0_PLYLFN4lu92-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;" target="-JoS83o0_PLYLFN4lu92-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-JoS83o0_PLYLFN4lu92-39" parent="1" style="rounded=1;whiteSpace=wrap;html=1;roundedPerimeter=1;" value="Den a čas" vertex="1">
+          <mxGeometry height="60" width="120" x="32.5" y="740" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
