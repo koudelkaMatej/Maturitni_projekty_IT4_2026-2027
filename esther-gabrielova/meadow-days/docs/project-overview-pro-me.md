@@ -91,5 +91,8 @@ Projekt se skládá ze dvou hlavních částí:
 
 1.  **Hra** -- samotná 2D hra vytvořená v Pythonu pomocí knihovny Pygame.
 2.  **Databáze** -- propojená s hrou, která zajišťuje ukládání a načítání herního postupu.
+<<<<<<< HEAD
 
 notes: ER diagram upravovat a později finálně dokončit, optat se na obsah webu (mby switch)
+=======
+>>>>>>> 4bfde0b (Add Project Overview #2)
