@@ -17,7 +17,11 @@ pygame.init()
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 # Nastaveni herniho okna
+<<<<<<< HEAD
 BACKGROUND = pygame.image.load("Maturitni_projekty_IT4_2026-2027\PavelKrob\obrazky\OIP.png").convert()
+=======
+BACKGROUND = pygame.image.load("PavelKrob/obrazky/OIP.png").convert()
+>>>>>>> 9cfa72d (Stranka)
 BACKGROUND = pygame.transform.scale(BACKGROUND, (WIDTH, HEIGHT))
 
 lvl = pygame.image.load("Maturitni_projekty_IT4_2026-2027\PavelKrob\obrazky\dungeon.png").convert()
