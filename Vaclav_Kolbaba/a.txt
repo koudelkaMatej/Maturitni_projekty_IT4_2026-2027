@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 aaaaaaaaaaaaa
 =======
 a
@@ -11,3 +12,6 @@ aaaaaaaaaa
 =======
 aaaaaaaaaa
 >>>>>>> bafb10d (bb)
+=======
+aaaaaaaaaaaaa
+>>>>>>> d7671e5 (Kontrola)
