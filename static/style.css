@@ -28,3 +28,29 @@ button:hover { background-color: #45a049; }
 .flash.error { background-color: #f44336; color: white; border: 1px solid #d32f2f; }
 .flash.success { background-color: #4CAF50; color: white; border: 1px solid #388e3c; }
 .flash.info { background-color: #2196F3; color: white; border: 1px solid #1976D2; }
+
+
+/* --- NAVIGAČNÍ LIŠTA --- */
+.navbar {
+    background-color: #333;
+    overflow: hidden;
+    border-bottom: 2px solid #ff9800;
+    margin-bottom: 20px;
+}
+.navbar a {
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 20px;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+}
+.navbar a:hover {
+    background-color: #555;
+    color: #ff9800;
+}
+.navbar .prava-strana {
+    float: right;
+}

@@ -112,6 +112,10 @@ def odhlaseni():
     session.pop("uzivatel", None)
     flash("Byl jsi úspěšně odhlášen.", "info")
     return redirect(url_for("domovska_stranka"))
+# --- O KINĚ  4. stránka ---
+@app.route("/o-kine")
+def o_kine():
+    return render_template("o_kine.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
