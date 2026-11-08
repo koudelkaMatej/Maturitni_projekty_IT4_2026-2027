@@ -15,7 +15,7 @@ pygame.init()
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 # Nastaveni herniho okna
-BACKGROUND = pygame.image.load("Maturitni_projekty_IT4_2026-2027/PavelKrob/obrazky/OIP.png").convert()
+BACKGROUND = pygame.image.load("PavelKrob/obrazky/OIP.png").convert()
 BACKGROUND = pygame.transform.scale(BACKGROUND, (WIDTH, HEIGHT))
 
 pygame.display.set_caption("Endless Cinderia")

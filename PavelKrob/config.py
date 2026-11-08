@@ -16,11 +16,15 @@ RED = (200, 0, 0)
 
 GRAY = (150, 150, 150)
 
+pygame.init()
 
+font = pygame.font.SysFont(None, 50)
 
-play_text = "Hrát"
-settings_text = "Nastavení"
-exit_text = "Vypnout"
+play_text = font.render("Hrat", True, WHITE)
+settings_text = font.render("Settings", True, WHITE)
+exit_text = font.render("Konec", True, WHITE)
+zpet_text = font.render("Zpet", True, BLACK)
+
 play_button = pygame.Rect(860, 350, 200, 60)
 settings_button = pygame.Rect(860, 450, 200, 60)
 exit_button = pygame.Rect(860, 550, 200, 60)
