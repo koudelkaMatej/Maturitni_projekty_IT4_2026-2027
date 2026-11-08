@@ -8,6 +8,8 @@ from config import *
 from menu import draw_menu
 from settings import draw_settings
 from character_select import draw_character_select
+from game import draw_play
+from player import Player
 
 # Inicializace pygame
 
@@ -18,10 +20,13 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 BACKGROUND = pygame.image.load("PavelKrob/obrazky/OIP.png").convert()
 BACKGROUND = pygame.transform.scale(BACKGROUND, (WIDTH, HEIGHT))
 
+lvl = pygame.image.load("PavelKrob/obrazky/dungeon.png").convert()
+lvl = pygame.transform.scale(lvl, (WIDTH, HEIGHT))
+
 pygame.display.set_caption("Endless Cinderia")
 
 # Font pro texty
-
+player = Player()
 font = pygame.font.SysFont(None, 50)
 
 # Aktualne zobrazena obrazovka
@@ -36,11 +41,18 @@ selected_class = None
 
 running = True
 
+clock = pygame.time.Clock()
 while running:
-
+    clock.tick(60)
     # Vyplneni pozadi
 
-    screen.blit(BACKGROUND, (0,0))
+    keyState = pygame.key.get_pressed()
+
+    if game_state != "play" :
+        screen.blit(BACKGROUND, (0,0))
+    else:
+        screen.blit(lvl, (0,0))
+
 
     # Zpracovani vstupu od uzivatele
 
@@ -82,18 +94,22 @@ while running:
                 if knight_button.collidepoint(event.pos):
 
                     selected_class = "Knight"
-
+                    game_state = "play"
                     print(f"Player picked {selected_class}")
 
                 elif assassin_button.collidepoint(event.pos):
 
                     selected_class = "Assassin"
-
+                    game_state = "play"
                     print(f"Player picked {selected_class}")
 
                 elif back_button.collidepoint(event.pos):
 
                     game_state = "menu"
+        elif game_state == "play":
+            if keyState[pygame.K_ESCAPE]:
+                print("escape")
+                game_state = "menu"
 
     # Vykresleni hlavniho menu
 
@@ -128,7 +144,12 @@ while running:
             assassin_button,
             back_button
         )
-
+    elif game_state == "play":
+        screen.blit(player.image, player.pos)
+        draw_play(
+            selected_class,
+            player.update()
+        )
     # Obnoveni obrazovky
 
     pygame.display.flip()
