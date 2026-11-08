@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CactusHub – Administrace</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav class="container nav">
+            <a class="logo" href="{{ url_for('katalog') }}">🌵 CactusHub</a>
+            <div>
+                <a href="{{ url_for('katalog') }}">Obchod</a>
+                <a href="{{ url_for('kosik') }}">Košík</a>
+                <a href="{{ url_for('admin') }}">Administrace</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% for zprava in get_flashed_messages() %}
+            <p class="zprava">{{ zprava }}</p>
+        {% endfor %}
+        <div class="radek">
+    <h1>Administrace</h1>
+    <form method="post" action="{{ url_for('odhlaseni') }}"><button class="vedlejsi">Odhlásit</button></form>
+</div>
+<a class="tlacitko" href="{{ url_for('novy_produkt') }}">+ Přidat nový kaktus</a>
+<h2>Produkty</h2>
+{% for product in products %}
+    <div class="radek">
+        <span>{{ product.name }} – {{ product.price }} Kč ({{ product.stock }} ks)</span>
+        <a href="{{ url_for('editace', product_id=product.id) }}">Upravit</a>
+    </div>
+{% else %}
+    <p>Produkty zatím neexistují.</p>
+{% endfor %}
+<h2>Objednávky</h2>
+{% for order in orders %}
+    <div class="radek">
+        <span>#{{ order.id }} – {{ order.customer_name }} ({{ order.customer_email }})</span>
+        <strong>{{ order.total_price }} Kč</strong>
+    </div>
+{% else %}
+    <p>Zatím žádné objednávky.</p>
+{% endfor %}
+    </main>
+    <footer class="container">CactusHub – školní maturitní projekt (bez skutečných plateb)</footer>
+</body>
+</html>

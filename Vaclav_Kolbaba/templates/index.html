@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CactusHub – Nabídka kaktusů</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav class="container nav">
+            <a class="logo" href="{{ url_for('katalog') }}">🌵 CactusHub</a>
+            <div>
+                <a href="{{ url_for('katalog') }}">Obchod</a>
+                <a href="{{ url_for('kosik') }}">Košík</a>
+                <a href="{{ url_for('admin') }}">Administrace</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% for zprava in get_flashed_messages() %}
+            <p class="zprava">{{ zprava }}</p>
+        {% endfor %}
+        <section class="hero">
+    <h1>Kaktusy s příběhem</h1>
+    <p>Vítej v CactusHubu – malém obchodě pro milovníky sukulentů.</p>
+</section>
+<h2>Naše nabídka</h2>
+<div class="grid">
+    {% for product in products %}
+        <article class="card">
+            {% if product.image_url %}
+                <img class="foto-produktu" src="{{ url_for('static', filename='uploads/' ~ product.image_url) }}" alt="{{ product.name }}">
+            {% else %}
+                <div class="obrazek">🌵</div>
+            {% endif %}
+            <h3><a href="{{ url_for('detail', product_id=product.id) }}">{{ product.name }}</a></h3>
+            <p>{{ product.description or 'Krásný kaktus do sbírky.' }}</p>
+            <strong>{{ product.price }} Kč</strong>
+            <p>Skladem: {{ product.stock }} ks</p>
+            {% if product.stock > 0 %}
+                <form method="post" action="{{ url_for('do_kosiku', product_id=product.id) }}">
+                    <button>Přidat do košíku</button>
+                </form>
+            {% else %}
+                <p>Vyprodáno</p>
+            {% endif %}
+        </article>
+    {% else %}
+        <p>Žádné kaktusy zatím nejsou. Přidej první v administraci.</p>
+    {% endfor %}
+</div>
+    </main>
+    <footer class="container">CactusHub – školní maturitní projekt (bez skutečných plateb)</footer>
+</body>
+</html>
