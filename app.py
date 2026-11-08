@@ -112,6 +112,25 @@ def odhlaseni():
     session.pop("uzivatel", None)
     flash("Byl jsi úspěšně odhlášen.", "info")
     return redirect(url_for("domovska_stranka"))
+# --- TAJNÉ TLAČÍTKO PRO UČITELE / ADMINA ---
+@app.route("/vycistit")
+def vycistit_sal():
+    # 1. Zkontrolujeme, jestli je přihlášený "admin"
+    if session.get("uzivatel") != "admin":
+        flash("Na tuto akci nemáš práva!", "error")
+        return redirect(url_for('domovska_stranka'))
+        
+    # 2. Načteme všechny sedačky
+    vsechny_sedacky = Sedacka.query.all()
+    
+    # 3. Cyklem projdeme jednu po druhé a uvolníme je
+    for sedacka in vsechny_sedacky:
+        sedacka.obsazeno = False
+        sedacka.vlastnik = None
+        
+    db.session.commit()
+    flash("Admin vyčistil sál! Všechny rezervace byly smazány.", "success")
+    return redirect(url_for('domovska_stranka'))
 # --- O KINĚ  4. stránka ---
 @app.route("/o-kine")
 def o_kine():
