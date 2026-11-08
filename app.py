@@ -14,6 +14,7 @@ class Sedacka(db.Model):
     obsazeno = db.Column(db.Boolean, default=False)
     vlastnik = db.Column(db.String(100), nullable=True)
 
+
 class Uzivatel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     jmeno = db.Column(db.String(50), unique=True)
