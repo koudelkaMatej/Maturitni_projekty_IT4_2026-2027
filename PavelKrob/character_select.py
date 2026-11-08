@@ -6,10 +6,15 @@ def draw_character_select(screen, font, knight_button, assassin_button, back_but
     text = font.render("VYBER POSTAVU", True, WHITE)
     screen.blit(text, (790, 150))
 
-    pygame.draw.rect(screen, BLUE, knight_button)
-    pygame.draw.rect(screen, RED, assassin_button)
-    pygame.draw.rect(screen, GRAY, back_button)
 
-    screen.blit(font.render("Knight", True, WHITE), (920, 365))
-    screen.blit(font.render("Assassin", True, WHITE), (900, 465))
-    screen.blit(font.render("Zpet", True, BLACK), (1735, 965))
+    
+
+    
+    pygame.draw.rect(screen, GREEN, assassin_button)
+    pygame.draw.rect(screen, BLUE, knight_button)
+    zpet_button=pygame.draw.rect(screen, GRAY, back_button)
+
+    screen.blit(Assasin_text, Assasin_text.get_rect(center=assassin_button.center))
+    screen.blit(Knight_text, Knight_text.get_rect(center=knight_button.center))
+    screen.blit(zpet_text, zpet_text.get_rect(center=zpet_button.center))
+
