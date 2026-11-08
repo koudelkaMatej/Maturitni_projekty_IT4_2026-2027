@@ -24,8 +24,11 @@ play_text = font.render("Hrat", True, WHITE)
 settings_text = font.render("Settings", True, WHITE)
 exit_text = font.render("Konec", True, WHITE)
 zpet_text = font.render("Zpet", True, BLACK)
+<<<<<<< HEAD
 Knight_text = font.render("Knight", True, WHITE)
 Assasin_text = font.render("Assasin", True, WHITE)
+=======
+>>>>>>> 9cfa72d (Stranka)
 
 play_button = pygame.Rect(860, 350, 200, 60)
 settings_button = pygame.Rect(860, 450, 200, 60)
