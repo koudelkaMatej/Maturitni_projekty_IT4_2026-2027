@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CactusHub – Košík</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav class="container nav">
+            <a class="logo" href="{{ url_for('katalog') }}">🌵 CactusHub</a>
+            <div>
+                <a href="{{ url_for('katalog') }}">Obchod</a>
+                <a href="{{ url_for('kosik') }}">Košík</a>
+                <a href="{{ url_for('admin') }}">Administrace</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% for zprava in get_flashed_messages() %}
+            <p class="zprava">{{ zprava }}</p>
+        {% endfor %}
+        <h1>Nákupní košík</h1>
+{% if items %}
+    {% for product, quantity, subtotal in items %}
+        <div class="radek">
+            <span>{{ product.name }} × {{ quantity }} – {{ subtotal }} Kč</span>
+            <form method="post" action="{{ url_for('odebrat', product_id=product.id) }}">
+                <button class="vedlejsi">Odebrat</button>
+            </form>
+        </div>
+    {% endfor %}
+    <h2>Celkem: {{ total }} Kč</h2>
+    <h3>Testovací objednávka</h3>
+    <p>Platby zatím nejsou součástí tohoto projektu.</p>
+    <form class="formular" method="post" action="{{ url_for('objednat') }}">
+        <label>Jméno <input name="name" maxlength="100" required></label>
+        <label>E-mail <input name="email" type="email" maxlength="150" required></label>
+        <button>Odeslat objednávku</button>
+    </form>
+{% else %}
+    <p>Tvůj košík je prázdný.</p>
+{% endif %}
+    </main>
+    <footer class="container">CactusHub – školní maturitní projekt (bez skutečných plateb)</footer>
+</body>
+</html>
