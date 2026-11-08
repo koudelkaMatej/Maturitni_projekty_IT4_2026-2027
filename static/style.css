@@ -1,0 +1,30 @@
+body { 
+    background-color: #222; 
+    color: white; 
+    font-family: Arial, sans-serif; 
+    text-align: center; 
+    margin: 0;
+    padding: 20px;
+}
+
+/* Vzhled kina a sedaček */
+.platno { background-color: white; color: black; padding: 10px; margin: 20px auto; width: 60%; border-radius: 10px; box-shadow: 0 0 15px white; font-weight: bold; letter-spacing: 5px; }
+.sal { display: grid; grid-template-columns: repeat(5, 50px); gap: 10px; justify-content: center; margin-top: 50px; }
+.sedacka { width: 50px; height: 50px; background-color: #4CAF50; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; text-decoration: none; }
+.sedacka.obsazeno { background-color: #f44336; cursor: not-allowed; color: white; }
+
+/* Panely a pokladna */
+.pokladna { margin-top: 40px; font-size: 24px; background-color: #333; display: inline-block; padding: 15px 30px; border-radius: 10px; border: 2px solid #ff9800; color: #ff9800; }
+.panel-uzivatele { background-color: #333; padding: 15px; margin-bottom: 20px; border-radius: 10px; display: inline-block; }
+
+/* Formuláře */
+.formular { margin-top: 50px; background-color: #333; display: inline-block; padding: 40px; border-radius: 10px; }
+input { padding: 10px; margin: 10px; border-radius: 5px; width: 200px; border: none; }
+button { padding: 10px 20px; background-color: #4CAF50; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; }
+button:hover { background-color: #45a049; }
+
+/* Flash hlášky */
+.flash { padding: 15px; margin: 10px auto; width: 60%; border-radius: 5px; font-weight: bold; }
+.flash.error { background-color: #f44336; color: white; border: 1px solid #d32f2f; }
+.flash.success { background-color: #4CAF50; color: white; border: 1px solid #388e3c; }
+.flash.info { background-color: #2196F3; color: white; border: 1px solid #1976D2; }
