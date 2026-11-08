@@ -1,34 +1,6 @@
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-    <meta charset="UTF-8">
-    <title>Kino Maturita</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block obsah %}
     <h1>Cinema Maturita</h1>
-    
-    <div class="panel-uzivatele">
-        {% if prihlaseny_uzivatel %}
-            <span style="font-size: 20px;">👤 Přihlášen jako: <strong>{{ prihlaseny_uzivatel }}</strong></span>
-            <a href="/odhlaseni" style="color: #f44336; margin-left: 20px; text-decoration: none; font-weight: bold;">(Odhlásit se)</a>
-        {% else %}
-            <span style="font-size: 20px;">Neregistrovaný divák</span>
-            <a href="/prihlaseni" style="color: #4CAF50; margin-left: 20px; font-weight: bold; text-decoration: none;">Přihlásit</a> |
-            <a href="/registrace" style="color: #ff9800; font-weight: bold; text-decoration: none;">Registrovat</a>
-        {% endif %}
-    </div>
-
-    <!-- Tady se vykreslí naše barevné hlášky z Pythonu -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash {{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
     <div class="platno">FILMOVÉ PLÁTNO</div>
     
     <div class="sal">
@@ -44,5 +16,4 @@
     <div class="pokladna">
         Celková cena rezervací: <strong>{{ celkova_cena }} Kč</strong>
     </div>
-</body>
-</html>
+{% endblock %}
