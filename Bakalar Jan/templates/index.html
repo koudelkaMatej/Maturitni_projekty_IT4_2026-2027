@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 455ae52 (update)
 {% extends "base.html" %}
 {% block obsah %}
     <h1>Kino</h1>
@@ -8,6 +11,7 @@
         {% for sedacka in sedacky %}
             {% if sedacka.obsazeno %}
                 <a href="/rezervace/{{ sedacka.cislo }}" class="sedacka obsazeno" title="Rezervoval: {{ sedacka.vlastnik if sedacka.vlastnik else 'Neznámý' }}">{{ sedacka.cislo }}</a>
+<<<<<<< HEAD
             {% else %}
                 <a href="/rezervace/{{ sedacka.cislo }}" class="sedacka" title="Volno">{{ sedacka.cislo }}</a>
             {% endif %}
@@ -105,14 +109,29 @@
                 <td>{{ row[0] }}</td>
                 <td>{{ row[1] }}</td>
             </tr>
+=======
+>>>>>>> 455ae52 (update)
             {% else %}
-            <tr>
-                <td colspan="3" class="empty">Zatím nebylo odehráno žádné skóre.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                <a href="/rezervace/{{ sedacka.cislo }}" class="sedacka" title="Volno">{{ sedacka.cislo }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
 
+<<<<<<< HEAD
 </body>
 </html>
 >>>>>>> 6fb242b (úprava bakalář - koudelka)
+=======
+    <div class="pokladna">
+        Celková cena rezervací: <strong>{{ celkova_cena }} Kč</strong>
+    </div>
+    <!-- Zobrazí se POUZE uživateli se jménem admin -->
+{% if prihlaseny_uzivatel == 'admin' %}
+    <div style="margin-top: 30px;">
+        <a href="/vycistit" style="background-color: red; color: white; padding: 15px 30px; text-decoration: none; font-weight: bold; border-radius: 5px;">
+            🚨 TAJNÉ UČITELSKÉ TLAČÍTKO: Vymazat všechny rezervace 🚨
+        </a>
+    </div>
+{% endif %}
+{% endblock %}
+>>>>>>> 455ae52 (update)
