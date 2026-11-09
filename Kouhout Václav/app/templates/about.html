@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}
+    O projektu
+{% endblock %}
+{% block content %}
+    <section class="wrap page-heading">
+        <p class="eyebrow">
+            MATURITNÍ PROJEKT / 2026-2027
+        </p>
+        <h1>
+            Prostor pro učení.
+            <br>
+            A praktické řešení.
+        </h1>
+        <p class="intro">
+            B2B katalog nábytku s plánovaným konfigurátorem projektů a cenovými nabídkami. Projekt Václava Kohouta.
+        </p>
+    </section>
+    <section class="wrap section about-grid">
+        <article>
+            <h2>
+                Co už funguje
+            </h2>
+            <ul>
+                <li>
+                    Pět veřejných stránek a společná navigace.
+                </li>
+                <li>
+                    Ukázkový katalog s hledáním a kategoriemi.
+                </li>
+                <li>
+                    Responzivní vzhled ve vlastním CSS.
+                </li>
+                <li>
+                    Vlastní chybová stránka pro neexistující adresy.
+                </li>
+            </ul>
+        </article>
+        <article>
+            <h2>
+                Co bude následovat
+            </h2>
+            <ul>
+                <li>
+                    MySQL a skutečné načítání produktů.
+                </li>
+                <li>
+                    Registrace, přihlášení a soukromé projekty.
+                </li>
+                <li>
+                    Ukládání cenových nabídek a administrace.
+                </li>
+                <li>
+                    AI vizualizace a případně export nabídky do PDF.
+                </li>
+            </ul>
+        </article>
+        <article>
+            <h2>
+                Jak spolu části komunikují
+            </h2>
+            <p>
+                Prohlížeč odešle požadavek → Flask vybere Python funkci → Jinja doplní HTML šablonu → prohlížeč zobrazí stránku.
+            </p>
+            <p>
+                V další fázi Python načte data z MySQL pomocí ručně psaných parametrizovaných SQL dotazů.
+            </p>
+        </article>
+        <article>
+            <h2>
+                Použité technologie
+            </h2>
+            <p>
+                Python, Flask, Jinja, HTML5 a CSS3. Bez CSS frameworku, ORM a platební brány.
+            </p>
+            <p>
+                ER diagram a podrobné datové toky jsou součástí dokumentace v repozitáři.
+            </p>
+        </article>
+    </section>
+{% endblock %}

@@ -1,0 +1,45 @@
+body {
+    background-color: #1A1212;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    height: 80px;
+    padding: 0 40px;
+
+    background-color: #1A1212;
+    border-bottom: 1px solid #3B2F2F;
+    font-family: 'inter';
+    font-size: large;
+    font-weight: bold;
+}
+
+.navigace {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.logo {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+}
+
+nav a {
+    color: #F5EBDD;
+    text-decoration: none;
+}
+
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.active {
+    font-weight: bolder;
+}
