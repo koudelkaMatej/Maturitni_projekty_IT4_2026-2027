@@ -1,1 +1,1 @@
-#hehehe
+print("hello world")
