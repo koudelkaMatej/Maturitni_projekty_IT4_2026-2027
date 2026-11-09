@@ -1,0 +1,451 @@
+/* БАЗОВЫЕ СБРОСЫ */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #0d0f12; /* Темный графитовый фон */
+    color: #ffffff;            /* Белый текст */
+    line-height: 1.5;
+}
+
+.container {
+    width: 90%;
+    max-width: 1160px;
+    margin: 0 auto;
+}
+
+/* ==================== ШАПКА И МЕНЮ ==================== */
+header {
+    background-color: #13171d;
+    border-bottom: 1px solid #263345; /* Темно-синяя рамка */
+    padding: 18px 0;
+}
+
+.header-obsah {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.logo {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.logo span {
+    color: #5bc0be; /* Голубой акцент в логотипе */
+}
+
+nav a {
+    color: #a0aab8; /* Светло-серый цвет ссылок */
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-left: 25px;
+    padding-bottom: 4px;
+}
+
+nav a:hover,
+nav a.aktivni {
+    color: #ffffff;
+    border-bottom: 2px solid #c6ff00; /* Яркое подчеркивание активной вкладки */
+}
+
+.kosik-btn {
+    background-color: #1e3a5f; /* Синяя кнопка корзины */
+    color: #ffffff !important;
+    padding: 8px 14px;
+    border: 1px solid #5bc0be;
+}
+
+/* ==================== ГЛАВНЫЙ БАННЕР (HERO) ==================== */
+.hero {
+    padding: 50px 0;
+    border-bottom: 1px solid #263345;
+}
+
+.hero-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    align-items: center;
+}
+
+.hero-text {
+    flex: 1;
+    min-width: 300px;
+}
+
+.nadpis-maly {
+    color: #5bc0be; /* Голубой технический текст */
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.hero-text h1 {
+    font-size: 64px;
+    line-height: 0.95;
+    font-weight: 900;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+}
+
+.hero-text h1 span {
+    color: #c6ff00; /* Точка в стиле референса */
+}
+
+.popis-hero {
+    color: #a0aab8;
+    font-size: 15px;
+    max-width: 440px;
+    margin-bottom: 25px;
+}
+
+.btn-akcent {
+    display: inline-block;
+    background-color: #c6ff00; /* Яркая кнопка как на картинке */
+    color: #0d0f12;
+    text-decoration: none;
+    font-weight: 900;
+    font-size: 14px;
+    padding: 12px 26px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-akcent:hover {
+    background-color: #5bc0be; /* При наведении становится голубой */
+}
+
+.hero-foto {
+    flex: 1;
+    min-width: 300px;
+}
+
+/* ==================== ПУСТЫЕ СЛОТЫ ДЛЯ ФОТОГРАФИЙ ==================== */
+.foto-slot {
+    width: 100%;
+    height: 250px;
+    background-color: #18202c; /* Серо-синий фон слота */
+   /* border: 1px dashed #4a6fa5; /* Голубая пунктирная рамка */
+    color: #7d93b2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.velky-slot {
+    height: 360px;
+}
+
+/* Когда вставишь <img> внутрь .foto-slot, он займет весь блок */
+.foto-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ==================== ПОЛОСКА ПРЕИМУЩЕСТВ ==================== */
+.pasek-info {
+    background-color: #13171d;
+    border-bottom: 1px solid #263345;
+    padding: 12px 0;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: #b6cae7;
+}
+
+.pasek-obsah {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* ==================== ФИЛЬТР КАТЕГОРИЙ И СОРТИРОВКА ==================== */
+.sekce-hlavicka {
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+.sekce-hlavicka h2 {
+    font-size: 24px;
+    letter-spacing: 1px;
+}
+
+/* Прячем радио-кнопки фильтра */
+input[name="kategorie"] {
+    display: none;
+}
+
+.filtr-panel {
+    background-color: #13171d;
+    border: 1px solid #263345;
+    padding: 15px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.kategorie-tlacitka {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.filtr-popis {
+    font-size: 12px;
+    font-weight: bold;
+    color: #5bc0be;
+    margin-right: 5px;
+}
+
+.kat-btn {
+    background-color: #1c2430;
+    color: #ffffff;
+    border: 1px solid #2e3d52;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.kat-btn:hover {
+    border-color: #5bc0be;
+}
+
+/* Подсветка выбранной кнопки категории */
+#kat-vse:checked ~ .filtr-panel label[for="kat-vse"],
+#kat-mikiny:checked ~ .filtr-panel label[for="kat-mikiny"],
+#kat-tricka:checked ~ .filtr-panel label[for="kat-tricka"],
+#kat-bundy:checked ~ .filtr-panel label[for="kat-bundy"],
+#kat-doplnky:checked ~ .filtr-panel label[for="kat-doplnky"] {
+    background-color: #1e3a5f;
+    border-color: #5bc0be;
+    color: #c6ff00;
+}
+
+/* Логика фильтрации карточек товаров без JS */
+#kat-mikiny:checked ~ .produkty-mrizka .karta:not(.Polozka-mikiny),
+#kat-tricka:checked ~ .produkty-mrizka .karta:not(.Polozka-tricka),
+#kat-bundy:checked ~ .produkty-mrizka .karta:not(.Polozka-bundy),
+#kat-doplnky:checked ~ .produkty-mrizka .karta:not(.Polozka-doplnky) {
+    display: none;
+}
+
+.razeni-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.razeni-box label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #a0aab8;
+}
+
+.razeni-box select {
+    background-color: #1c2430;
+    color: #ffffff;
+    border: 1px solid #4a6fa5;
+    padding: 7px 12px;
+    font-size: 13px;
+}
+
+/* ==================== СЕТКА И КАРТОЧКИ ТОВАРОВ ==================== */
+.produkty-mrizka {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 60px;
+}
+
+.karta {
+    background-color: #13171d;
+    border: 1px solid #263345;
+    width: calc(25% - 15px); /* 4 карточки в ряд */
+    display: flex;
+    flex-direction: column;
+}
+
+.karta-spodek {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.karta-kat {
+    font-size: 11px;
+    color: #5bc0be;
+    font-weight: bold;
+}
+
+.karta h3 {
+    font-size: 15px;
+    margin: 4px 0;
+}
+
+.cena {
+    font-size: 14px;
+    color: #a0aab8;
+    font-weight: bold;
+}
+
+/* Квадратная кнопка + */
+.btn-plus {
+    background-color: #c6ff00;
+    color: #0d0f12;
+    text-decoration: none;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.btn-plus:hover {
+    background-color: #5bc0be;
+}
+
+/* ==================== ВНУТРЕННИЕ СТРАНИЦЫ (ИНФО, ПРЕЗЕНТАЦИЯ, КОРЗИНА) ==================== */
+.stranka-obsah {
+    padding: 45px 0 70px;
+    min-height: 75vh;
+}
+
+.stranka-titul {
+    font-size: 36px;
+    font-weight: 900;
+    margin-bottom: 30px;
+}
+
+.info-mrizka {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.tmavy-box {
+    background-color: #13171d;
+    border: 1px solid #263345;
+    border-top: 3px solid #5bc0be; /* Голубая полоска сверху блока */
+    padding: 25px;
+    flex: 1;
+    min-width: 280px;
+}
+
+.tmavy-box h3 {
+    color: #ffffff;
+    margin-bottom: 12px;
+    font-size: 18px;
+}
+
+.tmavy-box p,
+.tmavy-box li {
+    color: #a0aab8;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.tmavy-box ul {
+    padding-left: 20px;
+}
+
+/* Таблица корзины */
+.tabulka-kosik {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #13171d;
+    margin-bottom: 30px;
+}
+
+.tabulka-kosik th,
+.tabulka-kosik td {
+    border: 1px solid #263345;
+    padding: 14px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.tabulka-kosik th {
+    background-color: #1e3a5f; /* Темно-синяя шапка таблицы */
+    color: #ffffff;
+}
+
+.radek-celkem {
+    background-color: #18202c;
+    font-weight: bold;
+    color: #c6ff00;
+}
+
+/* Форма в корзине */
+.formular-box {
+    max-width: 550px;
+}
+
+.formular-box label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    color: #5bc0be;
+    margin-bottom: 6px;
+}
+
+.formular-box input,
+.formular-box select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 18px;
+    background-color: #0d0f12;
+    border: 1px solid #2e3d52;
+    color: #ffffff;
+}
+
+/* ==================== ПОДВАЛ И АДАПТИВНОСТЬ ==================== */
+footer {
+    background-color: #13171d;
+    border-top: 1px solid #263345;
+    padding: 25px 0;
+    text-align: center;
+    font-size: 12px;
+    color: #7d93b2;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 850px) {
+    .karta {
+        width: calc(50% - 10px);
+    }
+    .hero-text h1 {
+        font-size: 44px;
+    }
+}
+
+@media (max-width: 520px) {
+    .karta {
+        width: 100%;
+    }
+}
