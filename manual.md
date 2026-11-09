@@ -43,11 +43,3 @@ Pokud `python` nefunguje, použij cestu ke skutečně nainstalovanému interpret
 - **Prohlížeč se nemůže připojit**: server musí stále běžet v terminálu.
 
 Vývojový Flask server slouží jen pro lokální práci, nikoliv veřejné produkční nasazení.
-
-## Automatizované ověření
-
-```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s tests -v
-```
-
-Testy kontrolují stránky, místní odkazy a zdroje, kombinaci filtrů, escapování vstupu a chybovou stránku. V další fázi doplníme důležité obchodní funkce: výpočet slev a přístupová oprávnění.
