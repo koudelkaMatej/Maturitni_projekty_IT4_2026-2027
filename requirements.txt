@@ -1,2 +1,2 @@
-# Přímá závislost projektu. requirements-lock.txt zachycuje ověřené prostředí.
+# Závislosti projektu
 Flask==3.1.3
