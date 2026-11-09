@@ -1,0 +1,2 @@
+Fix problem in settings title.png
+database connection / work with database 
