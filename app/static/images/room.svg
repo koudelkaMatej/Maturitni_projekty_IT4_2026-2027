@@ -1,19 +1,176 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="760" height="700" viewBox="0 0 760 700">
-  <title>Ilustrační interiér se stolem a židlemi</title>
-  <defs><linearGradient id="wall" x2="1" y2="1"><stop stop-color="#f1e9d8"/><stop offset="1" stop-color="#d4c6ad"/></linearGradient><linearGradient id="floor" x2="0" y2="1"><stop stop-color="#c7b798"/><stop offset="1" stop-color="#e6d8bf"/></linearGradient><linearGradient id="glass" x2="1" y2="1"><stop stop-color="#abb6a2"/><stop offset="1" stop-color="#e0dfbf"/></linearGradient></defs>
-  <!-- Jednoduchá vektorová studie, nikoli fotografie skutečného produktu. -->
-  <path fill="url(#wall)" d="M0 0h760v700H0z"/><path fill="url(#floor)" d="M0 467 760 430v270H0z"/>
-  <path fill="#c4b698" d="M398 395V181a133 133 0 0 1 266 0v198z"/>
-  <path fill="url(#glass)" d="M414 387V184a116 116 0 0 1 232 0v189z"/>
-  <path stroke="#e9ddc6" stroke-width="12" d="M530 67v312m-113-143h228"/>
-  <path fill="#f4ecd9" opacity=".5" d="m415 386 226-12 119 166-315 43z"/>
-  <path fill="#ded4be" d="M70 133h190v229H70z"/><path fill="#9aa38b" d="M87 151h155v193H87z"/><circle cx="165" cy="227" r="58" fill="#cfc8aa"/><path d="M87 288q78-102 155-30v86H87z" fill="#6e7e66"/>
-  <ellipse cx="405" cy="541" rx="230" ry="46" fill="#82795c" opacity=".16"/>
-  <path d="m283 421-16 132h17l31-129m212-12 39 131h17l-23-143" fill="#786347"/>
-  <ellipse cx="415" cy="406" rx="187" ry="51" fill="#9a7d54"/><ellipse cx="415" cy="396" rx="187" ry="48" fill="#bea075"/>
-  <path d="M173 373q-9-64 34-68h31q44 7 38 68l-5 53-93 4z" fill="#a2aa8b"/><path d="m177 428 4 119m71-122 18 112" stroke="#66583e" stroke-width="12"/><path d="m168 421 101-8 22 26-107 16z" fill="#7b896d"/>
-  <path d="M483 439q-3-63 42-70h31q45 7 42 66l-4 40-107 9z" fill="#b9a27c"/><path d="m487 485-2 101m99-112 19 104" stroke="#6d5a3e" stroke-width="12"/><path d="m477 478 118-9 17 24-119 13z" fill="#a88c64"/>
-  <ellipse cx="421" cy="383" rx="25" ry="8" fill="#9c855f"/><path d="m402 341 7 43h27l7-43" fill="#e3d7ba"/><ellipse cx="423" cy="341" rx="21" ry="7" fill="#b5a58a"/>
-  <path d="M421 341v-62m0 31q-45-33-38-53 37 0 38 53m2-19q40-34 48-14-8 22-48 23" fill="#6d805b" stroke="#6d805b" stroke-width="3"/>
-  <path d="M685 429v-146m0 68q-49-41-45-77 45 8 45 77m0-21q39-67 58-50-4 45-58 62" fill="#6c7b54" stroke="#6c7b54" stroke-width="5"/><path d="m655 400 12 74h47l12-74" fill="#aa8968"/>
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="760"
+    height="700"
+    viewBox="0 0 760 700"
+>
+    <title>
+        Ilustrační interiér se stolem a židlemi
+    </title>
+    <defs>
+        <linearGradient
+            id="wall"
+            x2="1"
+            y2="1"
+        >
+            <stop stop-color="#f1e9d8"/>
+            <stop
+                offset="1"
+                stop-color="#d4c6ad"
+            />
+        </linearGradient>
+        <linearGradient
+            id="floor"
+            x2="0"
+            y2="1"
+        >
+            <stop stop-color="#c7b798"/>
+            <stop
+                offset="1"
+                stop-color="#e6d8bf"
+            />
+        </linearGradient>
+        <linearGradient
+            id="glass"
+            x2="1"
+            y2="1"
+        >
+            <stop stop-color="#abb6a2"/>
+            <stop
+                offset="1"
+                stop-color="#e0dfbf"
+            />
+        </linearGradient>
+    </defs>
+    <!-- Ilustrace interiéru -->
+    <path
+        fill="url(#wall)"
+        d="M0 0h760v700H0z"
+    />
+    <path
+        fill="url(#floor)"
+        d="M0 467 760 430v270H0z"
+    />
+    <path
+        fill="#c4b698"
+        d="M398 395V181a133 133 0 0 1 266 0v198z"
+    />
+    <path
+        fill="url(#glass)"
+        d="M414 387V184a116 116 0 0 1 232 0v189z"
+    />
+    <path
+        stroke="#e9ddc6"
+        stroke-width="12"
+        d="M530 67v312m-113-143h228"
+    />
+    <path
+        fill="#f4ecd9"
+        opacity=".5"
+        d="m415 386 226-12 119 166-315 43z"
+    />
+    <path
+        fill="#ded4be"
+        d="M70 133h190v229H70z"
+    />
+    <path
+        fill="#9aa38b"
+        d="M87 151h155v193H87z"
+    />
+    <circle
+        cx="165"
+        cy="227"
+        r="58"
+        fill="#cfc8aa"
+    />
+    <path
+        d="M87 288q78-102 155-30v86H87z"
+        fill="#6e7e66"
+    />
+    <ellipse
+        cx="405"
+        cy="541"
+        rx="230"
+        ry="46"
+        fill="#82795c"
+        opacity=".16"
+    />
+    <path
+        d="m283 421-16 132h17l31-129m212-12 39 131h17l-23-143"
+        fill="#786347"
+    />
+    <ellipse
+        cx="415"
+        cy="406"
+        rx="187"
+        ry="51"
+        fill="#9a7d54"
+    />
+    <ellipse
+        cx="415"
+        cy="396"
+        rx="187"
+        ry="48"
+        fill="#bea075"
+    />
+    <path
+        d="M173 373q-9-64 34-68h31q44 7 38 68l-5 53-93 4z"
+        fill="#a2aa8b"
+    />
+    <path
+        d="m177 428 4 119m71-122 18 112"
+        stroke="#66583e"
+        stroke-width="12"
+    />
+    <path
+        d="m168 421 101-8 22 26-107 16z"
+        fill="#7b896d"
+    />
+    <path
+        d="M483 439q-3-63 42-70h31q45 7 42 66l-4 40-107 9z"
+        fill="#b9a27c"
+    />
+    <path
+        d="m487 485-2 101m99-112 19 104"
+        stroke="#6d5a3e"
+        stroke-width="12"
+    />
+    <path
+        d="m477 478 118-9 17 24-119 13z"
+        fill="#a88c64"
+    />
+    <ellipse
+        cx="421"
+        cy="383"
+        rx="25"
+        ry="8"
+        fill="#9c855f"
+    />
+    <path
+        d="m402 341 7 43h27l7-43"
+        fill="#e3d7ba"
+    />
+    <ellipse
+        cx="423"
+        cy="341"
+        rx="21"
+        ry="7"
+        fill="#b5a58a"
+    />
+    <path
+        d="M421 341v-62m0 31q-45-33-38-53 37 0 38 53m2-19q40-34 48-14-8 22-48 23"
+        fill="#6d805b"
+        stroke="#6d805b"
+        stroke-width="3"
+    />
+    <path
+        d="M685 429v-146m0 68q-49-41-45-77 45 8 45 77m0-21q39-67 58-50-4 45-58 62"
+        fill="#6c7b54"
+        stroke="#6c7b54"
+        stroke-width="5"
+    />
+    <path
+        d="m655 400 12 74h47l12-74"
+        fill="#aa8968"
+    />
 </svg>
