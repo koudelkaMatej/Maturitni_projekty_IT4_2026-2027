@@ -1,3 +1,22 @@
 {
+<<<<<<< HEAD
   "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe"
 }
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+  "python-envs.defaultEnvManager": "ms-python.python:system"
+}
+=======
+    "python-envs.defaultEnvManager": "ms-python.python:system"
+}
+>>>>>>> 7a0519f (Stranka)
+=======
+    "python-envs.defaultEnvManager": "ms-python.python:system"
+}
+=======
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe"
+}
+>>>>>>> f0196a4 (PrvniKontrolniTermin)
+>>>>>>> 4b574bc (PrvniKontrolniTermin)
+>>>>>>> 6041e56 (update)
