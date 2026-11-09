@@ -1,26 +1,130 @@
 {% extends "base.html" %}
-{% block title %}Prostor pro vaše nápady{% endblock %}
+{% block title %}
+    Prostor pro vaše nápady
+{% endblock %}
 {% block content %}
-<section class="hero wrap">
-  <div class="hero-copy">
-    <p class="eyebrow">NÁBYTEK PRO FIREMNÍ PROSTORY</p>
-    <h1>Dobrý prostor.<br>Začíná výběrem.</h1>
-    <p class="intro">Kancelář, kde vznikají nápady. Kavárna, kam se lidé vracejí. Objevte nábytek, který dává vašemu prostoru smysl.</p>
-    <div class="actions"><a class="button" href="{{ url_for('pages.catalog') }}">Prohlédnout katalog <span>↗</span></a><a class="text-link" href="{{ url_for('pages.collections') }}">Inspirace pro váš projekt →</a></div>
-    <div class="hero-note"><span>01 / VYBRAT</span><span>02 / SESTAVIT</span><span>03 / POPTAT</span></div>
-  </div>
-  <figure class="hero-art">
-    <img src="{{ url_for('static', filename='images/room.svg') }}" alt="Stylizovaný návrh prostoru s dubovým stolem, židlemi a obloukovým oknem" width="760" height="700">
-    <figcaption><span>PROSTOR V SOUVISLOSTECH</span><strong>Místo pro setkávání</strong><span>Ilustrační návrh · interiér</span></figcaption>
-  </figure>
-</section>
-<section class="section wrap">
-  <div class="section-heading"><div><p class="eyebrow">OD NÁPADU K SESTAVĚ</p><h2>Každý prostor má svůj účel.</h2></div><a class="text-link" href="{{ url_for('pages.collections') }}">Všechny sestavy →</a></div>
-  <div class="collection-grid">
-    {% for number, title, description, tone in [('01', 'Pracovní prostředí', 'Pro soustředění i společné nápady.', 'sand'), ('02', 'Kavárny a bistra', 'Pohodlí pro hosty. Praktičnost pro provoz.', 'sage'), ('03', 'Odpočinkové zóny', 'Malá pauza s velkým významem.', 'clay')] %}
-    <a class="collection-card {{ tone }}" href="{{ url_for('pages.collections') }}"><span>{{ number }} / INSPIRACE</span><div><h3>{{ title }}</h3><p>{{ description }}</p></div><span class="arrow" aria-hidden="true">↗</span></a>
-    {% endfor %}
-  </div>
-</section>
-<section class="info-strip wrap"><h2>Celý projekt na jednom místě.</h2><p>Plánujeme výběr produktů, počty kusů a přehlednou cenovou nabídku. Prohlédněte si, jak bude služba fungovat.</p><a class="text-link" href="{{ url_for('pages.how_it_works') }}">Poznat postup →</a></section>
+    <section class="hero wrap">
+        <div class="hero-copy">
+            <p class="eyebrow">
+                NÁBYTEK PRO FIREMNÍ PROSTORY
+            </p>
+            <h1>
+                Dobrý prostor.
+                <br>
+                Začíná výběrem.
+            </h1>
+            <p class="intro">
+                Kancelář, kde vznikají nápady. Kavárna, kam se lidé vracejí. Objevte nábytek, který dává vašemu prostoru smysl.
+            </p>
+            <div class="actions">
+                <a
+                    class="button"
+                    href="{{ url_for('pages.catalog') }}"
+                >
+                    Prohlédnout katalog
+                    <span>
+                        ↗
+                    </span>
+                </a>
+                <a
+                    class="text-link"
+                    href="{{ url_for('pages.collections') }}"
+                >
+                    Inspirace pro váš projekt →
+                </a>
+            </div>
+            <div class="hero-note">
+                <span>
+                    01 / VYBRAT
+                </span>
+                <span>
+                    02 / SESTAVIT
+                </span>
+                <span>
+                    03 / POPTAT
+                </span>
+            </div>
+        </div>
+        <figure class="hero-art">
+            <img
+                src="{{ url_for('static', filename='images/room.svg') }}"
+                alt="Stylizovaný návrh prostoru s dubovým stolem, židlemi a obloukovým oknem"
+                width="760"
+                height="700"
+            >
+            <figcaption>
+                <span>
+                    PROSTOR V SOUVISLOSTECH
+                </span>
+                <strong>
+                    Místo pro setkávání
+                </strong>
+                <span>
+                    Ilustrační návrh · interiér
+                </span>
+            </figcaption>
+        </figure>
+    </section>
+    <section class="section wrap">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">
+                    OD NÁPADU K SESTAVĚ
+                </p>
+                <h2>
+                    Každý prostor má svůj účel.
+                </h2>
+            </div>
+            <a
+                class="text-link"
+                href="{{ url_for('pages.collections') }}"
+            >
+                Všechny sestavy →
+            </a>
+        </div>
+        <div class="collection-grid">
+            {% for number, title, description, tone in [
+                ('01', 'Pracovní prostředí', 'Pro soustředění i společné nápady.', 'sand'),
+                ('02', 'Kavárny a bistra', 'Pohodlí pro hosty. Praktičnost pro provoz.', 'sage'),
+                ('03', 'Odpočinkové zóny', 'Malá pauza s velkým významem.', 'clay')
+            ] %}
+                <a
+                    class="collection-card {{ tone }}"
+                    href="{{ url_for('pages.collections') }}"
+                >
+                    <span>
+                        {{ number }} / INSPIRACE
+                    </span>
+                    <div>
+                        <h3>
+                            {{ title }}
+                        </h3>
+                        <p>
+                            {{ description }}
+                        </p>
+                    </div>
+                    <span
+                        class="arrow"
+                        aria-hidden="true"
+                    >
+                        ↗
+                    </span>
+                </a>
+            {% endfor %}
+        </div>
+    </section>
+    <section class="info-strip wrap">
+        <h2>
+            Celý projekt na jednom místě.
+        </h2>
+        <p>
+            Plánujeme výběr produktů, počty kusů a přehlednou cenovou nabídku. Prohlédněte si, jak bude služba fungovat.
+        </p>
+        <a
+            class="text-link"
+            href="{{ url_for('pages.how_it_works') }}"
+        >
+            Poznat postup →
+        </a>
+    </section>
 {% endblock %}
