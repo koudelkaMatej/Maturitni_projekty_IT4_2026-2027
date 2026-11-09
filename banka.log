@@ -1,3 +1,0 @@
-2026-10-11 23:24:08,367 - INFO - Účet [Alice]: Vloženo 500 Kč. Nový zůstatek: 1500.0 Kč.
-2026-10-11 23:24:08,368 - WARNING - Účet [Bob]: Pokus o výběr 1000 Kč selhal – nedostatek peněz (aktuální zůstatek: 500.0 Kč).
-2026-10-11 23:24:08,369 - INFO - Účet [Alice]: Úspěšně převedeno 200 Kč na účet [Bob].
