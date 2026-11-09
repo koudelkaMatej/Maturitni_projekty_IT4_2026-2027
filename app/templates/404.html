@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}Stránka nenalezena{% endblock %}
+{% block content %}
+<section class="wrap page-heading"><p class="eyebrow">CHYBA 404</p><h1>Tady je zatím prázdno.</h1><p class="intro">Požadovaná stránka neexistuje. Pokračujte přes navigaci nebo se vraťte na úvod.</p><a class="button" href="{{ url_for('pages.home') }}">Zpět na úvod →</a></section>
+{% endblock %}
