@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SKYLINE | Streetwear E-shop</title>
+    <link rel="stylesheet" href="static/styles/style.css" />
+  </head>
+
+<body>
+
+    <!-- ШАПКА САЙТА (одинаковая на всех страницах) -->
+    <header>
+        <div class="container header-obsah">
+            <a href="index.html" class="logo">SKY<span>LINE</span></a>
+            <nav>
+                <a href="index.html" class="aktivni">DOMŮ</a>
+                <a href="informace.html">INFORMACE</a>
+                <a href="prezentace.html">PREZENTACE</a>
+                <a href="kosik.html" class="kosik-btn">KOŠÍK</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ГЛАВНЫЙ БАННЕР В СТИЛЕ STREETWEAR -->
+    <section class="hero">
+        <div class="container hero-grid">
+            <div class="hero-text">
+                <p class="nadpis-maly">// NOVÁ KOLEKCE 2026</p>
+                <h1>BUILT<br>DIFFERENT<span>.</span></h1>
+                <p class="popis-hero">Městská móda, která určuje pravidla. Kvalitní materiály, limitované edice a střihy pro každý den.</p>
+                <a href="#katalog" class="btn-akcent">KOUPIT NYNÍ &rarr;</a>
+            </div>
+            <div class="hero-foto">
+                <div class="foto-slot velky-slot">BANER</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ПОЛОСКА ПРЕИМУЩЕСТВ -->
+    <div class="pasek-info">
+        <div class="container pasek-obsah">
+            <span>DOPRAVA PO CELÉ ČR</span>
+            <span>+</span>
+            <span>VRÁCENÍ DO 14 DNŮ</span>
+            <span>+</span>
+            <span>BEZPEČNÁ PLATBA</span>
+            <span>+</span>
+            <span>LIMITOVANÉ EDICE</span>
+        </div>
+    </div>
+
+    <!-- ОСНОВНОЙ КАТАЛОГ С ФИЛЬТРОМ И СОРТИРОВКОЙ -->
+    <main class="container" id="katalog">
+        <div class="sekce-hlavicka">
+            <h2>NOVÉ KOUSKY</h2>
+        </div>
+
+        <!-- Скрытые переключатели для работы фильтра категорий без JS -->
+        <input type="radio" name="kategorie" id="kat-vse" checked>
+        <input type="radio" name="kategorie" id="kat-mikiny">
+        <input type="radio" name="kategorie" id="kat-tricka">
+        <input type="radio" name="kategorie" id="kat-bundy">
+        <input type="radio" name="kategorie" id="kat-doplnky">
+
+        <!-- ПАНЕЛЬ ВЫБОРА КАТЕГОРИЙ И СОРТИРОВКИ (Обязательное задание учителя) -->
+        <div class="filtr-panel">
+            <div class="kategorie-tlacitka">
+                <span class="filtr-popis">KATEGORIE:</span>
+                <label for="kat-vse" class="kat-btn">VŠE (8)</label>
+                <label for="kat-mikiny" class="kat-btn">MIKINY</label>
+                <label for="kat-tricka" class="kat-btn">TRIČKA</label>
+                <label for="kat-bundy" class="kat-btn">BUNDY A KALHOTY</label>
+                <label for="kat-doplnky" class="kat-btn">DOPLŇKY</label>
+            </div>
+
+            <div class="razeni-box">
+                <label for="razeni">SEŘADIT PODLE:</label>
+                <select id="razeni" name="razeni">
+                    <option value="nejnovejsi">Nejnovější produkty</option>
+                    <option value="nejlevnejsi">Od nejlevnějšího</option>
+                    <option value="nejdrazsi">Od nejdražšího</option>
+                    <option value="abeceda">Podle názvu (A–Z)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- СЕТКА ТОВАРОВ -->
+        <div class="produkty-mrizka">
+
+            <!-- Товар 1 (Mikiny) -->
+            <div class="karta Polozka-mikiny">
+                <div class="foto-slot">FOTKA1</div>
+                <div class="karta-spodek">
+                    <div>
+                        <span class="karta-kat">MIKINY</span>
+                        <h3>1</h3>
+                        <p class="cena">1 290 Kč</p>
+                    </div>
+                    <a href="kosik.html" class="btn-plus" title="Přidat do košíku">+</a>
+                </div>
+            </div>
+
+            <!-- Товар 2 (Trička) -->
+            <div class="karta Polozka-tricka">
+                <div class="foto-slot">FOTKA2</div>
+                <div class="karta-spodek">
+                    <div>
+                        <span class="karta-kat">TRIČKA</span>
+                        <h3>2</h3>
+                        <p class="cena">590 Kč</p>
+                    </div>
+                    <a href="kosik.html" class="btn-plus" title="Přidat do košíku">+</a>
+                </div>
+            </div>
+
+            <!-- Товар 3 (Bundy a kalhoty) -->
+            <div class="karta Polozka-bundy">
+                <div class="foto-slot">FOTKA3</div>
+                <div class="karta-spodek">
+                    <div>
+                        <span class="karta-kat">KALHOTY</span>
+                        <h3>3</h3>
+                        <p class="cena">1 490 Kč</p>
+                    </div>
+                    <a href="kosik.html" class="btn-plus" title="Přidat do košíku">+</a>
+                </div>
+            </div>
+
+            <!-- Товар 4 (Doplňky) -->
+            <div class="karta Polozka-doplnky">
+                <div class="foto-slot">FOTKA4</div>
+                <div class="karta-spodek">
+                    <div>
+                        <span class="karta-kat">DOPLŇKY</span>
+                        <h3>4</h3>
+                        <p class="cena">450 Kč</p>
+                    </div>
+                    <a href="kosik.html" class="btn-plus" title="Přidat do košíku">+</a>
+                </div>
+            </div>
+
+            <!-- Товар 5 (Bundy a kalhoty) -->
+            <div class="karta Polozka-bundy">
+                <div class="foto-slot">FOTKA5</div>
+                <div class="karta-spodek">
+                    <div>
+                        <span class="karta-kat">BUNDY</span>
+                        <h3>5</h3>
+                        <p class="cena">2 390 Kč</p>
+                    </div>
+                    <a href="kosik.html" class="btn-plus" title="Přidat do košíku">+</a>
+                </div>
+            </div>
+
+            <!-- Товар 6 (Mikiny) -->
+            <div class="karta Polozka-mikiny">
+                <div class="foto-slot">FOTKA6</div>
+                <div class="karta-spodek">
+                    <div>
+                        <span class="karta-kat">MIKINY</span>
+                        <h3>6</h3>
+                        <p class="cena">1 090 Kč</p>
+                    </div>
+                    <a href="kosik.html" class="btn-plus" title="Přidat do košíku">+</a>
+                </div>
+            </div>
+
+            <!-- Товар 7 (Trička) -->
+            <div class="karta Polozka-tricka">
+                <div class="foto-slot">FOTKA7</div>
+                <div class="karta-spodek">
+                    <div>
+                        <span class="karta-kat">TRIČKA</span>
+                        <h3>7</h3>
+                        <p class="cena">650 Kč</p>
+                    </div>
+                    <a href="kosik.html" class="btn-plus" title="Přidat do košíku">+</a>
+                </div>
+            </div>
+
+            <!-- Товар 8 (Doplňky) -->
+            <div class="karta Polozka-doplnky">
+                <div class="foto-slot">FOTKA8</div>
+                <div class="karta-spodek">
+                    <div>
+                        <span class="karta-kat">DOPLŇKY</span>
+                        <h3>8</h3>
+                        <p class="cena">990 Kč</p>
+                    </div>
+                    <a href="kosik.html" class="btn-plus" title="Přidat do košíku">+</a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ПОДВАЛ САЙТA -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 SKYLINE STREETWEAR // MATURITNÍ PROJEKT</p>
+        </div>
+    </footer>
+
+</body>
+</html>

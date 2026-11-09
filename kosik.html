@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SKYLINE | Nákupní košík</title>
+    <link rel="stylesheet" href="static/styles/style.css" />
+  </head>
+<body>
+
+    <header>
+        <div class="container header-obsah">
+            <a href="index.html" class="logo">SKY<span>LINE</span></a>
+            <nav>
+                <a href="index.html">DOMŮ</a>
+                <a href="informace.html">INFORMACE</a>
+                <a href="prezentace.html">PREZENTACE</a>
+                <a href="kosik.html" class="kosik-btn aktivni">KOŠÍK</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container stranka-obsah">
+        <p class="nadpis-maly">// SOUHRN OBJEDNÁVKY</p>
+        <h1 class="stranka-titul">NÁKUPNÍ KOŠÍK</h1>
+
+        <!-- Таблица товаров в корзине -->
+        <table class="tabulka-kosik">
+            <thead>
+                <tr>
+                    <th>PRODUKT</th>
+                    <th>KATEGORIE</th>
+                    <th>VELIKOST</th>
+                    <th>POČET</th>
+                    <th>CENA</th>
+                </tr>
+            </thead>
+            
+        </table>
+
+        <!-- Форма оформления заказа -->
+        <div class="tmavy-box formular-box">
+            <h3>DODACÍ ÚDAJE</h3>
+            <form action="index.html">
+                <label for="jmeno">JMÉNO A PŘÍJMENÍ:</label>
+                <input type="text" id="jmeno" placeholder="Jan Novák" required>
+
+                <label for="email">E-MAIL:</label>
+                <input type="email" id="email" placeholder="jan.novak@email.cz" required>
+
+                <label for="adresa">ADRESA DORUČENÍ (Ulice, město, PSČ):</label>
+                <input type="text" id="adresa" placeholder="Václavské náměstí 1, Praha 1" required>
+
+                <label for="doprava">ZPŮSOB DOPRAVY:</label>
+                <select id="doprava">
+                    <option>Zásilkovna - výdejní místo</option>
+                    <option>PPL kurýr na adresu</option>
+                    <option>Osobní odběr v Praze</option>
+                </select>
+
+                <button type="submit" class="btn-akcent">DOKONČIT OBJEDNÁVKU &rarr;</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 SKYLINE STREETWEAR // MATURITNÍ PROJEKT</p>
+        </div>
+    </footer>
+
+</body>
+</html>
