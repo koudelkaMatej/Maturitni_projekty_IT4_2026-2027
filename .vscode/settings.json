@@ -1,3 +1,8 @@
 {
+<<<<<<< HEAD
     "python-envs.defaultEnvManager": "ms-python.python:system"
 }
+=======
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe"
+}
+>>>>>>> f0196a4 (PrvniKontrolniTermin)

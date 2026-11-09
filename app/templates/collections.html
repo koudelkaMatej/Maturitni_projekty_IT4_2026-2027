@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Vzorové sestavy{% endblock %}
+{% block content %}
+<section class="wrap page-heading"><p class="eyebrow">INSPIRACE MÁ SVŮJ ZAČÁTEK</p><h1>Prostory, které dávají smysl.</h1><p class="intro">Ukázky budoucích sestav. Později si vybranou sestavu zkopírujete do svého projektu a upravíte počty i produkty.</p></section>
+<section class="wrap section collection-grid">
+  {% for number, title, description, items, tone in [('01', 'Malá kancelář', 'Základ pro čtyřčlenný tým a společná setkání.', '4 pracovní místa · stoly a židle', 'sand'), ('02', 'Kavárna na rohu', 'Útulné místo pro ranní kávu i delší rozhovor.', '12 míst k sezení · 4 stoly', 'sage'), ('03', 'Klid mezi schůzkami', 'Odpočinkový kout pro neformální setkání.', '2 křesla · odkládací stůl', 'clay')] %}
+  <article class="collection-card {{ tone }}"><span>{{ number }} / KONCEPT SESTAVY</span><div><h2>{{ title }}</h2><p>{{ description }}</p><p class="collection-detail">{{ items }}</p></div><a class="text-link" href="{{ url_for('pages.catalog') }}">Prohlédnout ukázkový nábytek →</a></article>
+  {% endfor %}
+</section>
+{% endblock %}
