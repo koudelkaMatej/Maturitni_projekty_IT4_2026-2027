@@ -4,7 +4,7 @@ import math
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.transform.rotozoom(pygame.image.load("PavelKrob/obrazky/knight.png").convert_alpha(), 0, player_size)
+        self.image = pygame.transform.rotozoom(pygame.image.load("Maturitni_projekty_IT4_2026-2027/PavelKrob/obrazky/knight.png").convert_alpha(), 0, player_size)
         self.pos = pygame.math.Vector2(player_x, player_y)
         self.speed = player_speed
     def user_input(self):
