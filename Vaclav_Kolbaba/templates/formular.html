@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CactusHub – Úprava kaktusu</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav class="container nav">
+            <a class="logo" href="{{ url_for('katalog') }}">🌵 CactusHub</a>
+            <div>
+                <a href="{{ url_for('katalog') }}">Obchod</a>
+                <a href="{{ url_for('kosik') }}">Košík</a>
+                <a href="{{ url_for('admin') }}">Administrace</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% for zprava in get_flashed_messages() %}
+            <p class="zprava">{{ zprava }}</p>
+        {% endfor %}
+        <h1>{{ 'Upravit kaktus' if product else 'Přidat kaktus' }}</h1>
+<form class="formular" method="post" enctype="multipart/form-data">
+    <label>Název
+        <input name="name" maxlength="100" value="{{ product.name if product else '' }}" required>
+    </label>
+    <label>Cena v Kč
+        <input name="price" type="number" step="0.01" min="0" value="{{ product.price if product else '' }}" required>
+    </label>
+    <label>Počet kusů na skladě
+        <input name="stock" type="number" min="0" value="{{ product.stock if product else 0 }}" required>
+    </label>
+    <label>Popis
+        <textarea name="description" rows="5">{{ product.description if product else '' }}</textarea>
+    </label>
+    <label>Fotografie kaktusu (JPG, PNG nebo WEBP, max. 5 MB)
+        <input type="file" name="image" accept="image/jpeg,image/png,image/webp">
+    </label>
+    {% if product and product.image_url %}
+        <p>Současná fotografie:</p>
+        <img class="nahled" src="{{ url_for('static', filename='uploads/' ~ product.image_url) }}" alt="Fotografie kaktusu">
+        <p>Pokud nevybereš novou, zůstane původní.</p>
+    {% endif %}
+    <button>Uložit do databáze</button>
+</form>
+    </main>
+    <footer class="container">CactusHub – školní maturitní projekt (bez skutečných plateb)</footer>
+</body>
+</html>

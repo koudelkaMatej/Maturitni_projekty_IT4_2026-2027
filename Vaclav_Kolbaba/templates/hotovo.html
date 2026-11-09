@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CactusHub – Objednávka dokončena</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav class="container nav">
+            <a class="logo" href="{{ url_for('katalog') }}">🌵 CactusHub</a>
+            <div>
+                <a href="{{ url_for('katalog') }}">Obchod</a>
+                <a href="{{ url_for('kosik') }}">Košík</a>
+                <a href="{{ url_for('admin') }}">Administrace</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% for zprava in get_flashed_messages() %}
+            <p class="zprava">{{ zprava }}</p>
+        {% endfor %}
+        <h1>Děkujeme!</h1>
+<p>Testovací objednávka číslo <strong>{{ order_id }}</strong> byla uložena do MySQL.</p>
+<p>Neproběhla žádná platba a neposílá se automatický e-mail.</p>
+<a href="{{ url_for('katalog') }}">Zpět do obchodu</a>
+    </main>
+    <footer class="container">CactusHub – školní maturitní projekt (bez skutečných plateb)</footer>
+</body>
+</html>
