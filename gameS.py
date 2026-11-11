@@ -1,6 +1,7 @@
 import pygame
 from button import *
 from settings import *
+
 from diceroll import diceroll
 from diceroll import PIP_LAYOUT
 
@@ -37,11 +38,12 @@ def get_die_rects(count):
 
 while running:
     screen.fill(BG)
+    
 
     mouse_pos = pygame.mouse.get_pos()
     draw_button(mouse_pos)
     draw_add_die_button(mouse_pos)
-
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -50,19 +52,28 @@ while running:
             if button_rect.collidepoint(event.pos) and not rolling:
                 final_values = [diceroll() for _ in range(dice_count)]
                 current_values = [diceroll() for _ in range(dice_count)]
-
+                
                 rolling = True
+                print(ExtraScore)
+                print(final_values)
+                print(Score)
+                print(Check)
                 roll_start = pygame.time.get_ticks()
                 last_flicker = roll_start
-
+                Check = 0
                 print("Rolling...")
+               
 
             if add_die_button_rect.collidepoint(event.pos) and not rolling:
-                if dice_count < MAX_DICE:
-                    dice_count += 1
-                    current_values.append(1)
-                    final_values.append(1)
-                    print(f"Dice count: {dice_count}")
+                if Score > 10:
+                    Score = Score - 10    
+                    if dice_count < MAX_DICE:
+                        dice_count += 1
+                        current_values.append(1)
+                        final_values.append(1)
+                        print(f"Dice count: {dice_count}")
+                else:
+                    continue
 
     now = pygame.time.get_ticks()
     if rolling:
@@ -73,8 +84,26 @@ while running:
         else:
             current_values = list(final_values)
             rolling = False
-            print(f"Result: {final_values}")
-            Score = Score + sum(final_values)
+            if final_values.count(1) == 2:
+                final_values = [d for d in final_values if d != 1]
+                ExtraScore = 10
+            elif final_values.count(2) == 2:
+                final_values = [d for d in final_values if d != 2]
+                ExtraScore = 4
+            elif final_values.count(3) == 2:
+                final_values = [d for d in final_values if d != 3]
+                ExtraScore = 9
+            elif final_values.count(4) == 2:
+                final_values = [d for d in final_values if d != 4]
+                ExtraScore = 16
+            elif final_values.count(5) == 2:
+                final_values = [d for d in final_values if d != 5]
+                ExtraScore = 25
+            if final_values.count(6) == 2:
+                final_values = [d for d in final_values if d != 6]
+                ExtraScore = 36
+        
+            Score = Score + sum(final_values) + ExtraScore
             print(f"Skóre: {Score}")
 
     for rect, value in zip(get_die_rects(dice_count), current_values):

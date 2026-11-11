@@ -1,8 +1,8 @@
 import pygame
 
-USER = "?"
-HOST = "?"
-PASSWORD = "?"
+USER = "student12"
+HOST = "vyuka12"
+PASSWORD = "spsnet"
 DATABASE = "http://dbs.spskladno.cz/myadmin/"
 
 
@@ -56,7 +56,9 @@ rolling = False
 roll_start = 0
 last_flicker = 0
 Score = 0
-dice_count = 1
+Check = 0
+ExtraScore = 0
+dice_count = 3
 current_values = [1]
 final_values = [1]
 
